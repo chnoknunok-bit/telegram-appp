@@ -1,0 +1,76 @@
+ <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram App</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #111827;
+            color: white;
+            text-align: center;
+        }
+
+        .card {
+            max-width: 450px;
+            margin: 40px auto;
+            padding: 25px;
+            background: #1f2937;
+            border-radius: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #9ca3af;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border: 0;
+            border-radius: 12px;
+            background: #2481cc;
+            color: white;
+            font-size: 17px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h1>🚀 Telegram App</h1>
+        <p>Добро пожаловать!</p>
+
+        <button onclick="showMessage()">
+            Нажать
+        </button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+
+        tg.ready();
+        tg.expand();
+
+        function showMessage() {
+            tg.showAlert("Приложение работает!");
+        }
+    </script>
+
+</body>
+</html>
