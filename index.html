@@ -1,76 +1,611 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram App</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#071a36">
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>СК МЕТРОШОП</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-            background: #111827;
-            color: white;
-            text-align: center;
-        }
+html {
+    scroll-behavior: smooth;
+}
 
-        .card {
-            max-width: 450px;
-            margin: 40px auto;
-            padding: 25px;
-            background: #1f2937;
-            border-radius: 20px;
-        }
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fff;
+    background:
+        radial-gradient(
+            circle at 50% -10%,
+            #1454a8 0,
+            #0a2852 28%,
+            transparent 52%
+        ),
+        linear-gradient(
+            180deg,
+            #06142b 0%,
+            #030b18 100%
+        );
+    min-height: 100vh;
+}
 
-        h1 {
-            margin-bottom: 10px;
-        }
+.container {
+    width: min(1100px, 92%);
+    margin: auto;
+}
 
-        p {
-            color: #9ca3af;
-        }
+/* ШАПКА */
 
-        button {
-            width: 100%;
-            padding: 15px;
-            margin-top: 20px;
-            border: 0;
-            border-radius: 12px;
-            background: #2481cc;
-            color: white;
-            font-size: 17px;
-        }
-    </style>
+header {
+    padding: 22px 0 14px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(3, 11, 24, 0.82);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(71, 157, 255, 0.16);
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.logo span {
+    color: #35a7ff;
+}
+
+.badge {
+    padding: 8px 12px;
+    border: 1px solid #1675d1;
+    border-radius: 999px;
+    color: #8dceff;
+    background: rgba(19, 105, 190, 0.12);
+    font-size: 12px;
+}
+
+/* ГЛАВНЫЙ ЭКРАН */
+
+.hero {
+    padding: 54px 0 30px;
+    text-align: center;
+}
+
+.hero .mini {
+    color: #48b2ff;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.hero h1 {
+    font-size: clamp(38px, 8vw, 76px);
+    margin: 12px 0 8px;
+    line-height: 0.95;
+}
+
+.hero h1 span {
+    color: #36a9ff;
+    text-shadow: 0 0 30px rgba(54, 169, 255, 0.35);
+}
+
+.hero p {
+    max-width: 650px;
+    margin: 18px auto;
+    color: #a9bfd9;
+    line-height: 1.6;
+}
+
+.hero-btn {
+    display: inline-block;
+    text-decoration: none;
+    color: #fff;
+    background: linear-gradient(
+        135deg,
+        #168fff,
+        #0756b8
+    );
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-weight: 800;
+    box-shadow: 0 10px 35px rgba(0, 110, 255, 0.22);
+}
+
+/* ЗАГОЛОВОК */
+
+.section-title {
+    margin: 30px 0 16px;
+    font-size: 25px;
+}
+
+/* КАРТОЧКИ */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(230px, 1fr)
+    );
+    gap: 16px;
+}
+
+.card {
+    position: relative;
+    overflow: hidden;
+    min-height: 245px;
+    padding: 20px;
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(12, 45, 87, 0.95),
+            rgba(5, 19, 39, 0.98)
+        );
+
+    border: 1px solid rgba(61, 160, 255, 0.22);
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.22);
+
+    transition:
+        0.2s transform,
+        0.2s border-color;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(61, 177, 255, 0.6);
+}
+
+/* КАРТИНКА */
+
+.visual {
+    height: 92px;
+    border-radius: 14px;
+    margin-bottom: 17px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle,
+            #167ed6 0,
+            rgba(14, 77, 145, 0.45) 38%,
+            transparent 70%
+        ),
+        linear-gradient(
+            135deg,
+            #0a315f,
+            #06172e
+        );
+
+    border: 1px solid rgba(67, 177, 255, 0.2);
+
+    font-size: 42px;
+}
+
+.card h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+.card p {
+    margin: 0 0 18px;
+    color: #91aac6;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.price {
+    font-weight: 900;
+    color: #42b0ff;
+    font-size: 17px;
+    margin-bottom: 13px;
+}
+
+/* КНОПКА */
+
+.order {
+    width: 100%;
+    border: 0;
+    border-radius: 10px;
+    padding: 12px;
+
+    color: #fff;
+    background: #0c6dcc;
+
+    font-weight: 800;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.order:hover {
+    background: #1685ec;
+}
+
+/* ИНФОРМАЦИЯ */
+
+.info {
+    margin: 34px 0;
+    padding: 20p
+ x;
+    border-radius: 18px;
+
+    background: rgba(7, 29, 58, 0.8);
+    border: 1px solid rgba(61, 160, 255, 0.18);
+}
+
+.info h2 {
+    margin-top: 0;
+}
+
+.info p {
+    color: #9eb5cf;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+/* ФУТЕР */
+
+footer {
+    text-align: center;
+    color: #617b99;
+    padding: 28px 0 35px;
+    font-size: 12px;
+}
+
+/* ТЕЛЕФОН */
+
+max-width: 520px {
+
+    header {
+        position: static;
+    }
+
+    .hero {
+        padding-top: 38px;
+    }
+
+    .card {
+        min-height: 220px;
+    }
+}
+</style>
 </head>
 
 <body>
 
-    <div class="card">
-        <h1>🚀 Telegram App</h1>
-        <p>Добро пожаловать!</p>
+<!-- ШАПКА -->
 
-        <button onclick="showMessage()">
-            Нажать
-        </button>
+<header>
+    <div class="container nav">
+
+        <div class="logo">
+            СК <span>МЕТРОШОП</span>
+        </div>
+
+        <div class="badge">
+            METRO ROYALE
+        </div>
+
+    </div>
+</header>
+
+<main class="container">
+
+<!-- ГЛАВНЫЙ ЭКРАН -->
+
+<section class="hero">
+
+    <div class="mini">
+        Официальная витрина
     </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
+    <h1>
+        СК <span>МЕТРОШОП</span>
+    </h1>
 
-        tg.ready();
-        tg.expand();
+    <p>
+        Наборы, экипировка и сопровождение
+        для Metro Royale.
+        Выбери нужную категорию и оформи заказ.
+    </p>
 
-        function showMessage() {
-            tg.showAlert("Приложение работает!");
-        }
-    </script>
+    <a
+        class="hero-btn"
+        href="#catalog"
+    >
+        Смотреть каталог
+    </a>
+
+</section>
+
+<!-- КАТАЛОГ -->
+
+<section id="catalog">
+
+    <h2 class="section-title">
+        📦 Каталог
+    </h2>
+
+    <div class="grid">
+
+        <!-- ФУЛЛ 6 + МК -->
+
+        <article class="card">
+
+            <div class="visual">
+                🛡️
+            </div>
+
+            <h3>
+                Набор Фулл 6 + МК
+            </h3>
+
+            <p>
+                Комплект с экипировкой
+                для обвесов.
+            </p>
+
+            <div class="price">
+                Цена уточняется
+            </div>
+
+            <button
+                class="order"
+                onclick="order('Набор Фулл 6 + МК вк на обвесах')"
+            >
+                Заказать
+            </button>
+
+        </article>
+
+        <!-- ФУЛЛ 6 -->
+
+        <article class="card">
+
+            <div class="visual">
+                🎒
+            </div>
+
+            <h3>
+                Набор Фулл 6
+            </h3>
+
+            <p>
+                Готовый комплект
+                для Metro Royale.
+            </p>
+
+            <div class="price">
+                Цена уточняется
+            </div>
+
+            <button
+                class="order"
+                onclick="order('Набор фулл 6')"
+            >
+                Заказать
+            </button>
+
+        </article>
+
+        <!-- МК -->
+
+        <article class="card">
+
+            <div class="visual">
+                📦
+            </div>
+
+            <h3>
+                Оружие МК вк
+            </h3>
+
+            <p>
+                Раздел товара из каталога.
+                Детали уточняются при заказе.
+            </p>
+
+            <div class="price">
+                Цена уточняется
+            </div>
+
+            <button
+                class="order"
+                onclick="order('Оружие МК вк')"
+            >
+                Заказать
+            </button>
+
+        </article>
+
+        <!-- 7КК -->
+
+        <article class="card">
+
+            <div class="visual">
+                🤝
+            </div>
+
+            <h3>
+                Сопровождение 7кк + вещи
+            </h3>
+
+            <p>
+                Сопровождение в Metro Royale
+                с дополнительными вещами.
+            </p>
+
+            <div class="price">
+                Цена уточняется
+            </div>
+
+            <button
+                class="order"
+                onclick="order('Сопровождение 7кк + вещи')"
+            >
+                Заказать
+            </button>
+
+        </article>
+
+        <!-- 15КК -->
+
+        <article class="card">
+
+            <div class="visual">
+                🤝
+            </div>
+
+            <h3>
+                Сопровождение 15кк + вещи
+            </h3>
+
+            <p>
+                Сопровождение
+                с увеличенным комплектом.
+            </p>
+
+            <div class="price">
+                Цена уточняется
+            </div>
+
+            <button
+                class="order"
+                onclick="order('Сопровождение 15кк + вещи')"
+            >
+                Заказать
+            </button>
+
+        </article>
+
+        <!-- 20КК -->
+
+        <article class="card">
+
+            <div class="visual">
+                🤝
+            </div>
+
+            <h3>
+                Сопровождение 20кк + вещи
+            </h3>
+
+            <p>
+                Расширенный вариант
+                сопровождения.
+            </p>
+
+            <div class="price">
+                Цена уточняется
+            </div>
+
+            <button
+                class="order"
+                onclick="order('Сопровождение 20кк + вещи')"
+            >
+                Заказать
+            </button>
+
+        </article>
+
+        <!-- 25КК -->
+
+        <article class="card">
+
+            <div class="visual">
+                🤝
+            </div>
+
+            <h3>
+                Сопровождение 25кк + вещи
+            </h3>
+
+            <p>
+                Максимальный вариант
+                сопровождения.
+            </p>
+
+            <div class="price">
+                Цена уточняется
+            </div>
+
+            <button
+                class="order"
+                onclick="order('Сопровождение 25кк + вещи')"
+            >
+                Заказать
+            </button>
+
+        </article>
+
+    </div>
+
+</section>
+
+<!-- ИНФОРМАЦИЯ -->
+
+<section class="info">
+
+    <h2>
+        🔷 Как заказать?
+    </h2>
+
+    <p>
+        Выбери нужный товар в каталоге
+        и нажми «Заказать».
+        Сейчас кнопки работают как демонстрация —
+        после подключения Telegram можно сделать
+        автоматическую отправку заказа
+        в нужный чат.
+    </p>
+
+</section>
+
+</main>
+
+<!-- ФУТЕР -->
+
+<footer>
+
+    СК МЕТРОШОП • Metro Royale
+
+</footer>
+
+<!-- JAVASCRIPT -->
+
+<script>
+
+function order(item) {
+
+    alert(
+        "Вы выбрали: " +
+        item +
+        "\n\nTelegram-заказ можно подключить следующим шагом."
+    );
+
+}
+
+</script>
 
 </body>
 </html>
