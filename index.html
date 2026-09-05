@@ -606,6 +606,76 @@ function order(item) {
 }
 
 </script>
+<!-- ОКНО ЗАКАЗА -->
+<div class="modal-bg" id="orderModal">
 
+    <div class="modal">
+
+        <div id="orderForm">
+
+            <h2>🛒 Оформление заказа</h2>
+
+            <div class="modal-product" id="selectedProduct">
+                Товар
+            </div>
+
+            <label for="gameId">
+                🎮 Введите ваш игровой ID
+            </label>
+
+            <input
+                id="gameId"
+                type="text"
+                inputmode="numeric"
+                maxlength="30"
+                placeholder="Введите игровой ID"
+            >
+
+            <div class="error" id="idError">
+                Введите игровой ID
+            </div>
+
+            <div class="modal-actions">
+
+                <button
+                    class="close-btn"
+                    onclick="closeOrder()"
+                >
+                    Отмена
+                </button>
+
+                <button
+                    class="send-btn"
+                    onclick="submitOrder()"
+                >
+                    Отправить заявку
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="success" id="orderSuccess">
+
+            <div style="font-size:42px">✅</div>
+
+            <h2>Заявка принята!</h2>
+
+            <p>
+                Ваша заявка отправлена.
+            </p>
+
+            <button
+                class="send-btn"
+                onclick="closeOrder()"
+            >
+                Закрыть
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 </body>
 </html>
