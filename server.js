@@ -2,8 +2,20 @@ const express = require("express");
 const crypto = require("crypto");
 
 const app = express();
-app.use(express.json());
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
+    }
+
+    next();
+});
+
+app.use(express.json());
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const STAFF_CHAT_ID = process.env.STAFF_CHAT_ID;
 
