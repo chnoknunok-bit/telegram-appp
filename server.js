@@ -849,13 +849,29 @@ async function startBot() {
                 ]
             });
 
-            if (!result.ok) {
-                console.error("Telegram getUpdates:", result);
-await new Promise(resolve =>
-    setTimeout(resolve, 3000)
-);
+          if (!result.ok) {
+    console.error("Telegram getUpdates:", result);
 
+    await new Promise(resolve =>
+        setTimeout(resolve, 3000)
+    );
+
+    continue;
+}
+
+for (const update of result.result) {
+    offset = update.update_id + 1;
+
+    if (update.callback_query) {
+        try {
+            await handleCallback(update.callback_query);
         } catch (error) {
+            console.error("Ошибка callback:", error);
+        }
+    }
+}
+
+} catch (error) {
             console.error("Ошибка Telegram:", error);
 
             await new Promise(resolve =>
