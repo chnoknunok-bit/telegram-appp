@@ -3,9 +3,7 @@
 
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#06172e">
 
 <title>СК МЕТРОШОП</title>
@@ -47,6 +45,8 @@ body {
     width: min(1100px, 92%);
     margin: auto;
 }
+
+/* HEADER */
 
 header {
     position: sticky;
@@ -135,8 +135,7 @@ header {
 
 .menu {
     display: grid;
-    grid-template-columns:
-        repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr);
 
     gap: 10px;
 
@@ -157,6 +156,12 @@ header {
     font-weight: 800;
 
     cursor: pointer;
+
+    transition: .2s;
+}
+
+.menu button:hover {
+    border-color: #168fff;
 }
 
 .menu button.active {
@@ -285,6 +290,12 @@ header {
     font-weight: 800;
 
     cursor: pointer;
+
+    transition: .2s;
+}
+
+.order:hover {
+    background: #168fff;
 }
 
 .order:disabled {
@@ -347,6 +358,12 @@ header {
     font-weight: 900;
 
     cursor: pointer;
+
+    transition: .2s;
+}
+
+.action-button:hover {
+    filter: brightness(1.12);
 }
 
 /* TOP UP */
@@ -380,10 +397,13 @@ header {
     text-align: center;
 
     font-weight: 900;
+
+    transition: .2s;
 }
 
 .topup:hover {
     border-color: #168fff;
+    background: rgba(12,65,120,.8);
 }
 
 .topup small {
@@ -486,6 +506,9 @@ header {
 
     border:
         1px solid rgba(61,160,255,.3);
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.45);
 }
 
 .modal-box h2 {
@@ -509,6 +532,10 @@ header {
     color: #fff;
 
     background: #06172e;
+}
+
+.input:focus {
+    border-color: #168fff;
 }
 
 .modal-buttons {
@@ -541,6 +568,12 @@ header {
     background: #0c6dcc;
 }
 
+.confirm:hover {
+    background: #168fff;
+}
+
+/* FOOTER */
+
 footer {
     text-align: center;
 
@@ -548,6 +581,8 @@ footer {
 
     padding: 35px 0;
 }
+
+/* MOBILE */
 
 max-width:520px {
 
@@ -558,6 +593,27 @@ max-width:520px {
 
     .menu button {
         font-size: 12px;
+    }
+
+    .logo {
+        font-size: 17px;
+    }
+
+    .balance {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+
+    .hero {
+        padding-top: 30px;
+    }
+
+    .modal {
+        padding: 12px;
+    }
+
+    .modal-box {
+        padding: 20px;
     }
 
 }
@@ -614,7 +670,7 @@ max-width:520px {
     </button>
 
     <button
-        onclick="showSection('profile',this)">
+        onclick="showSection('profile', this)">
         👤 Профиль
     </button>
 
@@ -631,14 +687,19 @@ max-width:520px {
     id="shop"
     class="section active">
 
-<h2 class="section-title">
-    📦 Каталог
-</h2>
+    <h2 class="section-title">
+        📦 Каталог
+    </h2>
 
-<div
-    id="products"
-    class="grid">
-</div>
+    <div
+        id="products"
+        class="grid">
+
+        <div class="empty">
+            Загрузка товаров...
+        </div>
+
+    </div>
 
 </section>
 
@@ -648,49 +709,51 @@ max-width:520px {
     id="profile"
     class="section">
 
-<div class="profile-card">
+    <div class="profile-card">
 
-    <div
-        id="profileName"
-        class="profile-name">
-        Загрузка...
+        <div
+            id="profileName"
+            class="profile-name">
+            Загрузка...
+        </div>
+
+        <div
+            id="profileBalance"
+            class="big-balance">
+            0 PT
+        </div>
+
+        <button
+            class="action-button"
+            onclick="showTopup()">
+
+            💳 Пополнить POINT через СБП
+
+        </button>
+
     </div>
 
-    <div
-        id="profileBalance"
-        class="big-balance">
-        0 PT
+    
+
+    <div class="card">
+
+        <h3>
+            💰 Что такое POINT?
+        </h3>
+
+        <p>
+            POINT — внутренняя валюта
+            СК МЕТРОШОП.
+        </p>
+
+        <p>
+            После подключения оплаты
+            через СБП пополнение будет
+            автоматически зачисляться
+            на баланс.
+        </p>
+
     </div>
-
-    <button
-        class="action-button"
-        onclick="showTopup()">
-
-        💳 Пополнить POINT через СБП
-
-    </button>
-
-</div>
-
-<div class="card">
-
-    <h3>
-        💰 Что такое POINT?
-    </h3>
-
-    <p>
-        POINT — внутренняя валюта
-        СК МЕТРОШОП.
-    </p>
-
-    <p>
-        После подключения оплаты
-        через СБП пополнение будет
-        автоматически зачисляться
-        на баланс.
-    </p>
-
-</div>
 
 </section>
 
@@ -700,17 +763,17 @@ max-width:520px {
     id="history"
     class="section">
 
-<h2 class="section-title">
-    📋 История операций
-</h2>
+    <h2 class="section-title">
+        📋 История операций
+    </h2>
 
-<div id="historyList">
+    <div id="historyList">
 
-    <div class="empty">
-        Загрузка...
+        <div class="empty">
+            Загрузка...
+        </div>
+
     </div>
-
-</div>
 
 </section>
 
@@ -726,50 +789,52 @@ max-width:520px {
     id="buyModal"
     class="modal">
 
-<div class="modal-box">
+    <div class="modal-box">
 
-    <h2>
-        🛒 Оформление заказа
-    </h2>
+        <h2>
+            🛒 Оформление заказа
+        </h2>
 
-    <p id="buyProduct"></p>
+        <p id="buyProduct"></p>
 
-    <p>
-        Цена:
-        <b id="buyPrice"></b>
-    </p>
+        <p>
+            Цена:
+            <b id="buyPrice"></b>
+        </p>
 
-    <label>
-        🎮 Игровой ID
-    </label>
+        <label>
+            🎮 Игровой ID
+        </label>
 
-    <input
-        id="gameId"
-        class="input"
-        type="text"
-        placeholder="Введите Game ID">
+        <input
+            id="gameId"
+            class="input"
+            type="text"
+            inputmode="numeric"
+            placeholder="Введите Game ID">
 
-    <div class="modal-buttons">
+        <div class="modal-buttons">
 
-        <button
-            class="cancel"
-            onclick="closeBuy()">
+            <button
+                class="cancel"
+                onclick="closeBuy()">
 
-            Отмена
+                Отмена
 
-        </button>
+            </button>
 
-        <button
-            class="confirm"
-            onclick="confirmBuy()">
+            <button
+                id="confirmBuyButton"
+                class="confirm"
+                onclick="confirmBuy()">
 
-            Купить
+                Купить
 
-        </button>
+            </button>
+
+        </div>
 
     </div>
-
-</div>
 
 </div>
 
@@ -779,79 +844,78 @@ max-width:520px {
     id="topupModal"
     class="modal">
 
-<div class="modal-box">
+    <div class="modal-box">
 
-    <h2>
-        💳 Пополнение POINT
-    </h2>
+        <h2>
+            💳 Пополнение POINT
+        </h2>
 
-    <p>
-        Выбери сумму:
-    </p>
+        <p>
+            Выбери сумму:
+        </p>
 
-    <div class="topup-grid">
+        <div class="topup-grid">
+
+            <button
+                class="topup"
+                onclick="createTopup(100)">
+
+                100 PT
+
+                <small>
+                    100 ₽
+                </small>
+
+            </button>
+
+            <button
+                class="topup"
+                onclick="createTopup(500)">
+
+                500 PT
+
+                <small>
+                    500 ₽</small>
+
+            </button>
+
+            <button
+                class="topup"
+                onclick="createTopup(1000)">
+
+                1 000 PT
+
+                <small>
+                    1 000 ₽
+                </small>
+
+            </button>
+
+            <button
+                class="topup"
+                onclick="createTopup(2500)">
+
+                2 500 PT
+
+                <small>
+                    2 500 ₽
+                </small>
+
+            </button>
+
+        </div>
+
+        
 
         <button
-            class="topup"
-            onclick="createTopup(100)">
+            class="action-button"
+            onclick="closeTopup()">
 
-            100 PT
-
-            <small>
-                100 ₽
-            </small>
-
-        </button>
-
-        <button
-            class="topup"
-            onclick="createTopup(500)">
-
-            500 PT
-
-            <small>
-                500 ₽
-            </small>
-
-        </button>
-
-        <button
-            class="topup"
-            onclick="createTopup(1000)">
-
-            1 000 PT
-
-            <small>
-                1 000 ₽
-            </small>
-
-        </button>
-
-        <button
-            class="topup"
-            onclick="createTopup(2500)">
-
-            2 500 PT
-
-            <small>
-                2 500 ₽
-            </small>
+            Закрыть
 
         </button>
 
     </div>
-
-    
-
-    <button
-        class="action-button"
-        onclick="closeTopup()">
-
-        Закрыть
-
-    </button>
-
-</div>
 
 </div>
 
@@ -868,12 +932,22 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
+/*
+==================================================
+                    API
+==================================================
+*/
+
 const API =
     "https://telegram-appp.onrender.com";
 
 let currentUser = null;
+
 let selectedProduct = null;
+
 let selectedPrice = 0;
+
+let isBuying = false;
 
 /*
 ==================================================
@@ -885,7 +959,7 @@ const initData = tg.initData;
 
 /*
 ==================================================
-                 API
+                 API REQUEST
 ==================================================
 */
 
@@ -894,24 +968,91 @@ async function api(
     body = {}
 ) {
 
-    const response = await fetch(
-        API + endpoint,
-        {
-            method: "POST",
+    const response =
+        await fetch(
+            API + endpoint,
+            {
+                method: "POST",
 
-            headers: {
-                "Content-Type":
-                    "application/json"
-            },
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
 
-            body: JSON.stringify({
-                ...body,
-                initData
-            })
-        }
-    );
+                body: JSON.stringify({
+                    ...body,
+                    initData
+                })
+            }
+        );
+
+    if (!response.ok) {
+        throw new Error(
+            "HTTP " + response.status
+        );
+    }
 
     return await response.json();
+}
+
+/*
+==================================================
+             ПЕРЕКЛЮЧЕНИЕ РАЗДЕЛОВ
+==================================================
+*/
+
+function showSection(
+    sectionId,
+    button
+) {
+
+    document
+        .querySelectorAll(".section")
+        .forEach(section => {
+
+            section.classList.remove(
+                "active"
+            );
+
+        });
+
+    document
+        .querySelectorAll(".menu button")
+        .forEach(btn => {
+
+            btn.classList.remove(
+                "active"
+            );
+
+        });
+
+    const section =
+        document.getElementById(
+            sectionId
+        );
+
+    if (section) {
+
+        section.classList.add(
+            "active"
+        );
+
+    }
+
+    if (button) {
+
+        button.classList.add(
+            "active"
+        );
+
+    }
+
+    if (sectionId === "history") {
+
+        loadHistory();
+
+    }
+
 }
 
 /*
@@ -925,34 +1066,56 @@ async function loadProfile() {
     try {
 
         const result =
-            await api("/api/profile");
+            await api(
+                "/api/profile"
+            );
 
         if (!result.ok) {
 
-            alert(result.error);
+            alert(
+                result.error ||
+                "Не удалось загрузить профиль"
+            );
 
             return;
         }
 
-        currentUser = result.user;
+        currentUser =
+            result.user;
 
         updateBalance();
+
+        const profileName =
+            document.getElementById(
+                "profileName"
+            );
+
+        profileName.textContent =
+            currentUser.username
+                ? "@" + currentUser.username
+                : (
+                    currentUser.firstName ||
+                    "Пользователь"
+                );
+
+    } catch (error) {
+
+        console.error(
+            "Ошибка профиля:",
+            error
+        );
 
         document.getElementById(
             "profileName"
         ).textContent =
-            currentUser.username
-                ? "@" + currentUser.username
-                : currentUser.firstName;
-
-    } catch (error) {
-
-        console.error(error);
+            "Ошибка загрузки";
 
         alert(
             "Не удалось загрузить профиль"
         );
+
     }
+
 }
 
 /*
@@ -968,19 +1131,24 @@ function updateBalance() {
     }
 
     const balance =
-        Number(currentUser.balance || 0);
+        Number(
+            currentUser.balance || 0
+        );
 
     document.getElementById(
         "headerBalance"
     ).textContent =
-        balance.toLocaleString("ru-RU")
-        + " PT";
+        balance.toLocaleString(
+            "ru-RU"
+        ) + " PT";
 
     document.getElementById(
         "profileBalance"
     ).textContent =
-        balance.toLocaleString("ru-RU")
-        + " PT";
+        balance.toLocaleString(
+            "ru-RU"
+        ) + " PT";
+
 }
 
 /*
@@ -991,6 +1159,11 @@ function updateBalance() {
 
 async function loadProducts() {
 
+    const container =
+        document.getElementById(
+            "products"
+        );
+
     try {
 
         const response =
@@ -998,19 +1171,44 @@ async function loadProducts() {
                 API + "/api/products"
             );
 
+        if (!response.ok) {
+
+            throw new Error(
+                "HTTP " +
+                response.status
+            );
+
+        }
+
         const result =
             await response.json();
 
         if (!result.ok) {
+
+            container.innerHTML = `
+                <div class="empty">
+                    Не удалось загрузить товары
+                </div>
+            `;
+
             return;
         }
 
-        const container =
-            document.getElementById(
-                "products"
-            );
-
         container.innerHTML = "";
+
+        if (
+            !result.products ||
+            result.products.length === 0
+        ) {
+
+            container.innerHTML = `
+                <div class="empty">
+                    Товаров пока нет
+                </div>
+            `;
+
+            return;
+        }
 
         for (
             const product of result.products
@@ -1021,21 +1219,45 @@ async function loadProducts() {
                     "article"
                 );
 
-            card.className = "card";
+            card.className =
+                "card";
 
-            let icon = "📦";
+            let icon =
+                "📦";
 
             if (product.escort) {
-                icon = "🤝";
+
+                icon =
+                    "🤝";
+
             }
 
             if (
+                product.name &&
                 product.name
                     .toLowerCase()
                     .includes("фулл")
             ) {
-                icon = "🛡️";
+
+                icon =
+                    "🛡️";
+
             }
+
+            const price =
+                Number(
+                    product.price || 0
+                );
+
+            const productName =
+                String(
+                    product.name || "Товар"
+                );
+
+            const description =
+                product.escort
+                    ? "Сопровождение в Metro Royale."
+                    : "Товар из каталога СК МЕТРОШОП.";
 
             card.innerHTML = `
 
@@ -1044,21 +1266,18 @@ async function loadProducts() {
                 </div>
 
                 <h3>
-                    ${escapeHtml(product.name)}
+                    ${escapeHtml(productName)}
                 </h3>
 
                 <p>
-                    ${product.escort
-                        ? "Сопровождение в Metro Royale."
-                        : "Товар из каталога СК МЕТРОШОП."
-                    }
+                    ${escapeHtml(description)}
                 </p>
 
                 <div class="price">
 
                     ${
-                        product.price > 0
-                            ? product.price.toLocaleString("ru-RU")
+                        price > 0
+                            ? price.toLocaleString("ru-RU")
                               + " PT"
                             : "Цена уточняется"
                     }
@@ -1068,253 +1287,22 @@ async function loadProducts() {
                 <button
                     class="order"
                     ${
-                        product.price <= 0
+                        price <= 0
                             ? "disabled"
                             : ""
-                    }
-                    onclick='openBuy(
-                        ${JSON.stringify(product.name)},
-                        ${product.price}
-                    )'>
+                    }>
 
                     ${
-                        product.price > 0
+                        price > 0
                             ? "Купить за POINT"
                             : "Цена уточняется"
                     }
 
-                </button>`;
+                </button>
 
-            container.appendChild(card);
-        }
+            `;
 
-    } catch (error) {
-
-        console.error(
-            "Ошибка товаров:",
-            error
-        );
-
-    }
-
-}
-
-/*
-==================================================
-               ПОКУПКА
-==================================================
-*/
-
-function openBuy(
-    product,
-    price
-) {
-
-    selectedProduct = product;
-    selectedPrice = price;
-
-    document.getElementById(
-        "buyProduct"
-    ).textContent =
-        product;
-
-    document.getElementById(
-        "buyPrice"
-    ).textContent =
-        price.toLocaleString("ru-RU")
-        + " PT";
-
-    document.getElementById(
-        "gameId"
-    ).value = "";
-
-    document.getElementById(
-        "buyModal"
-    ).classList.add("active");
-}
-
-function closeBuy() {
-
-    document.getElementById(
-        "buyModal"
-    ).classList.remove("active");
-}
-
-async function confirmBuy() {
-
-    const gameId =
-        document.getElementById(
-            "gameId"
-        ).value.trim();
-
-    if (!gameId) {
-
-        alert(
-            "Введите игровой ID"
-        );
-
-        return;
-    }
-
-    if (
-        !currentUser ||
-        currentUser.balance < selectedPrice
-    ) {
-
-        alert(
-            "Недостаточно POINT"
-        );
-
-        return;
-    }
-
-    try {
-
-        const result =
-            await api(
-                "/api/buy",
-                {
-                    product:
-                        selectedProduct,
-
-                    gameId
-                }
-            );
-
-        if (!result.ok) {
-
-            alert(
-                "❌ " + result.error
-            );
-
-            return;
-        }
-
-        currentUser.balance =
-            result.balance;
-
-        updateBalance();
-
-        closeBuy();
-
-        alert(
-            `✅ Заказ #${result.orderId} создан!\n\n` +
-            `Списано: ${selectedPrice} PT`
-        );
-
-        loadHistory();
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            "Ошибка оформления заказа"
-        );
-    }
-}
-
-/*
-==================================================
-                ПОПОЛНЕНИЕ
-==================================================
-*/
-
-function showTopup() {
-
-    document.getElementById(
-        "topupModal"
-    ).classList.add("active");
-}
-
-function closeTopup() {
-
-    document.getElementById(
-        "topupModal"
-    ).classList.remove("active");
-}
-
-async function createTopup(amount) {
-
-    try {
-
-        const result =
-            await api(
-                "/api/topup/create",
-                {
-                    amount
-                }
-            );
-
-        if (!result.ok) {
-
-            alert(
-                "❌ " + result.error
-            );
-
-            return;
-        }
-
-        /*
-        Пока настоящая ссылка СБП
-        не подключена.
-        */
-
-        if (result.paymentUrl) {
-
-            window.location.href =
-                result.paymentUrl;
-
-        } else {
-
-            alert(
-                "⚠️ СБП пока не подключено.\n\n" +
-                "Сейчас создана заготовка платежа " +
-                result.paymentId +
-                ".\n\n" +
-                "После подключения платёжного провайдера " +
-                "здесь откроется настоящая оплата СБП."
-            );
-
-        }
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            "Ошибка создания платежа"
-        );
-    }
-}
-
-/*
-==================================================
-                 ИСТОРИЯ
-==================================================
-*/
-
-async function loadHistory() {
-
-    try {
-
-        const result =
-            await api(
-                "/api/history"
-            );
-
-        if (!result.ok) {
-            return;
-        }
-
-        const container =
-            document.getElementById(
-                "historyList"
-            );
-
-        if (
-            !result.history ||
-            result.history.length === 0
-        ) {
-
-            container.innerHTML = `
+            const orderButton =
+                card.querySelector(
+                    ".order"
+                );
