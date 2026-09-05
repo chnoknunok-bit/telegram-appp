@@ -36,21 +36,35 @@ function checkTelegramData(initData) {
     const user = JSON.parse(params.get("user") || "{}");
     return user;
 }
-
 async function telegram(method, data) {
-    const response = await fetch(
-        `https://api.telegram.org/bot${BOT_TOKEN}/${method}`,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        }
-    );
+    try {
+        const response = await fetch(
+            `https://api.telegram.org/bot${BOT_TOKEN}/${method}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }
+        );
 
-    return response.json();
+        const text = await response.text();
+
+        console.log("Telegram API:", method, response.status, text);
+
+        return JSON.parse(text);
+
+    } catch (error) {
+        console.error("ОШИБКА TELEGRAM API:", error);
+
+        return {
+            ok: false,
+            error: error.message
+        };
+    }
 }
+
 
 app.get("/", (req, res) => {
     res.send("СК МЕТРОШОП сервер работает ✅");
