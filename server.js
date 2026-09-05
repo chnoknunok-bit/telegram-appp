@@ -851,15 +851,33 @@ async function startBot() {
 
             if (!result.ok) {
                 console.error("Telegram getUpdates:", result);
+await new Promise(resolve =>
+    setTimeout(resolve, 3000)
+);
 
-                await new Promise(resolve =>
-                    setTimeout(resolve, 3000)
-                );
+        } catch (error) {
+            console.error("Ошибка Telegram:", error);
 
-                continue;
-            }
+            await new Promise(resolve =>
+                setTimeout(resolve, 3000)
+            );
+        }
+    }
+}
 
-            for (const update of result.result) {
-                offset = update.update_id + 1;
+/*
+==================================================
+                  ЗАПУСК СЕРВЕРА
+==================================================
+*/
 
-                if (update.callb
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 СК МЕТРОШОП запущен на порту ${PORT}`);
+    console.log(`💰 Валюта: POINT`);
+
+    if (BOT_TOKEN) {
+        startBot().catch(error => {
+            console.error("❌ Ошибка запуска бота:", error);
+        });
+    }
+});
