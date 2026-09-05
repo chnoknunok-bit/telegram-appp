@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#071a36">
@@ -592,17 +595,352 @@ max-width: 520px {
 </footer>
 
 <!-- JAVASCRIPT -->
+Заказать
+            </button>
+
+        </article>
+
+        <!-- 20КК -->
+
+        <article class="card">
+
+            <div class="visual">
+                🤝
+            </div>
+
+            <h3>
+                Сопровождение 20кк + вещи
+            </h3>
+
+            <p>
+                Расширенный вариант
+                сопровождения.
+            </p>
+
+            <div class="price">
+                Цена уточняется
+            </div>
+
+            <button
+                class="order"
+                onclick="order('Сопровождение 20кк + вещи')"
+            >
+                Заказать
+            </button>
+
+        </article>
+
+        <!-- 25КК -->
+
+        <article class="card">
+
+            <div class="visual">
+                🤝
+            </div>
+
+            <h3>
+                Сопровождение 25кк + вещи
+            </h3>
+
+            <p>
+                Максимальный вариант
+                сопровождения.
+            </p>
+
+            <div class="price">
+                Цена уточняется
+            </div>
+
+            <button
+                class="order"
+                onclick="order('Сопровождение 25кк + вещи')"
+            >
+                Заказать
+            </button>
+
+        </article>
+
+    </div>
+
+</section>
+
+<!-- ИНФОРМАЦИЯ -->
+
+<section class="info">
+
+    <h2>
+        🔷 Как заказать?
+    </h2>
+
+    <p>
+        Выбери нужный товар в каталоге
+        и нажми «Заказать».
+        Сейчас кнопки работают как демонстрация —
+        после подключения Telegram можно сделать
+        автоматическую отправку заказа
+        в нужный чат.
+    </p>
+
+</section>
+
+</main>
+
+<!-- ФУТЕР -->
+
+<footer>
+
+    СК МЕТРОШОП • Metro Royale
+
+</footer>
+
+<!-- JAVASCRIPT -->
+<!-- JAVASCRIPT -->
 
 <script>
 
+let selectedItem = "";
+
 function order(item) {
 
-    alert(
-        "Вы выбрали: " +
-        item +
-        "\n\nTelegram-заказ можно подключить следующим шагом."
-    );
+    selectedItem = item;
 
+    document.getElementById("selectedProduct").textContent = item;
+    document.getElementById("gameId").value = "";
+    document.getElementById("idError").style.display = "none";
+
+    document.getElementById("orderForm").style.display = "block";
+    document.getElementById("orderSuccess").style.display = "none";
+    document.getElementById("orderModal").style.display = "flex";
+
+}
+
+function closeOrder() {
+
+    document.getElementById("orderModal").style.display = "none";
+
+}
+
+async function submitOrder() {
+
+    const gameId = document.getElementById("gameId").value.trim();
+    const error = document.getElementById("idError");
+
+    if (!gameId) {
+
+        error.style.display = "block";
+        return;
+
+    }
+
+    error.style.display = "none";
+
+    const button = document.querySelector("#orderForm .send-btn");
+
+    button.disabled = true;
+    button.textContent = "Отправляем...";
+
+    try {
+
+        const tg = window.Telegram.WebApp;
+
+        tg.ready();
+
+        const response = await fetch(
+            "https://telegram-appp.onrender.com/order",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    product: selectedItem,
+                    gameId: gameId,
+                    initData: tg.initData
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            throw new Error(data.error || "Ошибка");
+        }
+
+        document.getElementById("orderForm").style.display = "none";
+        document.getElementById("orderSuccess").style.display = "block";
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Не удалось отправить заявку.\n\nПопробуйте ещё раз."
+        );
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Отправить заявку";
+
+    }
+
+}
+
+</script>
+
+<!-- ОКНО ЗАКАЗА -->
+<div class="modal-bg" id="orderModal">
+
+    <div class="modal">
+
+        <div id="orderForm">
+
+            <h2>🛒 Оформление заказа</h2>
+
+            <div class="modal-product" id="selectedProduct">
+                Товар
+            </div>
+
+            <label for="gameId">
+                🎮 Введите ваш игровой ID
+            </label>
+
+            <input
+                id="gameId"
+                type="text"
+                inputmode="numeric"
+                maxlength="30"
+                placeholder="Введите игровой ID"
+            >
+
+            <div class="error" id="idError">
+                Введите игровой ID
+            </div>
+
+            <div class="modal-actions">
+
+                <button
+                    class="close-btn"
+                    onclick="closeOrder()"
+                >
+                    Отмена
+                </button>
+
+                <button
+                    class="send-btn"
+                    onclick="submitOrder()"
+                >
+                    Отправить заявку
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="success" id="orderSuccess">
+
+            <div style="font-size:42px">✅</div>
+
+            <h2>Заявка принята!</h2>
+
+            <p>
+                Ваша заявка отправлена.
+            </p>
+
+            <button
+                class="send-btn"
+                onclick="closeOrder()"
+            >
+                Закрыть
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>
+<script>
+
+let selectedItem = "";
+
+function order(item) {
+    selectedItem = item;
+
+    document.getElementById("selectedProduct").textContent = item;
+    document.getElementById("gameId").value = "";
+    document.getElementById("idError").style.display = "none";
+
+    document.getElementById("orderForm").style.display = "block";
+    document.getElementById("orderSuccess").style.display = "none";
+    document.getElementById("orderModal").style.display = "flex";
+}
+
+function closeOrder() {
+    document.getElementById("orderModal").style.display = "none";
+}
+
+async function submitOrder() {
+
+    const gameId = document.getElementById("gameId").value.trim();
+    const error = document.getElementById("idError");
+
+    if (!gameId) {
+        error.style.display = "block";
+        return;
+    }
+
+    error.style.display = "none";
+
+    const button = document.querySelector("#orderForm .send-btn");
+    button.disabled = true;
+    button.textContent = "Отправляем...";
+
+    try {
+
+        const tg = window.Telegram.WebApp;
+
+        const response = await fetch(
+            "https://telegram-appp.onrender.com/order",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    product: selectedItem,
+                    gameId: gameId,
+                    initData: tg.initData
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            throw new Error(data.error || "Ошибка");
+        }
+
+        document.getElementById("orderForm").style.display = "none";
+        document.getElementById("orderSuccess").style.display = "block";
+
+    } catch (error) {
+
+        alert(
+            "Не удалось отправить заявку.\n\nПопробуйте ещё раз."
+        );
+
+        console.error(error);
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Отправить заявку";
+
+    }
 }
 
 </script>
