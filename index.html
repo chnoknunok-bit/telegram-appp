@@ -2,9 +2,10 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
   >
 
   <title>СК МЕТРОШОП</title>
@@ -14,96 +15,52 @@
   <style>
     * {
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       margin: 0;
-      padding: 0;
-      background: #0b0b0f;
-      color: #ffffff;
+      background: #0d0d12;
+      color: white;
       font-family: Arial, sans-serif;
     }
 
     button {
-      font-family: inherit;
-    }
-
-    .app {
-      min-height: 100vh;
-      padding-bottom: 80px;
-    }
-
-    .header {
-      padding: 20px 16px 14px;
-      background: #111116;
-      border-bottom: 1px solid #24242c;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .brand {
-      font-size: 22px;
-      font-weight: 800;
-    }
-
-    .subtitle {
-      margin-top: 5px;
-      color: #858591;
-      font-size: 13px;
-    }
-
-    .balance-card {
-      margin: 16px;
-      padding: 18px;
-      border-radius: 18px;
-      background: linear-gradient(
-        135deg,
-        #171720,
-        #111117
-      );
-      border: 1px solid #292934;
-    }
-
-    .balance-title {
-      color: #8c8c98;
-      font-size: 13px;
-    }
-
-    .balance {
-      margin-top: 6px;
-      font-size: 30px;
-      font-weight: 800;
-    }
-
-    .balance span {
-      font-size: 15px;
-      color: #9c9ca8;
-      font-weight: 600;
-    }
-
-    .topup {
-      width: 100%;
-      margin-top: 14px;
-      padding: 13px;
       border: 0;
-      border-radius: 12px;
-      background: #ffffff;
-      color: #111111;
-      font-size: 15px;
-      font-weight: 700;
       cursor: pointer;
     }
 
-    .content {
-      padding: 0 16px;
+    .page {
+      display: none;
+      padding: 16px;
+      padding-bottom: 90px;
     }
 
-    .section-title {
-      margin: 20px 0 12px;
-      font-size: 18px;
-      font-weight: 800;
+    .page.active {
+      display: block;
+    }
+
+    h1 {
+      margin-top: 5px;
+      font-size: 24px;
+    }
+
+    .card {
+      background: #18181f;
+      border: 1px solid #292933;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .balance {
+      font-size: 28px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .muted {
+      color: #8c8c98;
+      font-size: 14px;
     }
 
     .products {
@@ -113,232 +70,84 @@
     }
 
     .product {
-      background: #131318;
-      border: 1px solid #272730;
-      border-radius: 16px;
+      background: #18181f;
+      border: 1px solid #292933;
+      border-radius: 15px;
       padding: 15px;
     }
 
     .product-name {
-      font-size: 15px;
-      font-weight: 700;
-      line-height: 1.35;
+      font-size: 16px;
+      font-weight: bold;
     }
 
     .product-bottom {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      margin-top: 14px;
+      align-items: center;
+      margin-top: 13px;
     }
 
-    .product-price {
-      color: #b7b7c2;
-      font-size: 13px;
+    .price {
+      color: #aaaab5;
+      font-size: 14px;
     }
 
     .buy {
-      border: 0;
+      background: white;
+      color: black;
+      padding: 10px 15px;
       border-radius: 10px;
-      padding: 10px 14px;
-      background: #ffffff;
-      color: #111111;
-      font-weight: 700;
-      cursor: pointer;
+      font-weight: bold;
     }
 
     .buy:disabled {
-      opacity: 0.45;
-      cursor: default;
-    }
-
-    .empty {
-      padding: 30px 10px;
-      text-align: center;
-      color: #777783;
-    }
-
-    .error {
-      padding: 15px;
-      border-radius: 14px;
-      background: #211418;
-      border: 1px solid #49242d;
-      color: #ff9ca8;
-      font-size: 14px;
-      line-height: 1.4;
+      opacity: .4;
     }
 
     .loading {
-      padding: 30px;
       text-align: center;
-      color: #777783;
+      padding: 30px 10px;
+      color: #888894;
     }
 
-    .screen {
-      display: none;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    .profile-card,
-    .history-item {
-      background: #131318;
-      border: 1px solid #272730;
-      border-radius: 16px;
+    .error {
+      background: #28171b;
+      border: 1px solid #5b252e;
       padding: 15px;
-      margin-bottom: 10px;
+      border-radius: 12px;
+      color: #ff9da9;
     }
 
-    .profile-name {
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .profile-username {
-      color: #858591;
-      margin-top: 5px;
-    }
-
-    .profile-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 12px 0;
-      border-bottom: 1px solid #24242c;
-    }
-
-    .profile-row:last-child {
-      border-bottom: 0;
-    }
-
-    .profile-label {
-      color: #858591;
-    }
-
-    .profile-value {
-      text-align: right;
-      font-weight: 700;
-    }
-
-    .history-description {
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .history-date {
-      margin-top: 5px;
-      color: #777783;
-      font-size: 12px;
-    }.history-amount {
-      margin-top: 10px;
-      font-weight: 800;
-    }
-
-    .plus {
-      color: #75d68b;
-    }
-
-    .minus {
-      color: #ff8585;
-    }
-
-    .modal {
-      display: none;
+    .nav {
       position: fixed;
-      inset: 0;
-      z-index: 100;
-      background: rgba(0, 0, 0, 0.75);
-      align-items: flex-end;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-box {
-      width: 100%;
-      background: #15151b;
-      border-radius: 22px 22px 0 0;
-      padding: 20px 16px 28px;
-      border-top: 1px solid #292932;
-    }
-
-    .modal-title {
-      font-size: 20px;
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
-
-    .modal-text {
-      color: #9898a3;
-      font-size: 14px;
-      line-height: 1.45;
-    }
-
-    .input {
-      width: 100%;
-      margin-top: 14px;
-      padding: 13px;
-      border-radius: 11px;
-      border: 1px solid #30303a;
-      outline: none;
-      background: #0e0e13;
-      color: #ffffff;
-      font-size: 15px;
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .modal-button {
-      flex: 1;
-      padding: 13px;
-      border: 0;
-      border-radius: 11px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .modal-button.primary {
-      background: #ffffff;
-      color: #111111;
-    }
-
-    .modal-button.secondary {
-      background: #282830;
-      color: #ffffff;
-    }
-
-    .bottom-nav {
-      position: fixed;
+      bottom: 0;
       left: 0;
       right: 0;
-      bottom: 0;
-      z-index: 20;
+
       display: flex;
-      background: #111116;
-      border-top: 1px solid #25252d;
-      padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+
+      background: #15151b;
+      border-top: 1px solid #292932;
+
+      padding: 8px;
+      padding-bottom: calc(
+        8px + env(safe-area-inset-bottom)
+      );
+
+      z-index: 100;
     }
 
-    .nav-button {
+    .nav button {
       flex: 1;
-      border: 0;
       background: transparent;
       color: #777783;
-      padding: 8px 4px;
-      cursor: pointer;
+      padding: 9px 5px;
       font-size: 12px;
     }
 
-    .nav-button.active {
-      color: #ffffff;
+    .nav button.active {
+      color: white;
     }
 
     .nav-icon {
@@ -347,332 +156,295 @@
       margin-bottom: 3px;
     }
 
-    .toast {
-      position: fixed;
-      left: 16px;
-      right: 16px;
-      bottom: 78px;
-      z-index: 200;
-      padding: 13px 15px;
-      border-radius: 12px;
-      background: #24242c;
-      color: #ffffff;
-      font-size: 14px;
+    .modal {
       display: none;
-      box-shadow: 0 8px 30px rgba(0,0,0,.35);
+
+      position: fixed;
+      inset: 0;
+
+      background: rgba(0,0,0,.75);
+
+      align-items: flex-end;
+
+      z-index: 200;
     }
 
-    .toast.show {
-      display: block;
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      background: #18181f;
+      padding: 20px;
+      border-radius: 20px 20px 0 0;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+
+      margin-top: 12px;
+
+      background: #0e0e13;
+      border: 1px solid #30303a;
+
+      color: white;
+
+      border-radius: 10px;
+
+      outline: none;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+      padding: 13px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .cancel {
+      background: #292930;
+      color: white;
+    }
+
+    .confirm {
+      background: white;
+      color: black;
+    }
+
+    .history-item {
+      background: #18181f;
+      border: 1px solid #292933;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .positive {
+      color: #71d68a;
+      font-weight: bold;
+    }
+
+    .negative {
+      color: #ff7d89;
+      font-weight: bold;
     }
   </style>
 </head>
 
 <body>
 
-<div class="app">
-
-  <!-- ============================= -->
-  <!-- ГЛАВНАЯ / МАГАЗИН -->
-  <!-- ============================= -->
+  <!-- ================================= -->
+  <!-- МАГАЗИН -->
+  <!-- ================================= -->
 
   <div
-    id="shopScreen"
-    class="screen active"
+    id="shop"
+    class="page active"
   >
 
-    <div class="header">
-      <div class="brand">
-        СК МЕТРОШОП
-      </div>
+    <h1>
+      🛒 СК МЕТРОШОП
+    </h1>
 
-      <div class="subtitle">
-        Магазин товаров за POINT
-      </div>
-    </div>
-
-    <div class="balance-card">
-
-      <div class="balance-title">
-        Ваш баланс
+    <div class="card"><div class="muted">
+        Баланс
       </div>
 
       <div class="balance">
-        <span id="balance">
+        <span id="shopBalance">
           0
         </span>
-
-        <span>
-          POINT
-        </span>
-      </div>
-
-      <button
-        class="topup"
-        onclick="openTopup()"
-      >
-        Пополнить баланс
-      </button>
-
-    </div>
-
-    <div class="content">
-
-      <div class="section-title">
-        Товары
-      </div>
-
-      <div
-        id="products"
-        class="products"
-      >
-        <div class="loading">
-          Загрузка товаров...
-        </div>
+        POINT
       </div>
 
     </div>
 
-  </div>
-
-  <!-- ============================= -->
-  <!-- ПРОФИЛЬ -->
-  <!-- ============================= -->
-
-  <div
-    id="profileScreen"
-    class="screen"
-  >
-
-    <div class="header">
-      <div class="brand">
-        Профиль
-      </div>
-
-      <div class="subtitle">
-        Ваш аккаунт
-      </div>
-    </div>
-
-    <div class="content">
-
-      <div
-        id="profileContent"
-        style="margin-top:16px;"
-      >
-        <div class="loading">
-          Загрузка профиля...
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- ============================= -->
-  <!-- ИСТОРИЯ -->
-  <!-- ============================= --><div
-    id="historyScreen"
-    class="screen"
-  >
-
-    <div class="header">
-      <div class="brand">
-        История
-      </div>
-
-      <div class="subtitle">
-        Ваши операции
-      </div>
-    </div>
-
-    <div class="content">
-
-      <div
-        id="historyContent"
-        style="margin-top:16px;"
-      >
-        <div class="loading">
-          Загрузка истории...
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-<!-- ============================= -->
-<!-- НИЖНЕЕ МЕНЮ -->
-<!-- ============================= -->
-
-<div class="bottom-nav">
-
-  <button
-    id="navShop"
-    class="nav-button active"
-    onclick="showScreen('shop')"
-  >
-    <span class="nav-icon">🛒</span>
-    Магазин
-  </button>
-
-  <button
-    id="navHistory"
-    class="nav-button"
-    onclick="showScreen('history')"
-  >
-    <span class="nav-icon">📋</span>
-    История
-  </button>
-
-  <button
-    id="navProfile"
-    class="nav-button"
-    onclick="showScreen('profile')"
-  >
-    <span class="nav-icon">👤</span>
-    Профиль
-  </button>
-
-</div>
-
-<!-- ============================= -->
-<!-- ПОПОЛНЕНИЕ -->
-<!-- ============================= -->
-
-<div
-  id="topupModal"
-  class="modal"
-  onclick="closeModalOutside(event)"
->
-
-  <div class="modal-box">
-
-    <div class="modal-title">
-      Пополнение POINT
-    </div>
-
-    <div class="modal-text">
-      Введи количество POINT,
-      которое хочешь пополнить.
-      После подключения СБП здесь
-      будет открываться оплата.
-    </div>
-
-    <input
-      id="topupAmount"
-      class="input"
-      type="number"
-      min="1"
-      placeholder="Например: 100"
-    >
-
-    <div class="modal-buttons">
-
-      <button
-        class="modal-button secondary"
-        onclick="closeTopup()"
-      >
-        Отмена
-      </button>
-
-      <button
-        class="modal-button primary"
-        onclick="createTopup()"
-      >
-        Продолжить
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-<!-- ============================= -->
-<!-- ПОКУПКА -->
-<!-- ============================= -->
-
-<div
-  id="buyModal"
-  class="modal"
-  onclick="closeBuyOutside(event)"
->
-
-  <div class="modal-box">
-
-    <div class="modal-title">
-      Оформление заказа
-    </div>
+    <h2>
+      Товары
+    </h2>
 
     <div
-      id="buyProductName"
-      class="modal-text"
-    ></div>
-
-    <input
-      id="playerId"
-      class="input"
-      type="text"
-      placeholder="Игровой ID"
+      id="products"
+      class="products"
     >
+      <div class="loading">
+        Загрузка товаров...
+      </div>
+    </div>
 
-    <div class="modal-buttons">
+  </div>
 
-      <button
-        class="modal-button secondary"
-        onclick="closeBuy()"
+  <!-- ================================= -->
+  <!-- ИСТОРИЯ -->
+  <!-- ================================= -->
+
+  <div
+    id="history"
+    class="page"
+  >
+
+    <h1>
+      📋 История
+    </h1>
+
+    <div
+      id="historyContent"
+    >
+      <div class="loading">
+        Загрузка истории...
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================================= -->
+  <!-- ПРОФИЛЬ -->
+  <!-- ================================= -->
+
+  <div
+    id="profile"
+    class="page"
+  >
+
+    <h1>
+      👤 Профиль
+    </h1>
+
+    <div
+      id="profileContent"
+    >
+      <div class="loading">
+        Загрузка профиля...
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================================= -->
+  <!-- НИЖНЕЕ МЕНЮ -->
+  <!-- ================================= -->
+
+  <div class="nav">
+
+    <button
+      id="shopButton"
+      class="active"
+      onclick="openPage('shop')"
+    >
+      <span class="nav-icon">
+        🛒
+      </span>
+
+      Магазин
+    </button>
+
+    <button
+      id="historyButton"
+      onclick="openPage('history')"
+    >
+      <span class="nav-icon">
+        📋
+      </span>
+
+      История
+    </button>
+
+    <button
+      id="profileButton"
+      onclick="openPage('profile')"
+    >
+      <span class="nav-icon">
+        👤
+      </span>
+
+      Профиль
+    </button>
+
+  </div>
+
+  <!-- ================================= -->
+  <!-- ПОКУПКА -->
+  <!-- ================================= -->
+
+  <div
+    id="buyModal"
+    class="modal"
+  >
+
+    <div class="modal-box">
+
+      <h2>
+        Покупка
+      </h2>
+
+      <div
+        id="selectedProduct"
+        class="muted"
+      ></div>
+
+      <input
+        id="playerId"
+        placeholder="Введите игровой ID"
       >
-        Отмена
-      </button>
 
-      <button
-        class="modal-button primary"
-        onclick="confirmBuy()"
-      >
-        Купить
-      </button>
+      <div class="modal-buttons">
+
+        <button
+          class="cancel"
+          onclick="closeBuy()"
+        >
+          Отмена
+        </button>
+
+        <button
+          class="confirm"
+          onclick="buyProduct()"
+        >
+          Купить
+        </button>
+
+      </div>
 
     </div>
 
   </div>
 
-</div>
-
-<div
-  id="toast"
-  class="toast"
-></div>
-
 <script>
-  // =====================================================
-  // НАСТРОЙКИ
-  // =====================================================
 
-  const API_URL =
+  // =========================================
+  // НАСТРОЙКИ
+  // =========================================
+
+  const API =
     "https://telegram-appp.onrender.com";
 
-  const tg =
-    window.Telegram &&
-    window.Telegram.WebApp
-      ? window.Telegram.WebApp
-      : null;
+  let tg =
+    window.Telegram?.WebApp || null;
 
   let initData = "";
-  let currentUser = null;
-  let currentProduct = null;
+
   let products = [];
 
-  // =====================================================
+  let selectedProduct = null;
+
+  let userBalance = 0;
+
+  // =========================================
   // TELEGRAM
-  // =====================================================
+  // =========================================
 
   function initTelegram() {
 
     if (!tg) {
-      console.warn(
+      console.log(
         "Telegram WebApp не найден"
       );
 
@@ -680,113 +452,98 @@
     }
 
     try {
+
       tg.ready();
+
       tg.expand();
 
       initData =
         tg.initData || "";
 
-    } catch (error) {
-      console.error(
-        "Ошибка Telegram:",
-        error
-      );
+    } catch (e) {
+
+      console.error(e);
+
     }
+
   }
 
-  // =====================================================
-  // API ЗАПРОС
-  // =====================================================
+  // =========================================
+  // API
+  // =========================================
 
-  async function api(
-    endpoint,
-    options = {},
-    timeout = 10000
+  async function request(
+    url,
+    options = {}
   ) {
 
     const controller =
       new AbortController();
 
-    const timer =
+    const timeout =
       setTimeout(
         () => controller.abort(),
-        timeout
+        8000
       );
 
     try {
 
-      const config = {
-        ...options,
-        signal:
-          controller.signal,
-
-        headers: {
-          "Content-Type":
-            "application/json",
-
-          ...(options.headers || {})
-        }
-      };
-
       const response =
         await fetch(
-          API_URL + endpoint,
-          config
+          API + url,
+          {
+            ...options,
+
+            signal:
+              controller.signal,
+
+            headers: {
+              "Content-Type":
+                "application/json",
+
+              ...(options.headers || {})
+            }
+          }
         );
 
       const text =
         await response.text();
 
-      let data;
+      let data = {};
 
       try {
+
         data =
           text
             ? JSON.parse(text)
             : {};
+
       } catch (_) {
 
         throw new Error(
-          "Сервер вернул не JSON"
+          "Сервер вернул неправильный ответ"
         );
-      }
 
-      if (!response.ok) {
+      }if (!response.ok) {
 
         throw new Error(
           data.error ||
-          `Ошибка HTTP ${response.status}`
+          "Ошибка сервера"
         );
+
       }
 
       return data;
 
-    } catch (error) {
-
-      if (
-        error.name ===
-        "AbortError"
-      ) {
-
-        throw new Error(
-          "Сервер слишком долго отвечает"
-        );
-      }
-
-      throw error;
-
     } finally {
 
-      clearTimeout(timer);
+      clearTimeout(timeout);
 
     }
+
   }
 
-  // =====================================================
-  // POST BODY
-  // =====================================================
-
-  function body(
+  function postData(
     extra = {}
   ) {
 
@@ -797,203 +554,103 @@
 
   }
 
-  // =====================================================
-  // TOAST
-  // =====================================================
+  // =========================================
+  // ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ
+  // =========================================
 
-  let toastTimer = null;
-
-  function showToast(
-    message
+  function openPage(
+    page
   ) {
 
-    const toast =
-      document.getElementById(
-        "toast"
-      );
-
-    toast.textContent =
-      message;
-
-    toast.classList.add(
-      "show"
-    );
-
-    clearTimeout(
-      toastTimer
-    );
-
-    toastTimer =
-      setTimeout(
-        () => {
-          toast.classList.remove(
-            "show"
+    document
+      .querySelectorAll(".page")
+      .forEach(
+        element => {
+          element.classList.remove(
+            "active"
           );
-        },
-        3000
+        }
       );
 
-  }
+    document
+      .getElementById(page)
+      .classList.add(
+        "active"
+      );
 
-  // =====================================================
-  // БАЛАНС
-  // =====================================================
+    document
+      .querySelectorAll(".nav button")
+      .forEach(
+        button => {
+          button.classList.remove(
+            "active"
+          );
+        }
+      );
 
-  function updateBalance(
-    balance
-  ) {
-
-    const element =
+    const button =
       document.getElementById(
-        "balance"
+        page + "Button"
       );
 
-    element.textContent =
-      Number(balance || 0)
-        .toLocaleString("ru-RU");
+    if (button) {
 
-  }
-
-  // =====================================================
-  // ПРОФИЛЬ
-  // =====================================================
-
-  async function loadProfile() {
-
-    const container =
-      document.getElementById(
-        "profileContent"
+      button.classList.add(
+        "active"
       );
 
-    container.innerHTML =
-      `<div class="loading">
-        Загрузка профиля...
-      </div>`;
+    }
 
-    try {
+    // Загружаем данные отдельно.
+    // Они НЕ блокируют переключение.
 
-      const data =
-        await api(
-          "/api/profile",
-          {
-            method: "POST",
-            body: body()
-          }
-        );
+    if (page === "history") {
 
-      if (!data.ok) {
-        throw new Error(
-          data.error ||
-          "Не удалось загрузить профиль"
-        );
+      loadHistory();
+
+    }
+
+    if (page === "profile") {
+
+      loadProfile();
+
+    }
+
+    if (page === "shop") {
+
+      if (!products.length) {
+
+        loadProducts();
+
       }
-
-      currentUser =
-        data.profile;
-
-      updateBalance(
-        currentUser.balance
-      );
-
-      const fullName =
-        [
-          currentUser.firstName,
-          currentUser.lastName
-        ]
-          .filter(Boolean)
-          .join(" ") ||
-        "Пользователь";
-
-      const username =
-        currentUser.username
-          ? "@" +
-            currentUser.username
-          : "не указан";
-
-      container.innerHTML = `
-
-        <div class="profile-card">
-
-          <div class="profile-name">
-            ${escapeHtml(fullName)}
-          </div>
-
-          <div class="profile-username">
-            ${escapeHtml(username)}
-          </div>
-
-          <div
-            class="profile-row"
-            style="margin-top:14px;"
-          >
-            <div class="profile-label">
-              Telegram ID
-            </div>
-
-            <div class="profile-value">
-              ${escapeHtml(
-                String(currentUser.id)
-              )}
-            </div>
-          </div>
-
-          <div class="profile-row">
-
-            <div class="profile-label">
-              Баланс
-            </div>
-
-            <div class="profile-value">
-              ${Number(
-                currentUser.balance || 0).toLocaleString("ru-RU")}
-              POINT
-            </div>
-
-          </div>
-
-        </div>
-
-      `;
-
-    } catch (error) {
-
-      console.error(
-        "Profile error:",
-        error
-      );
-
-      container.innerHTML = `
-
-        <div class="error">
-
-          Не удалось загрузить профиль.
-
-          
-
-          ${escapeHtml(
-            error.message
-          )}
-
-          
-
-          <button
-            class="buy"
-            onclick="loadProfile()"
-          >
-            Повторить
-          </button>
-
-        </div>
-
-      `;
 
     }
 
   }
 
-  // =====================================================
+  // =========================================
+  // БАЛАНС
+  // =========================================
+
+  function setBalance(
+    value
+  ) {
+
+    userBalance =
+      Number(value || 0);
+
+    document.getElementById(
+      "shopBalance"
+    ).textContent =
+      userBalance.toLocaleString(
+        "ru-RU"
+      );
+
+  }
+
+  // =========================================
   // ТОВАРЫ
-  // =====================================================
+  // =========================================
 
   async function loadProducts() {
 
@@ -1010,18 +667,17 @@
     try {
 
       const data =
-        await api(
-          "/api/products",
-          {
-            method: "GET"
-          }
+        await request(
+          "/api/products"
         );
 
       if (!data.ok) {
+
         throw new Error(
           data.error ||
           "Не удалось загрузить товары"
         );
+
       }
 
       products =
@@ -1036,7 +692,7 @@
     } catch (error) {
 
       console.error(
-        "Products error:",
+        "Products:",
         error
       );
 
@@ -1069,10 +725,6 @@
 
   }
 
-  // =====================================================
-  // ОТОБРАЖЕНИЕ ТОВАРОВ
-  // =====================================================
-
   function renderProducts() {
 
     const container =
@@ -1083,11 +735,12 @@
     if (!products.length) {
 
       container.innerHTML =
-        `<div class="empty">
+        `<div class="loading">
           Товаров пока нет.
         </div>`;
 
       return;
+
     }
 
     container.innerHTML =
@@ -1100,44 +753,52 @@
                 product.price || 0
               );
 
-            const disabled =
-              price <= 0
-                ? "disabled"
-                : "";
-
-            const priceText =
-              price > 0
-                ? `${price.toLocaleString("ru-RU")} POINT`
-                : "Цена уточняется";
-
             return `
 
               <div class="product">
 
                 <div class="product-name">
+
                   ${escapeHtml(
                     product.name
                   )}
+
                 </div>
 
                 <div class="product-bottom">
 
-                  <div class="product-price">
-                    ${priceText}
+                  <div class="price">
+
+                    ${
+                      price > 0
+                        ? price.toLocaleString(
+                            "ru-RU"
+                          ) +
+                          " POINT"
+                        : "Цена уточняется"
+                    }
+
                   </div>
 
                   <button
                     class="buy"
-                    ${disabled}
+                    ${
+                      price <=0
+                        ? "disabled"
+                        : ""
+                    }
+
                     onclick="openBuy('${escapeAttr(
                       product.id
                     )}')"
                   >
+
                     ${
                       price > 0
                         ? "Купить"
                         : "Скоро"
                     }
+
                   </button>
 
                 </div>
@@ -1152,9 +813,161 @@
 
   }
 
-  // =====================================================
+  // =========================================
+  // ПРОФИЛЬ
+  // =========================================
+
+  async function loadProfile() {
+
+    const container =
+      document.getElementById(
+        "profileContent"
+      );
+
+    container.innerHTML =
+      `<div class="loading">
+        Загрузка профиля...
+      </div>`;
+
+    if (!initData) {
+
+      container.innerHTML =
+        `<div class="error">
+          Mini App не получил данные Telegram.
+        </div>`;
+
+      return;
+
+    }
+
+    try {
+
+      const data =
+        await request(
+          "/api/profile",
+          {
+            method: "POST",
+
+            body:
+              postData()
+          }
+        );
+
+      if (!data.ok) {
+
+        throw new Error(
+          data.error ||
+          "Ошибка профиля"
+        );
+
+      }
+
+      const profile =
+        data.profile;
+
+      setBalance(
+        profile.balance
+      );
+
+      const name =
+        [
+          profile.firstName,
+          profile.lastName
+        ]
+          .filter(Boolean)
+          .join(" ") ||
+        "Пользователь";
+
+      const username =
+        profile.username
+          ? "@" +
+            profile.username
+          : "Не указан";
+
+      container.innerHTML = `
+
+        <div class="card">
+
+          <h2>
+            ${escapeHtml(name)}
+          </h2>
+
+          <p class="muted">
+            ${escapeHtml(username)}
+          </p>
+
+          <hr>
+
+          <p>
+            <span class="muted">
+              Telegram ID
+            </span>
+
+            
+
+            ${escapeHtml(
+              String(profile.id)
+            )}
+          </p>
+
+          <p>
+            <span class="muted">
+              Баланс
+            </span>
+
+            
+
+            <b>
+              ${Number(
+                profile.balance || 0
+              ).toLocaleString("ru-RU")}
+              POINT
+            </b>
+          </p>
+
+        </div>
+
+      `;
+
+    } catch (error) {
+
+      console.error(
+        "Profile:",
+        error
+      );
+
+      container.innerHTML = `
+
+        <div class="error">
+
+          Не удалось загрузить профиль.
+
+          
+
+          ${escapeHtml(
+            error.message
+          )}
+
+          
+
+          <button
+            class="buy"
+            onclick="loadProfile()"
+          >
+            Повторить
+          </button>
+
+        </div>
+
+      `;
+
+    }
+
+  }
+
+  // =========================================
   // ИСТОРИЯ
-  // =====================================================
+  // =========================================
 
   async function loadHistory() {
 
@@ -1168,9 +981,306 @@
         Загрузка истории...
       </div>`;
 
+    if (!initData) {
+
+      container.innerHTML =
+        `<div class="error">
+          Mini App не получил данные Telegram.
+        </div>`;
+
+      return;
+
+    }
+
     try {
 
       const data =
-        await api(
+        await request(
           "/api/history",
           {
+            method: "POST",
+
+            body:
+              postData()
+          }
+        );
+
+      if (!data.ok) {
+
+        throw new Error(
+          data.error ||
+          "Ошибка истории"
+        );
+
+      }
+
+      const history =
+        Array.isArray(
+          data.history
+        )
+          ? data.history
+          : [];
+
+      if (!history.length) {
+
+        container.innerHTML =
+          `<div class="loading">
+            История операций пуста.
+          </div>`;
+
+        return;
+
+      }
+
+      container.innerHTML =
+        history
+          .map(
+            item => {
+
+              const amount =
+                Number(
+                  item.amount || 0
+                );
+
+              const positive =
+                amount > 0;
+
+              const date =
+                item.createdAt
+                  ? new Date(
+                      item.createdAt
+                    ).toLocaleString(
+                      "ru-RU"
+                    )
+                  : "";
+
+              return `
+
+                <div class="history-item">
+
+                  <b>
+
+                    ${escapeHtml(
+                      item.description ||
+                      "Операция"
+                    )}
+
+                  </b>
+
+                  <div class="muted">
+
+                    ${escapeHtml(
+                      date
+                    )}
+
+                  </div>
+
+                  
+
+                  <span
+                    class="${
+                      positive
+                        ? "positive"
+                        : "negative"
+                    }"
+                  >
+
+                    ${
+                      positive
+                        ? "+"
+                        : ""
+                    }
+
+                    ${amount.toLocaleString(
+                      "ru-RU"
+                    )}
+
+                    POINT
+
+                  </span>
+
+                </div>
+
+              `;
+
+            }
+          )
+          .join("");
+
+    } catch (error) {
+
+      console.error(
+        "History:",
+        error
+      );
+
+      container.innerHTML = `
+
+        <div class="error">
+
+          Не удалось загрузить историю.
+
+          
+
+          ${escapeHtml(
+            error.message
+          )}
+
+          
+
+          <button
+            class="buy"
+            onclick="loadHistory()"
+          >
+            Повторить
+          </button>
+
+        </div>
+
+      `;
+
+    }
+
+  }
+
+  // =========================================
+  // ПОКУПКА
+  // =========================================
+
+  function openBuy(
+    productId
+  ) {
+
+    selectedProduct =
+      products.find(
+        product =>
+          product.id ===
+          productId
+      );
+
+    if (!selectedProduct) {
+
+      return;
+
+    }
+
+    document.getElementById(
+      "selectedProduct"
+    ).textContent =
+      selectedProduct.name;
+
+    document.getElementById(
+      "playerId"
+    ).value = "";
+
+    document.getElementById(
+      "buyModal"
+    ).classList.add(
+      "active"
+    );
+
+  }
+
+  function closeBuy() {
+
+    document.getElementById(
+      "buyModal"
+    ).classList.remove(
+      "active"
+    );
+
+    selectedProduct =
+      null;
+
+  }
+
+  async function buyProduct() {
+
+    if (!selectedProduct) {
+
+      return;
+
+    }
+
+    const playerId =
+      document.getElementById(
+        "playerId"
+      ).value.trim();
+
+    if (!playerId) {
+
+      alert(
+        "Введите игровой ID"
+      );
+
+      return;
+
+    }
+
+    try {
+
+      const data =
+        await request(
+          "/api/buy",
+          {
+            method: "POST",
+
+            body:
+              postData({
+                productId:
+                  selectedProduct.id,
+
+                playerId
+              })
+          }
+        );
+
+      if (!data.ok) {
+
+        throw new Error(
+          data.error ||
+          "Не удалось купить товар"
+        );
+
+      }
+
+      closeBuy();
+
+      alert(
+        `Заказ #${
+          data.order?.id || ""
+        } создан`
+      );
+
+      loadProfile();
+
+      loadHistory();
+
+    } catch (error) {
+
+      alert(
+        error.message
+      );
+
+    }
+
+  }
+
+  // =========================================
+  // БЕЗОПАСНЫЙ HTML
+  // =========================================
+
+  function escapeHtml(
+    value
+  ) {
+
+    return String(
+      value ?? ""
+    )
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+      .replaceAll(
+        "<",
+        "&lt;"
