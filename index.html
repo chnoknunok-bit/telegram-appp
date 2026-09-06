@@ -2,10 +2,9 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
   >
 
   <title>СК МЕТРОШОП</title>
@@ -15,1272 +14,1077 @@
   <style>
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
+    html,
     body {
       margin: 0;
-      background: #0d0d12;
-      color: white;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      background: #111318;
+      color: #fff;
       font-family: Arial, sans-serif;
     }
 
+    body {
+      min-height: 100vh;
+    }
+
     button {
+      font: inherit;
       border: 0;
       cursor: pointer;
     }
 
+    .app {
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    .header {
+      padding: 22px 18px 14px;
+      background: #171920;
+      border-bottom: 1px solid #292c35;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      margin-top: 5px;
+      color: #8e94a3;
+      font-size: 13px;
+    }
+
     .page {
       display: none;
-      padding: 16px;
-      padding-bottom: 90px;
+      padding: 18px;
     }
 
     .page.active {
       display: block;
     }
 
-    h1 {
-      margin-top: 5px;
-      font-size: 24px;
+    .balance {
+      background: #1c1f28;
+      border: 1px solid #2b2f39;
+      border-radius: 16px;
+      padding: 17px;
+      margin-bottom: 18px;
     }
 
-    .card {
-      background: #18181f;
-      border: 1px solid #292933;
+    .balance-title {
+      color: #9298a7;
+      font-size: 13px;
+      margin-bottom: 7px;
+    }
+
+    .balance-value {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .product {
+      background: #1b1e26;
+      border: 1px solid #2b2f39;
       border-radius: 16px;
       padding: 16px;
       margin-bottom: 12px;
     }
 
-    .balance {
-      font-size: 28px;
-      font-weight: bold;
-      margin-top: 8px;
-    }
-
-    .muted {
-      color: #8c8c98;
-      font-size: 14px;
-    }
-
-    .products {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .product {
-      background: #18181f;
-      border: 1px solid #292933;
-      border-radius: 15px;
-      padding: 15px;
-    }
-
     .product-name {
       font-size: 16px;
-      font-weight: bold;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 10px;
     }
 
-    .product-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 13px;
-    }
-
-    .price {
-      color: #aaaab5;
+    .product-price {
+      color: #b5bbc9;
       font-size: 14px;
+      margin-bottom: 13px;
     }
 
-    .buy {
-      background: white;
-      color: black;
-      padding: 10px 15px;
-      border-radius: 10px;
-      font-weight: bold;
+    .buy-btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: 11px;
+      background: #5865f2;
+      color: white;
+      font-weight: 700;
     }
 
-    .buy:disabled {
-      opacity: .4;
+    .buy-btn:active {
+      opacity: .8;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 45px 15px;
+      color: #858b99;
+    }
+
+    .error {
+      background: #291b1e;
+      border: 1px solid #573137;
+      color: #ff9ca6;
+      border-radius: 12px;
+      padding: 13px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      display: none;
     }
 
     .loading {
       text-align: center;
+      color: #858b99;
       padding: 30px 10px;
-      color: #888894;
     }
 
-    .error {
-      background: #28171b;
-      border: 1px solid #5b252e;
-      padding: 15px;
-      border-radius: 12px;
-      color: #ff9da9;
+    .profile-card {
+      background: #1b1e26;
+      border: 1px solid #2b2f39;
+      border-radius: 16px;
+      padding: 17px;
     }
 
-    .nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-
+    .profile-row {
       display: flex;
-
-      background: #15151b;
-      border-top: 1px solid #292932;
-
-      padding: 8px;
-      padding-bottom: calc(
-        8px + env(safe-area-inset-bottom)
-      );
-
-      z-index: 100;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 12px 0;
+      border-bottom: 1px solid #292c35;
     }
 
-    .nav button {
-      flex: 1;
-      background: transparent;
-      color: #777783;
-      padding: 9px 5px;
-      font-size: 12px;
+    .profile-row:last-child {
+      border-bottom: 0;
     }
 
-    .nav button.active {
-      color: white;
+    .profile-label {
+      color: #8f95a4;
     }
 
-    .nav-icon {
-      display: block;
-      font-size: 19px;
-      margin-bottom: 3px;
-    }
-
-    .modal {
-      display: none;
-
-      position: fixed;
-      inset: 0;
-
-      background: rgba(0,0,0,.75);
-
-      align-items: flex-end;
-
-      z-index: 200;
-    }
-
-    .modal.active {
-      display: flex;
-    }
-
-    .modal-box {
-      width: 100%;
-      background: #18181f;
-      padding: 20px;
-      border-radius: 20px 20px 0 0;
-    }
-
-    input {
-      width: 100%;
-      padding: 13px;
-
-      margin-top: 12px;
-
-      background: #0e0e13;
-      border: 1px solid #30303a;
-
-      color: white;
-
-      border-radius: 10px;
-
-      outline: none;
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .modal-buttons button {
-      flex: 1;
-      padding: 13px;
-      border-radius: 10px;
-      font-weight: bold;
-    }
-
-    .cancel {
-      background: #292930;
-      color: white;
-    }
-
-    .confirm {
-      background: white;
-      color: black;
+    .profile-value {
+      text-align: right;
+      font-weight: 700;
+      word-break: break-word;
     }
 
     .history-item {
-      background: #18181f;
-      border: 1px solid #292933;
+      background: #1b1e26;
+      border: 1px solid #2b2f39;
       border-radius: 14px;
       padding: 14px;
       margin-bottom: 10px;
     }
 
-    .positive {
-      color: #71d68a;
-      font-weight: bold;
+    .history-name {
+      font-weight: 700;
+      margin-bottom: 6px;
     }
 
-    .negative {
-      color: #ff7d89;
-      font-weight: bold;
+    .history-info {
+      color: #9298a7;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 76px;
+      background: #171920;
+      border-top: 1px solid #292c35;
+      display: flex;
+      z-index: 9999;
+    }
+
+    .nav-btn {
+      flex: 1;
+      background: transparent;
+      color: #777d8c;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 12px;
+    }
+
+    .nav-btn .icon {
+      font-size: 21px;
+    }
+
+    .nav-btn.active {
+      color: #fff;
+    }
+
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 10000;
+    }
+
+    .modal-bg.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 420px;
+      background: #1b1e26;
+      border: 1px solid #303440;
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .modal-title {
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 15px;
+    }
+
+    .input {
+      width: 100%;
+      background: #111318;
+      color: #fff;
+      border: 1px solid #303440;
+      border-radius: 11px;
+      padding: 13px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+      padding: 13px;
+      border-radius: 11px;
+    }
+
+    .confirm {
+      background: #5865f2;
+      color: white;
+      font-weight: 700;
+    }
+
+    .cancel {
+      background: #2b2f39;
+      color: white;
+    }
+
+    .toast {
+      position: fixed;
+      left: 18px;
+      right: 18px;
+      bottom: 90px;
+      background: #242832;
+      border: 1px solid #363b48;
+      border-radius: 12px;
+      padding: 13px;
+      text-align: center;
+      z-index: 20000;
+      display: none;
+    }
+
+    .toast.show {
+      display: block;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- ================================= -->
+<div class="app">
+
+  <div class="header">
+    <div class="logo">СК МЕТРОШОП</div>
+    <div class="subtitle">Магазин за POINT</div>
+  </div>
+
   <!-- МАГАЗИН -->
-  <!-- ================================= -->
+  <section id="page-shop" class="page active">
 
-  <div
-    id="shop"
-    class="page active"
-  >
-
-    <h1>
-      🛒 СК МЕТРОШОП
-    </h1>
-
-    <div class="card"><div class="muted">
-        Баланс
-      </div>
-
-      <div class="balance">
-        <span id="shopBalance">
-          0
-        </span>
-        POINT
-      </div>
-
-    </div>
-
-    <h2>
-      Товары
-    </h2>
-
-    <div
-      id="products"
-      class="products"
-    >
-      <div class="loading">
-        Загрузка товаров...
+    <div class="balance">
+      <div class="balance-title">Ваш баланс</div>
+      <div class="balance-value">
+        <span id="shopBalance">0</span> POINT
       </div>
     </div>
 
-  </div>
+    <div id="shopError" class="error"></div>
 
-  <!-- ================================= -->
+    <div id="products">
+      <div class="loading">Загрузка товаров...</div>
+    </div>
+
+  </section>
+
   <!-- ИСТОРИЯ -->
-  <!-- ================================= -->
+  <section id="page-history" class="page">
 
-  <div
-    id="history"
-    class="page"
-  >
+    <h2>История</h2>
 
-    <h1>
-      📋 История
-    </h1>
+    <div id="historyError" class="error"></div>
 
-    <div
-      id="historyContent"
-    >
-      <div class="loading">
-        Загрузка истории...
-      </div>
+    <div id="history">
+      <div class="loading">Загрузка истории...</div>
     </div>
 
-  </div>
+  </section>
 
-  <!-- ================================= -->
   <!-- ПРОФИЛЬ -->
-  <!-- ================================= -->
+  <section id="page-profile" class="page">
 
-  <div
-    id="profile"
-    class="page"
-  >
+    <h2>Профиль</h2>
 
-    <h1>
-      👤 Профиль
-    </h1>
+    <div id="profileError" class="error"></div>
 
-    <div
-      id="profileContent"
-    >
-      <div class="loading">
-        Загрузка профиля...
+    <div class="profile-card">
+
+      <div class="profile-row">
+        <div class="profile-label">Имя</div>
+        <div id="profileName" class="profile-value">—</div>
       </div>
+
+      <div class="profile-row">
+        <div class="profile-label">Username</div>
+        <div id="profileUsername" class="profile-value">—</div>
+      </div>
+
+      <div class="profile-row">
+        <div class="profile-label">Telegram ID</div>
+        <div id="profileId" class="profile-value">—</div>
+      </div>
+
+      <div class="profile-row">
+        <div class="profile-label">Баланс</div>
+        <div id="profileBalance" class="profile-value">0 POINT</div>
+      </div>
+
     </div>
 
-  </div>
+  </section>
 
-  <!-- ================================= -->
-  <!-- НИЖНЕЕ МЕНЮ -->
-  <!-- ================================= -->
+</div>
 
-  <div class="nav">
+<!-- НИЖНЕЕ МЕНЮ -->
+<nav class="nav">
 
-    <button
-      id="shopButton"
-      class="active"
-      onclick="openPage('shop')"
-    >
-      <span class="nav-icon">
-        🛒
-      </span>
-
-      Магазин
-    </button>
-
-    <button
-      id="historyButton"
-      onclick="openPage('history')"
-    >
-      <span class="nav-icon">
-        📋
-      </span>
-
-      История
-    </button>
-
-    <button
-      id="profileButton"
-      onclick="openPage('profile')"
-    >
-      <span class="nav-icon">
-        👤
-      </span>
-
-      Профиль
-    </button>
-
-  </div>
-
-  <!-- ================================= -->
-  <!-- ПОКУПКА -->
-  <!-- ================================= -->
-
-  <div
-    id="buyModal"
-    class="modal"
+  <button
+    type="button"
+    class="nav-btn active"
+    id="nav-shop"
+    onclick="openPage('shop')"
   >
+    <span class="icon">🛒</span>
+    <span>Магазин</span>
+  </button>
 
-    <div class="modal-box">
+  <button
+    type="button"
+    class="nav-btn"
+    id="nav-history"
+    onclick="openPage('history')"
+  >
+    <span class="icon">📋</span>
+    <span>История</span>
+  </button>
 
-      <h2>
-        Покупка
-      </h2>
+  <button
+    type="button"
+    class="nav-btn"
+    id="nav-profile"
+    onclick="openPage('profile')"
+  >
+    <span class="icon">👤</span>
+    <span>Профиль</span>
+  </button>
 
-      <div
-        id="selectedProduct"
-        class="muted"
-      ></div>
+</nav>
 
-      <input
-        id="playerId"
-        placeholder="Введите игровой ID"
+<!-- МОДАЛКА ПОКУПКИ -->
+<div id="buyModal" class="modal-bg">
+
+  <div class="modal">
+
+    <div id="modalTitle" class="modal-title">
+      Покупка
+    </div>
+
+    <input
+      id="playerId"
+      class="input"
+      type="text"
+      placeholder="Введите игровой ID"
+      autocomplete="off"
+    >
+
+    <div class="modal-buttons">
+
+      <button
+        type="button"
+        class="cancel"
+        onclick="closeBuyModal()"
       >
+        Отмена
+      </button>
 
-      <div class="modal-buttons">
-
-        <button
-          class="cancel"
-          onclick="closeBuy()"
-        >
-          Отмена
-        </button>
-
-        <button
-          class="confirm"
-          onclick="buyProduct()"
-        >
-          Купить
-        </button>
-
-      </div>
+      <buttontype="button"
+        class="confirm"
+        onclick="confirmBuy()"
+      >
+        Купить
+      </button>
 
     </div>
 
   </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
 
 <script>
+  "use strict";
 
-  // =========================================
-  // НАСТРОЙКИ
-  // =========================================
-
-  const API =
-    "https://telegram-appp.onrender.com";
-
-  let tg =
-    window.Telegram?.WebApp || null;
-
-  let initData = "";
+  const API = "https://telegram-appp.onrender.com";
 
   let products = [];
-
   let selectedProduct = null;
 
-  let userBalance = 0;
+  const tg = window.Telegram && window.Telegram.WebApp
+    ? window.Telegram.WebApp
+    : null;
 
-  // =========================================
-  // TELEGRAM
-  // =========================================
-
-  function initTelegram() {
-
-    if (!tg) {
-      console.log(
-        "Telegram WebApp не найден"
-      );
-
-      return;
-    }
-
+  if (tg) {
     try {
-
       tg.ready();
-
       tg.expand();
-
-      initData =
-        tg.initData || "";
-
     } catch (e) {
-
-      console.error(e);
-
+      console.log("Telegram WebApp init:", e);
     }
-
   }
 
-  // =========================================
-  // API
-  // =========================================
+  /*
+   * ----------------------------------------------------
+   * НАВИГАЦИЯ
+   * ----------------------------------------------------
+   *
+   * ВАЖНО:
+   * Эти функции вообще не зависят от API.
+   * Поэтому вкладки должны переключаться даже
+   * если сервер недоступен.
+   */
 
-  async function request(
-    url,
-    options = {}
-  ) {
+  function openPage(page) {
 
-    const controller =
-      new AbortController();
+    console.log("OPEN PAGE:", page);
 
-    const timeout =
-      setTimeout(
-        () => controller.abort(),
-        8000
-      );
+    const pages = ["shop", "history", "profile"];
 
-    try {
+    pages.forEach(function(name) {
 
-      const response =
-        await fetch(
-          API + url,
-          {
-            ...options,
+      const element = document.getElementById("page-" + name);
+      const button = document.getElementById("nav-" + name);
 
-            signal:
-              controller.signal,
-
-            headers: {
-              "Content-Type":
-                "application/json",
-
-              ...(options.headers || {})
-            }
-          }
-        );
-
-      const text =
-        await response.text();
-
-      let data = {};
-
-      try {
-
-        data =
-          text
-            ? JSON.parse(text)
-            : {};
-
-      } catch (_) {
-
-        throw new Error(
-          "Сервер вернул неправильный ответ"
-        );
-
-      }if (!response.ok) {
-
-        throw new Error(
-          data.error ||
-          "Ошибка сервера"
-        );
-
+      if (!element || !button) {
+        return;
       }
 
-      return data;
+      if (name === page) {
+        element.classList.add("active");
+        button.classList.add("active");
+      } else {
+        element.classList.remove("active");
+        button.classList.remove("active");
+      }
 
-    } finally {
-
-      clearTimeout(timeout);
-
-    }
-
-  }
-
-  function postData(
-    extra = {}
-  ) {
-
-    return JSON.stringify({
-      initData,
-      ...extra
     });
 
-  }
-
-  // =========================================
-  // ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ
-  // =========================================
-
-  function openPage(
-    page
-  ) {
-
-    document
-      .querySelectorAll(".page")
-      .forEach(
-        element => {
-          element.classList.remove(
-            "active"
-          );
-        }
-      );
-
-    document
-      .getElementById(page)
-      .classList.add(
-        "active"
-      );
-
-    document
-      .querySelectorAll(".nav button")
-      .forEach(
-        button => {
-          button.classList.remove(
-            "active"
-          );
-        }
-      );
-
-    const button =
-      document.getElementById(
-        page + "Button"
-      );
-
-    if (button) {
-
-      button.classList.add(
-        "active"
-      );
-
-    }
-
-    // Загружаем данные отдельно.
-    // Они НЕ блокируют переключение.
-
     if (page === "history") {
-
       loadHistory();
-
     }
 
     if (page === "profile") {
-
       loadProfile();
-
-    }
-
-    if (page === "shop") {
-
-      if (!products.length) {
-
-        loadProducts();
-
-      }
-
     }
 
   }
 
-  // =========================================
-  // БАЛАНС
-  // =========================================
+  /*
+   * ----------------------------------------------------
+   * FETCH С ТАЙМАУТОМ
+   * ----------------------------------------------------
+   */
 
-  function setBalance(
-    value
-  ) {
+  async function fetchWithTimeout(url, options = {}, timeout = 8000) {
 
-    userBalance =
-      Number(value || 0);
+    const controller = new AbortController();
 
-    document.getElementById(
-      "shopBalance"
-    ).textContent =
-      userBalance.toLocaleString(
-        "ru-RU"
-      );
-
-  }
-
-  // =========================================
-  // ТОВАРЫ
-  // =========================================
-
-  async function loadProducts() {
-
-    const container =
-      document.getElementById(
-        "products"
-      );
-
-    container.innerHTML =
-      `<div class="loading">
-        Загрузка товаров...
-      </div>`;
+    const timer = setTimeout(function() {
+      controller.abort();
+    }, timeout);
 
     try {
 
-      const data =
-        await request(
-          "/api/products"
-        );
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
 
-      if (!data.ok) {
+      clearTimeout(timer);
 
-        throw new Error(
-          data.error ||
-          "Не удалось загрузить товары"
-        );
-
-      }
-
-      products =
-        Array.isArray(
-          data.products
-        )
-          ? data.products
-          : [];
-
-      renderProducts();
+      return response;
 
     } catch (error) {
 
-      console.error(
-        "Products:",
-        error
+      clearTimeout(timer);
+
+      throw error;
+    }
+  }
+
+  /*
+   * ----------------------------------------------------
+   * TELEGRAM INIT DATA
+   * ----------------------------------------------------
+   */
+
+  function getInitData() {
+
+    if (
+      tg &&
+      typeof tg.initData === "string" &&
+      tg.initData.length > 0
+    ) {
+      return tg.initData;
+    }
+
+    return "";
+  }
+
+  /*
+   * ----------------------------------------------------
+   * ПРОДУКТЫ
+   * ----------------------------------------------------
+   */
+
+  async function loadProducts() {
+
+    const container = document.getElementById("products");
+    const error = document.getElementById("shopError");
+
+    error.style.display = "none";
+
+    container.innerHTML =
+      '<div class="loading">Загрузка товаров...</div>';
+
+    try {
+
+      const response = await fetchWithTimeout(
+        API + "/api/products",
+        {
+          method: "GET"
+        },
+        8000
       );
 
+      if (!response.ok) {
+        throw new Error(
+          "Сервер вернул HTTP " + response.status
+        );
+      }
+
+      const data = await response.json();
+
+      console.log("PRODUCTS:", data);
+
+      if (!data.ok) {
+        throw new Error(
+          data.error || "Не удалось получить товары"
+        );
+      }
+
+      products = Array.isArray(data.products)
+        ? data.products
+        : [];
+
+      renderProducts();
+
+    } catch (err) {
+
+      console.error("PRODUCTS ERROR:", err);
+
       container.innerHTML = `
-
-        <div class="error">
-
+        <div class="empty">
           Не удалось загрузить товары.
 
-          
-
-          ${escapeHtml(
-            error.message
-          )}
-
-          
-
-          <button
-            class="buy"
-            onclick="loadProducts()"
-          >
-            Повторить
-          </button>
-
+          ${escapeHtml(err.message || "Ошибка")}
         </div>
-
       `;
 
+      error.textContent =
+        "Ошибка загрузки товаров: " +
+        (err.message || "неизвестная ошибка");
+
+      error.style.display = "block";
     }
 
   }
 
   function renderProducts() {
 
-    const container =
-      document.getElementById(
-        "products"
-      );
+    const container = document.getElementById("products");
 
     if (!products.length) {
 
-      container.innerHTML =
-        `<div class="loading">
+      container.innerHTML = `<div class="empty">
           Товаров пока нет.
-        </div>`;
+        </div>
+      `;
 
       return;
-
     }
 
-    container.innerHTML =
-      products
-        .map(
-          product => {
+    container.innerHTML = "";
 
-            const price =
-              Number(
-                product.price || 0
-              );
+    products.forEach(function(product) {
 
-            return `
+      const card = document.createElement("div");
 
-              <div class="product">
+      card.className = "product";
 
-                <div class="product-name">
+      const priceText =
+        Number(product.price) > 0
+          ? Number(product.price) + " POINT"
+          : "Цена пока не установлена";
 
-                  ${escapeHtml(
-                    product.name
-                  )}
+      card.innerHTML = `
+        <div class="product-name">
+          ${escapeHtml(product.name)}
+        </div>
 
-                </div>
+        <div class="product-price">
+          ${escapeHtml(priceText)}
+        </div>
 
-                <div class="product-bottom">
+        <button
+          type="button"
+          class="buy-btn"
+          data-product-id="${escapeHtml(product.id)}"
+        >
+          Купить
+        </button>
+      `;
 
-                  <div class="price">
+      const button = card.querySelector(".buy-btn");
 
-                    ${
-                      price > 0
-                        ? price.toLocaleString(
-                            "ru-RU"
-                          ) +
-                          " POINT"
-                        : "Цена уточняется"
-                    }
+      button.addEventListener("click", function() {
 
-                  </div>
+        openBuyModal(product);
 
-                  <button
-                    class="buy"
-                    ${
-                      price <=0
-                        ? "disabled"
-                        : ""
-                    }
+      });
 
-                    onclick="openBuy('${escapeAttr(
-                      product.id
-                    )}')"
-                  >
+      container.appendChild(card);
 
-                    ${
-                      price > 0
-                        ? "Купить"
-                        : "Скоро"
-                    }
-
-                  </button>
-
-                </div>
-
-              </div>
-
-            `;
-
-          }
-        )
-        .join("");
+    });
 
   }
 
-  // =========================================
-  // ПРОФИЛЬ
-  // =========================================
+  /*
+   * ----------------------------------------------------
+   * ПОКУПКА
+   * ----------------------------------------------------
+   */
 
-  async function loadProfile() {
+  function openBuyModal(product) {
 
-    const container =
-      document.getElementById(
-        "profileContent"
-      );
+    selectedProduct = product;
 
-    container.innerHTML =
-      `<div class="loading">
-        Загрузка профиля...
-      </div>`;
+    document.getElementById("modalTitle").textContent =
+      "Покупка: " + product.name;
+
+    document.getElementById("playerId").value = "";
+
+    document
+      .getElementById("buyModal")
+      .classList.add("show");
+
+  }
+
+  function closeBuyModal() {
+
+    selectedProduct = null;
+
+    document
+      .getElementById("buyModal")
+      .classList.remove("show");
+
+  }
+
+  async function confirmBuy() {
+
+    if (!selectedProduct) {
+      return;
+    }
+
+    const playerId =
+      document.getElementById("playerId").value.trim();
+
+    if (!playerId) {
+
+      showToast("Введите игровой ID");
+
+      return;
+    }
+
+    const initData = getInitData();
 
     if (!initData) {
 
-      container.innerHTML =
-        `<div class="error">
-          Mini App не получил данные Telegram.
-        </div>`;
+      showToast(
+        "Откройте Mini App через Telegram"
+      );
 
       return;
-
     }
 
     try {
 
-      const data =
-        await request(
-          "/api/profile",
-          {
-            method: "POST",
+      const response = await fetchWithTimeout(
+        API + "/api/buy",
+        {
+          method: "POST",
 
-            body:
-              postData()
-          }
-        );
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-      if (!data.ok) {
+          body: JSON.stringify({
+            initData: initData,
+            productId: selectedProduct.id,
+            playerId: playerId
+          })
+        },
+        10000
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.ok) {
 
         throw new Error(
-          data.error ||
-          "Ошибка профиля"
+          data.error || "Покупка не выполнена"
         );
 
       }
 
-      const profile =
-        data.profile;
+      closeBuyModal();
 
-      setBalance(
-        profile.balance
+      showToast("Покупка успешно оформлена");
+
+      loadProfile();
+
+    } catch (err) {
+
+      showToast(
+        err.message || "Ошибка покупки"
       );
-
-      const name =
-        [
-          profile.firstName,
-          profile.lastName
-        ]
-          .filter(Boolean)
-          .join(" ") ||
-        "Пользователь";
-
-      const username =
-        profile.username
-          ? "@" +
-            profile.username
-          : "Не указан";
-
-      container.innerHTML = `
-
-        <div class="card">
-
-          <h2>
-            ${escapeHtml(name)}
-          </h2>
-
-          <p class="muted">
-            ${escapeHtml(username)}
-          </p>
-
-          <hr>
-
-          <p>
-            <span class="muted">
-              Telegram ID
-            </span>
-
-            
-
-            ${escapeHtml(
-              String(profile.id)
-            )}
-          </p>
-
-          <p>
-            <span class="muted">
-              Баланс
-            </span>
-
-            
-
-            <b>
-              ${Number(
-                profile.balance || 0
-              ).toLocaleString("ru-RU")}
-              POINT
-            </b>
-          </p>
-
-        </div>
-
-      `;
-
-    } catch (error) {
-
-      console.error(
-        "Profile:",
-        error
-      );
-
-      container.innerHTML = `
-
-        <div class="error">
-
-          Не удалось загрузить профиль.
-
-          
-
-          ${escapeHtml(
-            error.message
-          )}
-
-          
-
-          <button
-            class="buy"
-            onclick="loadProfile()"
-          >
-            Повторить
-          </button>
-
-        </div>
-
-      `;
 
     }
 
   }
 
-  // =========================================
-  // ИСТОРИЯ
-  // =========================================
+  /*
+   * ----------------------------------------------------
+   * ПРОФИЛЬ
+   * ----------------------------------------------------
+   */
+
+  async function loadProfile() {
+
+    const error = document.getElementById("profileError");
+
+    error.style.display = "none";
+
+    const initData = getInitData();
+
+    if (!initData) {
+
+      document.getElementById("profileName").textContent =
+        "Откройте через Telegram";
+
+      return;
+    }
+
+    try {
+
+      const response = await fetchWithTimeout(
+        API + "/api/profile",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            initData: initData
+          })
+        },
+        8000
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.ok) {
+
+        throw new Error(
+          data.error || "Ошибка профиля"
+        );
+
+      }
+
+      const user = data.user || {};
+
+      document.getElementById("profileName").textContent =
+        user.firstName ||
+        user.name ||
+        "—";
+
+      document.getElementById("profileUsername").textContent =
+        user.username
+          ? "@" + user.username
+          : "—";
+
+      document.getElementById("profileId").textContent =user.telegramId ||
+        user.id ||
+        "—";
+
+      const balance =
+        Number(user.balance || 0);
+
+      document.getElementById("profileBalance").textContent =
+        balance + " POINT";
+
+      document.getElementById("shopBalance").textContent =
+        balance;
+
+    } catch (err) {
+
+      console.error("PROFILE ERROR:", err);
+
+      error.textContent =
+        err.message || "Ошибка загрузки профиля";
+
+      error.style.display = "block";
+
+    }
+
+  }
+
+  /*
+   * ----------------------------------------------------
+   * ИСТОРИЯ
+   * ----------------------------------------------------
+   */
 
   async function loadHistory() {
 
     const container =
-      document.getElementById(
-        "historyContent"
-      );
+      document.getElementById("history");
 
-    container.innerHTML =
-      `<div class="loading">
-        Загрузка истории...
-      </div>`;
+    const error =
+      document.getElementById("historyError");
+
+    error.style.display = "none";
+
+    const initData = getInitData();
 
     if (!initData) {
 
-      container.innerHTML =
-        `<div class="error">
-          Mini App не получил данные Telegram.
-        </div>`;
-
-      return;
-
-    }
-
-    try {
-
-      const data =
-        await request(
-          "/api/history",
-          {
-            method: "POST",
-
-            body:
-              postData()
-          }
-        );
-
-      if (!data.ok) {
-
-        throw new Error(
-          data.error ||
-          "Ошибка истории"
-        );
-
-      }
-
-      const history =
-        Array.isArray(
-          data.history
-        )
-          ? data.history
-          : [];
-
-      if (!history.length) {
-
-        container.innerHTML =
-          `<div class="loading">
-            История операций пуста.
-          </div>`;
-
-        return;
-
-      }
-
-      container.innerHTML =
-        history
-          .map(
-            item => {
-
-              const amount =
-                Number(
-                  item.amount || 0
-                );
-
-              const positive =
-                amount > 0;
-
-              const date =
-                item.createdAt
-                  ? new Date(
-                      item.createdAt
-                    ).toLocaleString(
-                      "ru-RU"
-                    )
-                  : "";
-
-              return `
-
-                <div class="history-item">
-
-                  <b>
-
-                    ${escapeHtml(
-                      item.description ||
-                      "Операция"
-                    )}
-
-                  </b>
-
-                  <div class="muted">
-
-                    ${escapeHtml(
-                      date
-                    )}
-
-                  </div>
-
-                  
-
-                  <span
-                    class="${
-                      positive
-                        ? "positive"
-                        : "negative"
-                    }"
-                  >
-
-                    ${
-                      positive
-                        ? "+"
-                        : ""
-                    }
-
-                    ${amount.toLocaleString(
-                      "ru-RU"
-                    )}
-
-                    POINT
-
-                  </span>
-
-                </div>
-
-              `;
-
-            }
-          )
-          .join("");
-
-    } catch (error) {
-
-      console.error(
-        "History:",
-        error
-      );
-
       container.innerHTML = `
-
-        <div class="error">
-
-          Не удалось загрузить историю.
-
-          
-
-          ${escapeHtml(
-            error.message
-          )}
-
-          
-
-          <button
-            class="buy"
-            onclick="loadHistory()"
-          >
-            Повторить
-          </button>
-
+        <div class="empty">
+          Откройте Mini App через Telegram,
+          чтобы увидеть историю.
         </div>
-
       `;
 
-    }
-
-  }
-
-  // =========================================
-  // ПОКУПКА
-  // =========================================
-
-  function openBuy(
-    productId
-  ) {
-
-    selectedProduct =
-      products.find(
-        product =>
-          product.id ===
-          productId
-      );
-
-    if (!selectedProduct) {
-
       return;
-
     }
 
-    document.getElementById(
-      "selectedProduct"
-    ).textContent =
-      selectedProduct.name;
-
-    document.getElementById(
-      "playerId"
-    ).value = "";
-
-    document.getElementById(
-      "buyModal"
-    ).classList.add(
-      "active"
-    );
-
-  }
-
-  function closeBuy() {
-
-    document.getElementById(
-      "buyModal"
-    ).classList.remove(
-      "active"
-    );
-
-    selectedProduct =
-      null;
-
-  }
-
-  async function buyProduct() {
-
-    if (!selectedProduct) {
-
-      return;
-
-    }
-
-    const playerId =
-      document.getElementById(
-        "playerId"
-      ).value.trim();
-
-    if (!playerId) {
-
-      alert(
-        "Введите игровой ID"
-      );
-
-      return;
-
-    }
+    container.innerHTML =
+      '<div class="loading">Загрузка истории...</div>';
 
     try {
 
-      const data =
-        await request(
-          "/api/buy",
-          {
-            method: "POST",
+      const response = await fetchWithTimeout(
+        API + "/api/history",
+        {
+          method: "POST",
 
-            body:
-              postData({
-                productId:
-                  selectedProduct.id,
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-                playerId
-              })
-          }
-        );
+          body: JSON.stringify({
+            initData: initData
+          })
+        },
+        8000
+      );
 
-      if (!data.ok) {
+      const data = await response.json();
+
+      if (!response.ok || !data.ok) {
 
         throw new Error(
-          data.error ||
-          "Не удалось купить товар"
+          data.error || "Ошибка истории"
         );
 
       }
 
-      closeBuy();
+      const list =
+        Array.isArray(data.transactions)
+          ? data.transactions
+          : Array.isArray(data.history)
+            ? data.history
+            : [];
 
-      alert(
-        `Заказ #${
-          data.order?.id || ""
-        } создан`
-      );
+      renderHistory(list);
 
-      loadProfile();
+    } catch (err) {
 
-      loadHistory();
+      console.error("HISTORY ERROR:", err);
 
-    } catch (error) {
+      container.innerHTML = `
+        <div class="empty">
+          Не удалось загрузить историю.
+        </div>
+      `;
 
-      alert(
-        error.message
-      );
+      error.textContent =
+        err.message || "Ошибка загрузки истории";
+
+      error.style.display = "block";
 
     }
 
   }
 
-  // =========================================
-  // БЕЗОПАСНЫЙ HTML
-  // =========================================
+  function renderHistory(list) {
 
-  function escapeHtml(
-    value
-  ) {
+    const container =
+      document.getElementById("history");
 
-    return String(
-      value ?? ""
-    )
-      .replaceAll(
-        "&",
-        "&amp;"
-      )
-      .replaceAll(
-        "<",
-        "&lt;"
+    if (!list.length) {
+
+      container.innerHTML = `
+        <div class="empty">
+          История операций пока пуста.
+        </div>
+      `;
+
+      return;
+    }
+
+    container.innerHTML = "";
+
+    list.forEach(function(item) {
+
+      const element =
+        document.createElement("div");
+
+      element.className =
+        "history-item";
+
+      const name =
+        item.productName ||
+        item.name ||
+        item.description ||
+        "Операция";
+
+      const amount =
+        item.amount !== undefined
+          ? item.amount
+          : item.price !== undefined
+            ? item.price
+            : 0;
+
+      const date =
+        item.createdAt ||
+        item.date ||
+        "";
+
+      element.innerHTML = `
+        <div class="history-name">
+          ${escapeHtml(String(name))}
+        </div>
+
+        <div class="history-info">
+          Сумма: ${escapeHtml(String(amount))} POINT
+          ${date
+            ? "
+Дата: " + escapeHtml(String(date))
+            : ""}
+        </div>
+      `;
+
+      container.appendChild(element);
+
+    });
+
+  }
+
+  /*
+   * ----------------------------------------------------
+   * БАЛАНС
+   * ----------------------------------------------------
+   */
+
+  async function updateBalance() {
+
+    const initData = getInitData();
+
+    if (!initData) {
+      return;
+    }
+
+    try {
+
+      const response = await fetchWithTimeout(
+        API + "/api/profile",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            initData: initData
+          })
+        },
+        8000
+      );
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        return;
