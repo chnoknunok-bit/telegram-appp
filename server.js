@@ -1,9 +1,14 @@
 const express = require("express");
 const crypto = require("crypto");
+const path = require("path");
 
 const app = express();
 
 app.use(express.json());
+
+// ==================================================
+//                    CORS
+// ==================================================
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -23,6 +28,10 @@ app.use((req, res, next) => {
     next();
 });
 
+// ==================================================
+//                    НАСТРОЙКИ
+// ==================================================
+
 const PORT = process.env.PORT || 10000;
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const STAFF_CHAT_ID = process.env.STAFF_CHAT_ID;
@@ -36,7 +45,7 @@ if (!STAFF_CHAT_ID) {
 }
 
 // ==================================================
-//                    ТОВАРЫ
+//                     ТОВАРЫ
 // ==================================================
 
 const PRODUCTS = {
@@ -77,7 +86,7 @@ const PRODUCTS = {
 };
 
 // ==================================================
-//                    ХРАНИЛИЩЕ
+//                   ХРАНИЛИЩЕ
 // ==================================================
 
 const users = new Map();
@@ -92,18 +101,37 @@ let transactionCounter = 1;
 // ==================================================
 
 async function telegram(method, data) {
-    const response = await fetch(
-        `https://api.telegram.org/bot${BOT_TOKEN}/${method}`,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        }
-    );
+    if (!BOT_TOKEN) {
+        return {
+            ok: false,
+            error: "BOT_TOKEN не задан"
+        };
+    }
 
-    return await response.json();
+    try {
+        const response = await fetch(
+            `https://api.telegram.org/bot${BOT_TOKEN}/${method}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }
+        );
+
+        return await response.json();
+    } catch (error) {
+        console.error(
+            `Ошибка Telegram API (${method}):`,
+            error
+        );
+
+        return {
+            ok: false,
+            error: error.message
+        };
+    }
 }
 
 // ==================================================
@@ -127,7 +155,10 @@ function checkTelegramData(initData) {
 
         const dataCheckString = [...params.entries()]
             .sort(([a], [b]) => a.localeCompare(b))
-            .map(([key, value]) => `${key}=${value}`)
+            .map(
+                ([key, value]) =>
+                    `${key}=${value}`
+            )
             .join("\n");
 
         const secretKey = crypto
@@ -141,8 +172,7 @@ function checkTelegramData(initData) {
             .digest("hex");
 
         if (calculatedHash !== hash) {
-            return null;
-        }
+            return null;}
 
         const userRaw = params.get("user");
 
@@ -153,13 +183,17 @@ function checkTelegramData(initData) {
         return JSON.parse(userRaw);
 
     } catch (error) {
-        console.error("Ошибка проверки Telegram:", error);
+        console.error(
+            "Ошибка проверки Telegram:",
+            error
+        );
+
         return null;
     }
 }
 
 // ==================================================
-//                    ПОЛЬЗОВАТЕЛЬ
+//                  ПОЛЬЗОВАТЕЛЬ
 // ==================================================
 
 function getOrCreateUser(user) {
@@ -174,8 +208,11 @@ function getOrCreateUser(user) {
 
     const saved = users.get(user.id);
 
-    saved.username = user.username || saved.username;
-    saved.firstName = user.first_name || saved.firstName;
+    saved.username =
+        user.username || saved.username;
+
+    saved.firstName =
+        user.first_name || saved.firstName;
 
     return saved;
 }
@@ -184,7 +221,12 @@ function getOrCreateUser(user) {
 //                   ТРАНЗАКЦИИ
 // ==================================================
 
-function addTransaction(userId, type, amount, description) {
+function addTransaction(
+    userId,
+    type,
+    amount,
+    description
+) {
     const id = transactionCounter++;
 
     const transaction = {
@@ -200,7 +242,9 @@ function addTransaction(userId, type, amount, description) {
         transactions.set(userId, []);
     }
 
-    transactions.get(userId).unshift(transaction);
+    transactions
+        .get(userId)
+        .unshift(transaction);
 
     return transaction;
 }
@@ -210,41 +254,55 @@ function addTransaction(userId, type, amount, description) {
 // ==================================================
 
 app.get("/", (req, res) => {
-    res.json({
-        ok: true,
-        service: "СК МЕТРОШОП",
-        currency: "POINT",
-        currencyShort: "PT"
-    });
+    res.sendFile(
+        path.join(__dirname, "index.html")
+    );
 });
 
 // ==================================================
-//                    ПРОФИЛЬ
+//                  ПРОФИЛЬ
 // ==================================================
 
 app.post("/api/profile", (req, res) => {
-    const { initData } = req.body;
+    try {
+        const { initData } = req.body;
 
-    const tgUser = checkTelegramData(initData);
+        const tgUser =
+            checkTelegramData(initData);
 
-    if (!tgUser) {
-        return res.status(401).json({
+        if (!tgUser) {
+            return res.status(401).json({
+                ok: false,
+                error:
+                    "Неверные данные Telegram"
+            });
+        }
+
+        const user =
+            getOrCreateUser(tgUser);
+
+        res.json({
+            ok: true,
+            user: {
+                id: user.id,
+                username: user.username,
+                firstName: user.firstName,
+                balance: user.balance
+            }
+        });
+
+    } catch (error) {
+        console.error(
+            "Ошибка профиля:",
+            error
+        );
+
+        res.status(500).json({
             ok: false,
-            error: "Неверные данные Telegram"
+            error:
+                "Внутренняя ошибка сервера"
         });
     }
-
-    const user = getOrCreateUser(tgUser);
-
-    res.json({
-        ok: true,
-        user: {
-            id: user.id,
-            username: user.username,
-            firstName: user.firstName,
-            balance: user.balance
-        }
-    });
 });
 
 // ==================================================
@@ -252,23 +310,40 @@ app.post("/api/profile", (req, res) => {
 // ==================================================
 
 app.post("/api/history", (req, res) => {
-    const { initData } = req.body;
+    try {
+        const { initData } = req.body;
 
-    const tgUser = checkTelegramData(initData);
+        const tgUser =
+            checkTelegramData(initData);
 
-    if (!tgUser) {
-        return res.status(401).json({
+        if (!tgUser) {
+            return res.status(401).json({
+                ok: false,
+                error:
+                    "Неверные данные Telegram"
+            });
+        }
+
+        const history =
+            transactions.get(tgUser.id) || [];
+
+        res.json({
+            ok: true,
+            history
+        });
+
+    } catch (error) {
+        console.error(
+            "Ошибка истории:",
+            error
+        );
+
+        res.status(500).json({
             ok: false,
-            error: "Неверные данные Telegram"
+            error:
+                "Внутренняя ошибка сервера"
         });
     }
-
-    const history = transactions.get(tgUser.id) || [];
-
-    res.json({
-        ok: true,
-        history
-    });
 });
 
 // ==================================================
@@ -276,18 +351,33 @@ app.post("/api/history", (req, res) => {
 // ==================================================
 
 app.get("/api/products", (req, res) => {
-    const result = Object.entries(PRODUCTS).map(
-        ([name, data]) => ({
-            name,
-            price: data.price,
-            escort: data.escort
-        })
-    );
+    try {
+        const result =
+            Object.entries(PRODUCTS).map(
+                ([name, data]) => ({
+                    name,
+                    price: data.price,
+                    escort: data.escort
+                })
+            );
 
-    res.json({
-        ok: true,
-        products: result
-    });
+        res.json({
+            ok: true,
+            products: result
+        });
+
+    } catch (error) {
+        console.error(
+            "Ошибка товаров:",
+            error
+        );
+
+        res.status(500).json({
+            ok: false,
+            error:
+                "Не удалось загрузить товары"
+        });
+    }
 });
 
 // ==================================================
@@ -302,66 +392,93 @@ app.post("/api/buy", async (req, res) => {
             gameId
         } = req.body;
 
-        const tgUser = checkTelegramData(initData);
+        const tgUser =
+            checkTelegramData(initData);
 
         if (!tgUser) {
             return res.status(401).json({
                 ok: false,
-                error: "Неверные данные Telegram"
+                error:
+                    "Неверные данные Telegram"
             });
         }
 
         if (!product || !gameId) {
             return res.status(400).json({
                 ok: false,
-                error: "Укажи товар и игровой ID"
+                error:
+                    "Укажи товар и игровой ID"
             });
         }
 
-        const productInfo = PRODUCTS[product];
+        const productInfo =
+            PRODUCTS[product];
 
         if (!productInfo) {
             return res.status(400).json({
                 ok: false,
-                error: "Товар не найден"
+                error:
+                    "Товар не найден"
             });
         }
 
-        if (!productInfo.price || productInfo.price <= 0) {
+        if (
+            !productInfo.price ||
+            productInfo.price <= 0
+        ) {
             return res.status(400).json({
                 ok: false,
-                error: "Цена этого товара ещё не установлена"
+                error:
+                    "Цена этого товара ещё не установлена"
             });
         }
 
-        const user = getOrCreateUser(tgUser);
+        const user =
+            getOrCreateUser(tgUser);
 
-        if (user.balance < productInfo.price) {
+        if (
+            user.balance <
+            productInfo.price
+        ) {
             return res.status(400).json({
                 ok: false,
-                error: "Недостаточно POINT",
+                error:
+                    "Недостаточно POINT",
                 balance: user.balance,
-                required: productInfo.price
-            });}
+                required:
+                    productInfo.price
+            });
+        }
 
-        user.balance -= productInfo.price;
+        // Списываем POINT
+        user.balance -=
+            productInfo.price;
 
-        const orderId = orderCounter++;
+        const orderId =
+            orderCounter++;
 
         const order = {
             id: orderId,
             product,
             gameId,
             userId: user.id,
-            username: user.username || "без username",
-            isEscort: productInfo.escort,
-            price: productInfo.price,
+            username:
+                user.username ||
+                "без username",
+            isEscort:
+                productInfo.escort,
+            price:
+                productInfo.price,
             status: "waiting",
             employees: [],
-            createdAt: new Date().toISOString()
+            createdAt:
+                new Date().toISOString()
         };
 
-        orders.set(orderId, order);
+        orders.set(
+            orderId,
+            order
+        );
 
         addTransaction(
             user.id,
@@ -371,7 +488,9 @@ app.post("/api/buy", async (req, res) => {
         );
 
         const maxEmployees =
-            productInfo.escort ? 3 : 1;
+            productInfo.escort
+                ? 3
+                : 1;
 
         const text =
             `🟡 <b>ЗАКАЗ В ОЖИДАНИИ</b>\n\n` +
@@ -382,25 +501,27 @@ app.post("/api/buy", async (req, res) => {
             `👤 Клиент: @${user.username || "без username"}\n\n` +
             `👥 Сотрудники: <b>0/${maxEmployees}</b>`;
 
-        const message = await telegram(
-            "sendMessage",
-            {
-                chat_id: STAFF_CHAT_ID,
-                text,
-                parse_mode: "HTML",
-                reply_markup: {
-                    inline_keyboard: [
-                        [
-                            {
-                                text: "✅ ВЗЯТЬ ЗАКАЗ",
-                                callback_data:
-                                    `claim:${orderId}`
-                            }
+        const message =
+            await telegram(
+                "sendMessage",
+                {
+                    chat_id:
+                        STAFF_CHAT_ID,
+                    text,
+                    parse_mode: "HTML",
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                {
+                                    text:
+                                        "✅ ВЗЯТЬ ЗАКАЗ",
+                                    callback_data:
+                                        `claim:${orderId}`
+                                }]
                         ]
-                    ]
+                    }
                 }
-            }
-        );
+            );
 
         if (!message.ok) {
             console.error(
@@ -408,7 +529,9 @@ app.post("/api/buy", async (req, res) => {
                 message
             );
 
-            user.balance += productInfo.price;
+            // Возвращаем POINT
+            user.balance +=
+                productInfo.price;
 
             addTransaction(
                 user.id,
@@ -417,7 +540,9 @@ app.post("/api/buy", async (req, res) => {
                 `Возврат за заказ #${orderId}`
             );
 
-            orders.delete(orderId);
+            orders.delete(
+                orderId
+            );
 
             return res.status(500).json({
                 ok: false,
@@ -432,16 +557,22 @@ app.post("/api/buy", async (req, res) => {
         res.json({
             ok: true,
             orderId,
-            balance: user.balance,
-            status: order.status
+            balance:
+                user.balance,
+            status:
+                order.status
         });
 
     } catch (error) {
-        console.error("Ошибка покупки:", error);
+        console.error(
+            "Ошибка покупки:",
+            error
+        );
 
         res.status(500).json({
             ok: false,
-            error: "Внутренняя ошибка сервера"
+            error:
+                "Внутренняя ошибка сервера"
         });
     }
 });
@@ -450,57 +581,96 @@ app.post("/api/buy", async (req, res) => {
 //                 ПОПОЛНЕНИЕ POINT
 // ==================================================
 
-app.post("/api/topup/create", (req, res) => {
-    const {
-        initData,
-        amount
-    } = req.body;
+app.post(
+    "/api/topup/create",
+    (req, res) => {
+        try {
+            const {
+                initData,
+                amount
+            } = req.body;
 
-    const tgUser = checkTelegramData(initData);
+            const tgUser =
+                checkTelegramData(
+                    initData
+                );
 
-    if (!tgUser) {
-        return res.status(401).json({
-            ok: false,
-            error: "Неверные данные Telegram"
-        });
+            if (!tgUser) {
+                return res
+                    .status(401)
+                    .json({
+                        ok: false,
+                        error:
+                            "Неверные данные Telegram"
+                    });
+            }
+
+            const rubles =
+                Number(amount);
+
+            if (
+                !Number.isInteger(
+                    rubles
+                ) ||
+                rubles <= 0
+            ) {
+                return res
+                    .status(400)
+                    .json({
+                        ok: false,
+                        error:
+                            "Неверная сумма"
+                    });
+            }
+
+            const paymentId =
+                "PT-" +
+                Date.now() +
+                "-" +
+                Math.floor(
+                    Math.random() *
+                        10000
+                );
+
+            res.json({
+                ok: true,
+                paymentId,
+                amount: rubles,
+                points: rubles,
+                paymentUrl: null,
+                message:
+                    "СБП пока не подключено. Сначала подключите платёжного провайдера."
+            });
+
+        } catch (error) {
+            console.error(
+                "Ошибка пополнения:",
+                error
+            );
+
+            res.status(500).json({
+                ok: false,
+                error:
+                    "Внутренняя ошибка сервера"
+            });
+        }
     }
-
-    const rubles = Number(amount);
-
-    if (!Number.isInteger(rubles) || rubles <= 0) {
-        return res.status(400).json({
-            ok: false,
-            error: "Неверная сумма"
-        });
-    }
-
-    const paymentId =
-        "PT-" +
-        Date.now() +
-        "-" +
-        Math.floor(Math.random() * 10000);
-
-    res.json({
-        ok: true,
-        paymentId,
-        amount: rubles,
-        points: rubles,
-        paymentUrl: null,
-        message:
-            "СБП пока не подключено. Сначала подключите платёжного провайдера."
-    });
-});
+);
 
 // ==================================================
 //                  WEBHOOK ОПЛАТЫ
 // ==================================================
 
-app.post("/api/payment/webhook", (req, res) => {
-    res.status(501).json({
-        ok: false,
-        error: "Webhook СБП ещё не подключён"
-    });
-});
+app.post(
+    "/api/payment/webhook",
+    (req, res) => {
+        res.status(501).json({
+            ok: false,
+            error:
+                "Webhook СБП ещё не подключён"
+        });
+    }
+);
 
 // ==================================================
 //                  ВЗЯТИЕ ЗАКАЗА
@@ -510,17 +680,18 @@ async function handleClaim(
     callbackQuery,
     orderId
 ) {
-    const order = orders.get(
-        Number(orderId)
-    );
+    const order =
+        orders.get(
+            Number(orderId)
+        );
 
     if (!order) {
         await telegram(
             "answerCallbackQuery",
             {
                 callback_query_id:
-                    callbackQuery.id,
-                text: "❌ Заказ не найден",
+                    callbackQuery.id,text:
+                    "❌ Заказ не найден",
                 show_alert: true
             }
         );
@@ -528,13 +699,17 @@ async function handleClaim(
         return;
     }
 
-    if (order.status === "completed") {
+    if (
+        order.status ===
+        "completed"
+    ) {
         await telegram(
             "answerCallbackQuery",
             {
                 callback_query_id:
                     callbackQuery.id,
-                text: "❌ Заказ уже выполнен",
+                text:
+                    "❌ Заказ уже выполнен",
                 show_alert: true
             }
         );
@@ -548,15 +723,20 @@ async function handleClaim(
     const employeeName =
         callbackQuery.from.username
             ? `@${callbackQuery.from.username}`
-            : callbackQuery.from.first_name ||
+            : callbackQuery.from
+                  .first_name ||
               "Сотрудник";
 
     const maxEmployees =
-        order.isEscort ? 3 : 1;
+        order.isEscort
+            ? 3
+            : 1;
 
     if (
         order.employees.some(
-            e => e.id === employeeId
+            employee =>
+                employee.id ===
+                employeeId
         )
     ) {
         await telegram(
@@ -596,7 +776,8 @@ async function handleClaim(
         name: employeeName
     });
 
-    order.status = "accepted";
+    order.status =
+        "accepted";
 
     const count =
         order.employees.length;
@@ -611,7 +792,8 @@ async function handleClaim(
         `👥 Сотрудники: <b>${count}/${maxEmployees}</b>\n`;
 
     for (
-        const employee of order.employees
+        const employee of
+        order.employees
     ) {
         text +=
             `• ${employee.name}\n`;
@@ -619,10 +801,14 @@ async function handleClaim(
 
     const buttons = [];
 
-    if (count < maxEmployees) {
+    if (
+        count <
+        maxEmployees
+    ) {
         buttons.push([
             {
-                text: "✅ ВЗЯТЬ ЗАКАЗ",
+                text:
+                    "✅ ВЗЯТЬ ЗАКАЗ",
                 callback_data:
                     `claim:${order.id}`
             }
@@ -630,7 +816,8 @@ async function handleClaim(
     } else {
         buttons.push([
             {
-                text: "🔵 ЗАКАЗ ВЫПОЛНЕН",
+                text:
+                    "🔵 ЗАКАЗ ВЫПОЛНЕН",
                 callback_data:
                     `complete:${order.id}`
             }
@@ -640,13 +827,15 @@ async function handleClaim(
     await telegram(
         "editMessageText",
         {
-            chat_id: STAFF_CHAT_ID,
+            chat_id:
+                STAFF_CHAT_ID,
             message_id:
                 order.staffMessageId,
             text,
             parse_mode: "HTML",
             reply_markup: {
-                inline_keyboard: buttons
+                inline_keyboard:
+                    buttons
             }
         }
     );
@@ -664,13 +853,15 @@ async function handleClaim(
     await telegram(
         "sendMessage",
         {
-            chat_id: order.userId,
+            chat_id:
+                order.userId,
             text:
                 `🟢 <b>Ваш заказ принят!</b>\n\n` +
                 `🆔 Заказ: <code>${order.id}</code>\n` +
                 `📦 ${order.product}\n` +
                 `👥 Сотрудников: <b>${count}/${maxEmployees}</b>`,
-            parse_mode: "HTML"
+            parse_mode:
+                "HTML"
         }
     );
 }
@@ -683,184 +874,5 @@ async function handleComplete(
     callbackQuery,
     orderId
 ) {
-    const order = orders.get(
-        Number(orderId)
-    );
-
-    if (!order) {
-        return;
-    }
-
-    if (order.status === "completed") {
-        await telegram(
-            "answerCallbackQuery",
-            {
-                callback_query_id:
-                    callbackQuery.id,
-                text:
-                    "Заказ уже выполнен",
-                show_alert: true
-            }
-        );
-
-        return;
-    }
-
-    const maxEmployees =
-        order.isEscort ? 3 : 1;
-
-    if (
-        order.employees.length <
-        maxEmployees
-    ) {
-        await telegram(
-            "answerCallbackQuery",
-            {
-                callback_query_id:
-                    callbackQuery.id,
-                text:
-                    `Нужно сотрудников: ${maxEmployees}`,
-                show_alert: true
-            }
-        );
-
-        return;
-    }
-
-    const employeeId =
-        callbackQuery.from.id;
-
-    const isEmployee =
-        order.employees.some(
-            employee =>
-                employee.id === employeeId
-        );
-
-    if (!isEmployee) {
-        await telegram(
-            "answerCallbackQuery",
-            {
-                callback_query_id:
-                    callbackQuery.id,
-                text:
-                    "❌ Ты не сотрудник этого заказа",
-                show_alert: true
-            }
-        );
-
-        return;
-    }
-
-    order.status = "completed";
-
-    const finisher =
-        callbackQuery.from.username
-            ? `@${callbackQuery.from.username}`
-            : callbackQuery.from.first_name ||
-              "Сотрудник";
-
-    let text =
-        `🔵 <b>ЗАКАЗ ВЫПОЛНЕН</b>\n\n` +
-        `🆔 Заказ: <code>${order.id}</code>\n` +
-        `📦 Товар: <b>${order.product}</b>\n` +
-        `💰 Цена: <b>${order.price} PT</b>\n` +
-        `🎮 Game ID: <code>${order.gameId}</code>\n` +
-        `👤 Клиент: @${order.username}\n\n` +
-        `👥 Сотрудники:\n`;
-
-    for (
-        const employee of order.employees
-    ) {
-        text +=
-            `• ${employee.name}\n`;
-    }
-
-    text +=
-        `\n✅ Завершил: ${finisher}`;
-
-    await telegram(
-        "editMessageText",
-        {
-            chat_id: STAFF_CHAT_ID,
-            message_id:
-                order.staffMessageId,
-            text,
-            parse_mode: "HTML"
-        }
-    );
-
-    await telegram(
-        "answerCallbackQuery",
-        {
-            callback_query_id:
-                callbackQuery.id,
-            text:
-                "🔵 Заказ завершён"
-        }
-    );
-
-    await telegram(
-        "sendMessage",
-        {
-            chat_id: order.userId,
-            text:
-                `🔵 <b>Ваш заказ выполнен!</b>\n\n` +
-                `🆔 Заказ: <code>${order.id}</code>\n` +
-                `📦 ${order.product}\n\n` +
-                `Спасибо за заказ!`,
-            parse_mode: "HTML"
-        }
-    );
-}
-
-// ==================================================
-//                 CALLBACK TELEGRAM
-// ==================================================
-
-async function handleCallback(
-    callbackQuery
-) {
-    const data =
-        callbackQuery.data || "";
-
-    if (data.startsWith("claim:")) {
-        const orderId =
-            data.split(":")[1];
-
-        await handleClaim(
-            callbackQuery,
-            orderId
-        );
-
-        return;
-    }
-
-    if (data.startsWith("complete:")) {
-        const orderId =
-            data.split(":")[1];
-
-        await handleComplete(
-            callbackQuery,
-            orderId
-        );
-
-        return;
-    }
-
-    await telegram(
-        "answerCallbackQuery",
-        {
-            callback_query_id:
-                callbackQuery.id
-        }
-    );
-}
-
-// ==================================================
-//                  TELEGRAM BOT
-// ==================================================
-
-let offset = 0;
-
-async function startBot() {
-    if (!BOT_TOKEN) {
+    const order =
+        orders.get(
