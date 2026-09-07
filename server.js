@@ -3,13 +3,13 @@ const crypto = require("crypto");
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+    "Origin, X-Requested-With, Content-Type, Accept, X-Telegram-Init-Data"
   );
   res.header(
     "Access-Control-Allow-Methods",
@@ -28,7 +28,8 @@ app.use((req, res, next) => {
    НАСТРОЙКИ
    ========================================================= */
 
-const PORT = process.env.PORT || 3000;
+const PORT =
+  process.env.PORT || 3000;
 
 const BOT_TOKEN =
   process.env.BOT_TOKEN || "";
@@ -38,7 +39,7 @@ const STAFF_CHAT_ID =
 
 
 /* =========================================================
-   URL API
+   API
    ========================================================= */
 
 const API_BASE =
@@ -111,7 +112,7 @@ const PRODUCTS = [
 
 
 /* =========================================================
-   ПОЛЬЗОВАТЕЛИ / ЗАКАЗЫ / ТРАНЗАКЦИИ
+   ХРАНИЛИЩА
    ========================================================= */
 
 const users =
@@ -131,7 +132,7 @@ const transactions =
 const PROMOCODES = {
 
   /*
-   * Промокод только на процент к пополнению.
+   * Только процент к пополнению.
    */
 
   WELCOME: {
@@ -143,9 +144,8 @@ const PROMOCODES = {
     active: true
   },
 
-
   /*
-   * Промокоды только на фиксированный бонус PT.
+   * Только фиксированный бонус PT.
    */
 
   CHEEZ: {
@@ -174,16 +174,14 @@ const PROMOCODES = {
    ========================================================= */
 
 function normalizePromoCode(code) {
-
   return String(code || "")
     .trim()
     .toUpperCase();
-
 }
 
 
 /* =========================================================
-   ПРОВЕРКА TELEGRAM INIT DATA
+   TELEGRAM INIT DATA
    ========================================================= */
 
 function checkTelegramData(initData) {
@@ -200,14 +198,11 @@ function checkTelegramData(initData) {
     );
   }
 
-
   const params =
     new URLSearchParams(initData);
 
-
   const hash =
     params.get("hash");
-
 
   if (!hash) {
     throw new Error(
@@ -215,9 +210,7 @@ function checkTelegramData(initData) {
     );
   }
 
-
   params.delete("hash");
-
 
   const dataCheckString =
     [...params.entries()]
@@ -231,11 +224,6 @@ function checkTelegramData(initData) {
       )
       .join("\n");
 
-
-  /*
-   * Секретный ключ Telegram WebApp.
-   */
-
   const secretKey =
     crypto
       .createHmac(
@@ -244,7 +232,6 @@ function checkTelegramData(initData) {
       )
       .update(BOT_TOKEN)
       .digest();
-
 
   const calculatedHash =
     crypto
@@ -255,17 +242,27 @@ function checkTelegramData(initData) {
       .update(dataCheckString)
       .digest("hex");
 
+  const calculated =
+    Buffer.from(calculatedHash, "hex");
 
-  if (calculatedHash !== hash) {
+  const received =
+    Buffer.from(hash, "hex");
+
+  if (
+    calculated.length !==
+    received.length ||
+    !crypto.timingSafeEqual(
+      calculated,
+      received
+    )
+  ) {
     throw new Error(
       "Неверные данные Telegram."
     );
   }
 
-
   const userRaw =
     params.get("user");
-
 
   if (!userRaw) {
     throw new Error(
@@ -273,21 +270,16 @@ function checkTelegramData(initData) {
     );
   }
 
-
   let telegramUser;
 
   try {
-
     telegramUser =
       JSON.parse(userRaw);
-
   } catch (error) {
-
     throw new Error(
       "Не удалось прочитать данные Telegram."
     );
   }
-
 
   if (!telegramUser.id) {
     throw new Error(
@@ -295,13 +287,12 @@ function checkTelegramData(initData) {
     );
   }
 
-
   return telegramUser;
 }
 
 
 /* =========================================================
-   ПОЛУЧИТЬ / СОЗДАТЬ ПОЛЬЗОВАТЕЛЯ
+   ПОЛЬЗОВАТЕЛЬ
    ========================================================= */
 
 function getOrCreateUser(telegramUser) {
@@ -309,15 +300,12 @@ function getOrCreateUser(telegramUser) {
   const userId =
     String(telegramUser.id);
 
-
   let user =
     users.get(userId);
-
 
   if (!user) {
 
     user = {
-
       id: userId,
 
       username:
@@ -338,30 +326,50 @@ function getOrCreateUser(telegramUser) {
         new Date().toISOString()
     };
 
-
     users.set(
       userId,
       user
     );
+
+  } else {
+
+    user.username =
+      telegramUser.username || "";
+
+    user.firstName =
+      telegramUser.first_name || "";
+
+    user.lastName =
+      telegramUser.last_name || "";
   }
 
-
-  /*
-   * Обновляем данные пользователя,
-   * если они изменились в Telegram.
-   */
-
-  user.username =
-    telegramUser.username || "";
-
-  user.firstName =
-    telegramUser.first_name || "";
-
-  user.lastName =
-    telegramUser.last_name || "";
-
-
   return user;
+}
+
+
+/* =========================================================
+   АВТОРИЗАЦИЯ TELEGRAM
+   ========================================================= */
+
+function requireTelegramUser(req) {
+
+  const initData =
+    req.body?.initData ||
+    req.headers["x-telegram-init-data"] ||
+    "";
+
+  const telegramUser =
+    checkTelegramData(initData);
+
+  const user =
+    getOrCreateUser(
+      telegramUser
+    );
+
+  return {
+    telegramUser,
+    user
+  };
 }
 
 
@@ -379,50 +387,45 @@ function addTransaction(
   const id =
     crypto.randomUUID();
 
-
   const transaction = {
 
     id,
 
     userId:
-
       String(userId),
 
     type,
 
     amount:
-
       Number(amount) || 0,
 
     description:
-
       String(description || ""),
 
     createdAt:
-
       new Date().toISOString()
   };
 
+  const key =
+    String(userId);
 
-  if (!transactions.has(String(userId))) {
+  if (!transactions.has(key)) {
     transactions.set(
-      String(userId),
+      key,
       []
     );
   }
 
-
   transactions
-    .get(String(userId))
+    .get(key)
     .push(transaction);
-
 
   return transaction;
 }
 
 
 /* =========================================================
-   ПРОВЕРКА ПРОЦЕНТНОГО ПРОМОКОДА
+   ПРОЦЕНТНЫЙ ПРОМОКОД
    ========================================================= */
 
 function calculatePercentPromo(
@@ -436,30 +439,18 @@ function calculatePercentPromo(
       promoCode
     );
 
-
-  /*
-   * Пустой промокод —
-   * обычное пополнение.
-   */
-
   if (!code) {
 
     return {
-
       code: "",
-
       percent: 0,
-
       bonus: 0,
-
       total: amount
     };
   }
 
-
   const promo =
     PROMOCODES[code];
-
 
   if (!promo) {
     throw new Error(
@@ -467,75 +458,57 @@ function calculatePercentPromo(
     );
   }
 
-
   if (promo.type !== "percent") {
-
     throw new Error(
-      "Этот промокод нельзя использовать для бонуса к пополнению."
+      "Этот промокод нельзя использовать в поле процентного промокода."
     );
   }
 
-
   if (!promo.active) {
-
     throw new Error(
       "Промокод больше не активен."
     );
   }
-
 
   if (
     promo.maxUses !== null &&
     promo.maxUses !== undefined &&
     promo.uses >= promo.maxUses
   ) {
-
     throw new Error(
       "Лимит использования промокода исчерпан."
     );
   }
 
-
   if (
     user.usedPromoCodes &&
     user.usedPromoCodes.has(code)
   ) {
-
     throw new Error(
       "Вы уже использовали этот промокод."
     );
   }
 
-
   const percent =
     Number(promo.percent) || 0;
-
 
   const bonus =
     Math.floor(
       amount * percent / 100
     );
 
-
-  const total =
-    amount + bonus;
-
-
   return {
-
     code,
-
     percent,
-
     bonus,
-
-    total
+    total:
+      amount + bonus
   };
 }
 
 
 /* =========================================================
-   ПРОВЕРКА PT-ПРОМОКОДА
+   PT-ПРОМОКОД
    ========================================================= */
 
 function calculateBonusPromo(
@@ -548,73 +521,54 @@ function calculateBonusPromo(
       promoCode
     );
 
-
   if (!code) {
-
-    return {
-
-      code: "",
-
-      bonus: 0
-    };
+    throw new Error(
+      "Введите промокод."
+    );
   }
-
 
   const promo =
     PROMOCODES[code];
 
-
   if (!promo) {
-
     throw new Error(
       "Промокод не найден."
     );
   }
 
-
   if (promo.type !== "bonus") {
-
     throw new Error(
-      "Этот промокод не является PT-промокодом."
+      "Этот промокод нельзя использовать здесь."
     );
   }
 
-
   if (!promo.active) {
-
     throw new Error(
       "Промокод больше не активен."
     );
   }
-
 
   if (
     promo.maxUses !== null &&
     promo.maxUses !== undefined &&
     promo.uses >= promo.maxUses
   ) {
-
     throw new Error(
       "Лимит использования промокода исчерпан."
     );
   }
 
-
   if (
     user.usedPromoCodes &&
     user.usedPromoCodes.has(code)
   ) {
-
     throw new Error(
       "Вы уже использовали этот промокод."
     );
   }
 
-
   return {
-
     code,
-
     bonus:
       Number(promo.bonus) || 0
   };
@@ -635,104 +589,57 @@ function activatePromoCode(
       promoCode
     );
 
-
   if (!code) {
-
     throw new Error(
       "Промокод не указан."
     );
   }
 
-
   const promo =
     PROMOCODES[code];
 
-
   if (!promo) {
-
     throw new Error(
       "Промокод не найден."
     );
   }
 
-
   if (!promo.active) {
-
     throw new Error(
       "Промокод не активен."
     );
   }
 
-
   if (!user.usedPromoCodes) {
-
     user.usedPromoCodes =
       new Set();
   }
 
-
   if (
     user.usedPromoCodes.has(code)
   ) {
-
     throw new Error(
       "Вы уже использовали этот промокод."
     );
   }
-
 
   if (
     promo.maxUses !== null &&
     promo.maxUses !== undefined &&
     promo.uses >= promo.maxUses
   ) {
-
     throw new Error(
       "Лимит использования промокода исчерпан."
     );
   }
 
-
   promo.uses += 1;
-
 
   user.usedPromoCodes.add(
     code
   );
 
-
   return promo;
-}
-
-
-/* =========================================================
-   БЕЗОПАСНОЕ ПОЛУЧЕНИЕ INIT DATA
-   ========================================================= */
-
-function requireTelegramUser(
-  req
-) {
-
-  const initData =
-    req.body?.initData ||
-    req.headers["x-telegram-init-data"] ||
-    "";
-
-
-  const telegramUser =
-    checkTelegramData(initData);
-
-
-  const user =
-    getOrCreateUser(
-      telegramUser
-    );
-
-
-  return {
-    telegramUser,
-    user
-  };
 }
 
 
@@ -743,15 +650,9 @@ function requireTelegramUser(
 app.get("/", (req, res) => {
 
   res.json({
-
     ok: true,
-
-    service:
-      "СК МЕТРОШОП API",
-
-    api:
-      API_BASE
-
+    service: "СК МЕТРОШОП API",
+    api: API_BASE
   });
 
 });
@@ -764,9 +665,7 @@ app.get("/", (req, res) => {
 app.get(
   "/api/products",
   (req, res) => {
-
     res.json(PRODUCTS);
-
   }
 );
 
@@ -782,10 +681,9 @@ app.post(
     try {
 
       const {
-        telegramUser,
         user
-      } = requireTelegramUser(req);
-
+      } =
+        requireTelegramUser(req);
 
       res.json({
 
@@ -806,7 +704,6 @@ app.post(
     } catch (error) {
 
       res.status(401).json({
-
         error:
           error.message ||
           "Ошибка авторизации Telegram."
@@ -829,23 +726,21 @@ app.post(
 
       const {
         user
-      } = requireTelegramUser(req);
+      } =
+        requireTelegramUser(req);
 
-
-      const userTransactions =
+      const history =
         transactions.get(
           String(user.id)
         ) || [];
 
-
       res.json(
-        userTransactions
+        history
       );
 
     } catch (error) {
 
       res.status(401).json({
-
         error:
           error.message ||
           "Ошибка авторизации Telegram."
@@ -868,16 +763,16 @@ app.post(
 
       const {
         user
-      } = requireTelegramUser(req);
-
+      } =
+        requireTelegramUser(req);
 
       const amount =
-        Number(req.body.amount);
-
+        Number(
+          req.body.amount
+        );
 
       const promoPercent =
-        req.body.promoPercent;
-
+        req.body.promoPercent || "";
 
       if (
         !Number.isInteger(amount) ||
@@ -886,12 +781,10 @@ app.post(
       ) {
 
         return res.status(400).json({
-
           error:
             "Количество PT должно быть от 1 до 1 000 000."
         });
       }
-
 
       const result =
         calculatePercentPromo(
@@ -900,8 +793,9 @@ app.post(
           promoPercent
         );
 
-
       res.json({
+
+        ok: true,
 
         code:
           result.code,
@@ -926,7 +820,6 @@ app.post(
     } catch (error) {
 
       res.status(400).json({
-
         error:
           error.message ||
           "Ошибка проверки промокода."
@@ -949,21 +842,18 @@ app.post(
 
       const {
         user
-      } = requireTelegramUser(req);
-
-
-      const promoBonus =
-        req.body.promoBonus;
-
+      } =
+        requireTelegramUser(req);
 
       const result =
         calculateBonusPromo(
           user,
-          promoBonus
+          req.body.promoBonus
         );
 
-
       res.json({
+
+        ok: true,
 
         code:
           result.code,
@@ -976,7 +866,6 @@ app.post(
     } catch (error) {
 
       res.status(400).json({
-
         error:
           error.message ||
           "Ошибка проверки PT-промокода."
@@ -988,8 +877,7 @@ app.post(
 
 
 /* =========================================================
-   СТАРЫЙ CHECK ПРОМОКОДА
-   ОСТАВЛЯЕМ ДЛЯ СОВМЕСТИМОСТИ
+   СОВМЕСТИМОСТЬ СО СТАРЫМ FRONTEND
    ========================================================= */
 
 app.post(
@@ -1000,16 +888,13 @@ app.post(
 
       const {
         user
-      } = requireTelegramUser(req);
-
+      } =
+        requireTelegramUser(req);
 
       const amount =
-        Number(req.body.amount);
-
-
-      const promoCode =
-        req.body.promoCode || "";
-
+        Number(
+          req.body.amount
+        );
 
       if (
         !Number.isInteger(amount) ||
@@ -1017,22 +902,21 @@ app.post(
       ) {
 
         return res.status(400).json({
-
           error:
             "Некорректная сумма."
         });
       }
 
-
       const result =
         calculatePercentPromo(
           user,
           amount,
-          promoCode
+          req.body.promoCode || ""
         );
 
-
       res.json({
+
+        ok: true,
 
         code:
           result.code,
@@ -1051,7 +935,6 @@ app.post(
     } catch (error) {
 
       res.status(400).json({
-
         error:
           error.message ||
           "Ошибка проверки промокода."
@@ -1089,19 +972,35 @@ app.post(
 
 
       /*
-       * Проверяем именно PT-промокод.
-       * Процентные промокоды здесь использовать нельзя.
+       * Проверяем, что это именно
+       * PT-промокод.
        */
 
-      const promo =
+      const checked =
         calculateBonusPromo(
           user,
           code
         );
 
 
+      const bonus =
+        Number(
+          checked.bonus
+        ) || 0;
+
+
+      if (bonus <= 0) {
+
+        return res.status(400).json({
+          error:
+            "У этого промокода нет бонуса."
+        });
+      }
+
+
       /*
-       * Фиксируем использование промокода.
+       * Фиксируем использование
+       * только после успешной проверки.
        */
 
       activatePromoCode(
@@ -1111,34 +1010,21 @@ app.post(
 
 
       /*
-       * Начисляем бонус на баланс.
+       * Начисляем PT.
        */
-
-      const bonus =
-        Number(promo.bonus) || 0;
-
-
-      if (bonus <= 0) {
-
-        return res.status(400).json({
-          error:
-            "У этого промокода отсутствует бонус."
-        });
-      }
-
 
       user.balance += bonus;
 
 
       /*
-       * Добавляем операцию в историю.
+       * Записываем в историю.
        */
 
       addTransaction(
         user.id,
         "promo_bonus",
         bonus,
-        `Активация PT-промокода ${code}`
+        "Активация PT-промокода"
       );
 
 
@@ -1160,13 +1046,19 @@ app.post(
 
     } catch (error) {
 
+      console.error(
+        "Promo activate error:",
+        error
+      );
+
+
       res.status(400).json({
 
         error:
           error.message ||
           "Не удалось активировать промокод."
-      });
 
+      });
     }
   }
 );
@@ -1206,7 +1098,7 @@ app.post(
 
 
       /*
-       * Проверяем товар.
+       * Ищем товар.
        */
 
       const product =
@@ -1219,7 +1111,6 @@ app.post(
       if (!product) {
 
         return res.status(404).json({
-
           error:
             "Товар не найден."
         });
@@ -1227,18 +1118,23 @@ app.post(
 
 
       /*
-       * Товары с нулевой ценой
-       * пока оформить нельзя.
+       * Получаем цену.
        */
 
       const price =
-        Number(product.price) || 0;
+        Number(
+          product.price
+        ) || 0;
 
+
+      /*
+       * Бесплатные товары
+       * пока недоступны для покупки.
+       */
 
       if (price <= 0) {
 
         return res.status(400).json({
-
           error:
             "Этот товар пока недоступен для покупки."
         });
@@ -1246,13 +1142,12 @@ app.post(
 
 
       /*
-       * Проверяем игровой ID.
+       * Проверяем Game ID.
        */
 
       if (!gameId) {
 
         return res.status(400).json({
-
           error:
             "Введите игровой ID."
         });
@@ -1263,16 +1158,19 @@ app.post(
        * Проверяем количество.
        */
 
-      if (!product.quantityEnabled) {
+      if (
+        !product.quantityEnabled
+      ) {
 
         quantity = 1;
 
       } else {
 
-        if (!Number.isInteger(quantity)) {
+        if (
+          !Number.isInteger(quantity)
+        ) {
 
           return res.status(400).json({
-
             error:
               "Количество должно быть целым числом."
           });
@@ -1294,13 +1192,14 @@ app.post(
 
             error:
               `Количество должно быть от 1 до ${maxQuantity}.`
+
           });
         }
       }
 
 
       /*
-       * Итоговая стоимость.
+       * Считаем итоговую стоимость.
        */
 
       const total =
@@ -1316,7 +1215,6 @@ app.post(
       ) {
 
         return res.status(400).json({
-
           error:
             "Недостаточно PT на балансе."
         });
@@ -1324,14 +1222,14 @@ app.post(
 
 
       /*
-       * Списываем баланс.
+       * Списываем PT.
        */
 
       user.balance -= total;
 
 
       /*
-       * Создаём ID заказа.
+       * Создаём заказ.
        */
 
       const orderId =
@@ -1368,6 +1266,7 @@ app.post(
 
         createdAt:
           new Date().toISOString()
+
       };
 
 
@@ -1378,7 +1277,7 @@ app.post(
 
 
       /*
-       * Добавляем транзакцию.
+       * Записываем покупку в историю.
        */
 
       addTransaction(
@@ -1390,7 +1289,7 @@ app.post(
 
 
       /*
-       * Пытаемся отправить заказ в рабочий чат.
+       * Отправляем заказ сотрудникам.
        */
 
       try {
@@ -1402,23 +1301,23 @@ app.post(
       } catch (telegramError) {
 
         console.error(
-          "Ошибка отправки заказа в Telegram:",
+          "Ошибка отправки заказа:",
           telegramError
         );
 
 
         /*
-         * Если сообщение сотрудникам
-         * не ушло — возвращаем деньги.
+         * Если заказ не отправился —
+         * возвращаем PT.
          */
 
         user.balance += total;
 
-        orders.delete(orderId);
 
-        /*
-         * Добавляем возврат в историю.
-         */
+        orders.delete(
+          orderId
+        );
+
 
         addTransaction(
           user.id,
@@ -1431,10 +1330,11 @@ app.post(
         return res.status(500).json({
 
           error:
-            "Не удалось отправить заказ. PT возвращены на баланс.",
+            "Не удалось отправить заказ. PT возвращены.",
 
           balance:
             user.balance
+
         });
       }
 
@@ -1473,8 +1373,8 @@ app.post(
         error:
           error.message ||
           "Не удалось оформить заказ."
-      });
 
+      });
     }
   }
 );
@@ -1511,38 +1411,43 @@ app.post(
 
           error:
             "Количество PT должно быть от 1 до 1 000 000."
+
         });
       }
 
 
       /*
-       * Только процентный промокод.
+       * Промокод здесь только
+       * на процент к пополнению.
        */
 
       let promoPercent =
-        req.body.promoPercent || "";
+        String(
+          req.body.promoPercent || ""
+        ).trim();
 
 
       /*
-       * Старое поле оставляем для совместимости.
-       * Если новое поле пустое, можем использовать promoCode.
+       * Старое поле оставляем
+       * для совместимости.
        */
 
       if (
-        !String(promoPercent).trim() &&
-        String(req.body.promoCode || "").trim()
+        !promoPercent &&
+        String(
+          req.body.promoCode || ""
+        ).trim()
       ) {
 
         promoPercent =
-          req.body.promoCode;
+          String(
+            req.body.promoCode
+          ).trim();
       }
 
 
       /*
-       * PT-промокод через пополнение НЕ активируем.
-       * Для него используется отдельный endpoint:
-       *
-       * POST /api/promo/activate
+       * PT-промокоды сюда не принимаем.
        */
 
       const promoBonus =
@@ -1550,16 +1455,6 @@ app.post(
           req.body.promoBonus || ""
         ).trim();
 
-
-      /*
-       * Если по какой-то причине frontend
-       * передал PT-код в поле promoBonus,
-       * не активируем его автоматически.
-       *
-       * Это важно, чтобы один PT-код нельзя было
-       * случайно или повторно активировать
-       * через создание заявки.
-       */
 
       if (promoBonus) {
 
@@ -1569,21 +1464,22 @@ app.post(
           );
 
 
-        const promo =
+        const bonusPromo =
           PROMOCODES[
             normalizedBonus
           ];
 
 
         if (
-          promo &&
-          promo.type === "bonus"
+          bonusPromo &&
+          bonusPromo.type === "bonus"
         ) {
 
           return res.status(400).json({
 
             error:
-              "PT-промокод нужно активировать отдельно в разделе «Промокод PT»."
+              "PT-промокод нужно активировать через отдельную кнопку «Промокод PT»."
+
           });
         }
       }
@@ -1607,28 +1503,18 @@ app.post(
         ) || 0;
 
 
-      const fixedBonus =
-        0;
-
-
       const totalPoints =
         amount +
-        percentBonus +
-        fixedBonus;
+        percentBonus;
 
 
       /*
-       * Уникальный ID заявки.
+       * Создаём ID заявки.
        */
 
       const paymentId =
         crypto.randomUUID();
 
-
-      /*
-       * Пока платёжная система
-       * реально не подключена.
-       */
 
       const payment = {
 
@@ -1643,9 +1529,10 @@ app.post(
         promoPercent:
           percentResult.code,
 
-        percentBonus,
+        percent:
+          percentResult.percent,
 
-        fixedBonus,
+        percentBonus,
 
         totalPoints,
 
@@ -1654,20 +1541,20 @@ app.post(
 
         createdAt:
           new Date().toISOString()
+
       };
 
-
-      /*
-       * Можно хранить заявку отдельно
-       * в orders только для текущей сессии,
-       * но реальные платежи пока не подключены.
-       */
 
       orders.set(
         `payment_${paymentId}`,
         payment
       );
 
+
+      /*
+       * Пока настоящей оплаты нет.
+       * Баланс здесь НЕ увеличиваем.
+       */
 
       res.json({
 
@@ -1685,14 +1572,10 @@ app.post(
 
         percentBonus,
 
-        fixedBonus,
+        fixedBonus:
+          0,
 
         totalPoints,
-
-        /*
-         * Когда подключишь платёжку,
-         * сюда можно будет вернуть реальную ссылку.
-         */
 
         paymentUrl:
           null,
@@ -1705,7 +1588,7 @@ app.post(
     } catch (error) {
 
       console.error(
-        "Topup create error:",
+        "Topup error:",
         error
       );
 
@@ -1714,9 +1597,9 @@ app.post(
 
         error:
           error.message ||
-          "Не удалось создать заявку на пополнение."
-      });
+          "Не удалось создать заявку."
 
+      });
     }
   }
 );
@@ -1736,6 +1619,7 @@ app.post(
 
       error:
         "Платёжная система пока не подключена."
+
     });
 
   }
@@ -1743,7 +1627,7 @@ app.post(
 
 
 /* =========================================================
-   ПОЛУЧЕНИЕ ЗАКАЗА
+   ПОЛУЧЕНИЕ ЗАКАЗА ПО ID
    ========================================================= */
 
 app.get(
@@ -1764,13 +1648,17 @@ app.get(
 
           error:
             "Заказ не найден."
+
         });
       }
 
 
       res.json({
+
         ok: true,
+
         order
+
       });
 
     } catch (error) {
@@ -1779,15 +1667,15 @@ app.get(
 
         error:
           "Ошибка получения заказа."
-      });
 
+      });
     }
   }
 );
 
 
 /* =========================================================
-   TELEGRAM BOT — ОТПРАВКА ЗАКАЗА СОТРУДНИКАМ
+   TELEGRAM API
    ========================================================= */
 
 async function telegramRequest(
@@ -1807,15 +1695,20 @@ async function telegramRequest(
     await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/${method}`,
       {
-        method: "POST",
+
+        method:
+          "POST",
 
         headers: {
+
           "Content-Type":
             "application/json"
+
         },
 
         body:
           JSON.stringify(body)
+
       }
     );
 
@@ -1824,11 +1717,16 @@ async function telegramRequest(
     await response.json();
 
 
-  if (!response.ok || !result.ok) {
+  if (
+    !response.ok ||
+    !result.ok
+  ) {
 
     throw new Error(
+
       result.description ||
       `Telegram API error: ${response.status}`
+
     );
   }
 
@@ -1838,7 +1736,7 @@ async function telegramRequest(
 
 
 /* =========================================================
-   ОТПРАВКА ЗАКАЗА В STAFF CHAT
+   ОТПРАВКА ЗАКАЗА СОТРУДНИКАМ
    ========================================================= */
 
 async function sendOrderToStaff(
@@ -1855,12 +1753,11 @@ async function sendOrderToStaff(
 
   const username =
     order.username
-      ? "@" + order.username
+      ? `@${order.username}`
       : "не указан";
 
 
   const text =
-
 `🛒 НОВЫЙ ЗАКАЗ
 
 📦 Товар:
@@ -1918,867 +1815,712 @@ ${order.id}`;
 
       reply_markup:
         keyboard
+
     }
   );
 }/* =========================================================
-   АКТИВАЦИЯ ОТДЕЛЬНОГО PT-ПРОМОКОДА
+   TELEGRAM — ВЗЯТЬ ЗАКАЗ
    ========================================================= */
 
-app.post(
-  "/api/promo/activate",
-  (req, res) => {
-
-    try {
-
-      const {
-        user
-      } = requireTelegramUser(req);
-
-
-      const code =
-        normalizePromoCode(
-          req.body.code
-        );
-
-
-      if (!code) {
-
-        return res.status(400).json({
-          error: "Введите промокод."
-        });
-      }
-
-
-      /*
-       * Проверяем именно PT-промокод.
-       * Процентные промокоды здесь использовать нельзя.
-       */
-
-      const promo =
-        calculateBonusPromo(
-          user,
-          code
-        );
-
-
-      /*
-       * Фиксируем использование промокода.
-       */
-
-      activatePromoCode(
-        user,
-        code
-      );
-
-
-      /*
-       * Начисляем бонус на баланс.
-       */
-
-      const bonus =
-        Number(promo.bonus) || 0;
-
-
-      if (bonus <= 0) {
-
-        return res.status(400).json({
-          error:
-            "У этого промокода отсутствует бонус."
-        });
-      }
-
-
-      user.balance += bonus;
-
-
-      /*
-       * Добавляем операцию в историю.
-       */
-
-      addTransaction(
-        user.id,
-        "promo_bonus",
-        bonus,
-        `Активация PT-промокода ${code}`
-      );
-
-
-      res.json({
-
-        ok: true,
-
-        code,
-
-        bonus,
-
-        balance:
-          user.balance,
-
-        message:
-          `Промокод активирован. Начислено ${bonus} PT.`
-
-      });
-
-    } catch (error) {
-
-      res.status(400).json({
-
-        error:
-          error.message ||
-          "Не удалось активировать промокод."
-      });
-
-    }
-  }
-);
-
-
-/* =========================================================
-   ПОКУПКА ТОВАРА
-   ========================================================= */
-
-app.post(
-  "/api/buy",
-  async (req, res) => {
-
-    try {
-
-      const {
-        user
-      } = requireTelegramUser(req);
-
-
-      const productName =
-        String(
-          req.body.product || ""
-        ).trim();
-
-
-      const gameId =
-        String(
-          req.body.gameId || ""
-        ).trim();
-
-
-      let quantity =
-        Number(
-          req.body.quantity || 1
-        );
-
-
-      /*
-       * Проверяем товар.
-       */
-
-      const product =
-        PRODUCTS.find(
-          item =>
-            item.name === productName
-        );
-
-
-      if (!product) {
-
-        return res.status(404).json({
-
-          error:
-            "Товар не найден."
-        });
-      }
-
-
-      /*
-       * Товары с нулевой ценой
-       * пока оформить нельзя.
-       */
-
-      const price =
-        Number(product.price) || 0;
-
-
-      if (price <= 0) {
-
-        return res.status(400).json({
-
-          error:
-            "Этот товар пока недоступен для покупки."
-        });
-      }
-
-
-      /*
-       * Проверяем игровой ID.
-       */
-
-      if (!gameId) {
-
-        return res.status(400).json({
-
-          error:
-            "Введите игровой ID."
-        });
-      }
-
-
-      /*
-       * Проверяем количество.
-       */
-
-      if (!product.quantityEnabled) {
-
-        quantity = 1;
-
-      } else {
-
-        if (!Number.isInteger(quantity)) {
-
-          return res.status(400).json({
-
-            error:
-              "Количество должно быть целым числом."
-          });
-        }
-
-
-        const maxQuantity =
-          Number(
-            product.maxQuantity || 1
-          );
-
-
-        if (
-          quantity < 1 ||
-          quantity > maxQuantity
-        ) {
-
-          return res.status(400).json({
-
-            error:
-              `Количество должно быть от 1 до ${maxQuantity}.`
-          });
-        }
-      }
-
-
-      /*
-       * Итоговая стоимость.
-       */
-
-      const total =
-        price * quantity;
-
-
-      /*
-       * Проверяем баланс.
-       */
-
-      if (
-        Number(user.balance) < total
-      ) {
-
-        return res.status(400).json({
-
-          error:
-            "Недостаточно PT на балансе."
-        });
-      }
-
-
-      /*
-       * Списываем баланс.
-       */
-
-      user.balance -= total;
-
-
-      /*
-       * Создаём ID заказа.
-       */
-
-      const orderId =
-        crypto.randomUUID();
-
-
-      const order = {
-
-        id:
-          orderId,
-
-        userId:
-          String(user.id),
-
-        username:
-          user.username || "",
-
-        firstName:
-          user.firstName || "",
-
-        product:
-          product.name,
-
-        gameId,
-
-        quantity,
-
-        price,
-
-        total,
-
-        status:
-          "waiting",
-
-        createdAt:
-          new Date().toISOString()
-      };
-
-
-      orders.set(
-        orderId,
-        order
-      );
-
-
-      /*
-       * Добавляем транзакцию.
-       */
-
-      addTransaction(
-        user.id,
-        "purchase",
-        -total,
-        `Покупка: ${product.name} × ${quantity}`
-      );
-
-
-      /*
-       * Пытаемся отправить заказ в рабочий чат.
-       */
-
-      try {
-
-        await sendOrderToStaff(
-          order
-        );
-
-      } catch (telegramError) {
-
-        console.error(
-          "Ошибка отправки заказа в Telegram:",
-          telegramError
-        );
-
-
-        /*
-         * Если сообщение сотрудникам
-         * не ушло — возвращаем деньги.
-         */
-
-        user.balance += total;
-
-        orders.delete(orderId);
-
-        /*
-         * Добавляем возврат в историю.
-         */
-
-        addTransaction(
-          user.id,
-          "refund",
-          total,
-          "Возврат средств: заказ не удалось отправить."
-        );
-
-
-        return res.status(500).json({
-
-          error:
-            "Не удалось отправить заказ. PT возвращены на баланс.",
-
-          balance:
-            user.balance
-        });
-      }
-
-
-      res.json({
-
-        ok: true,
-
-        orderId,
-
-        product:
-          product.name,
-
-        quantity,
-
-        total,
-
-        balance:
-          user.balance,
-
-        message:
-          "Заказ принят и отправлен сотрудникам."
-
-      });
-
-    } catch (error) {
-
-      console.error(
-        "Buy error:",
-        error
-      );
-
-
-      res.status(400).json({
-
-        error:
-          error.message ||
-          "Не удалось оформить заказ."
-      });
-
-    }
-  }
-);
-
-
-/* =========================================================
-   СОЗДАНИЕ ЗАЯВКИ НА ПОПОЛНЕНИЕ
-   ========================================================= */
-
-app.post(
-  "/api/topup/create",
-  (req, res) => {
-
-    try {
-
-      const {
-        user
-      } = requireTelegramUser(req);
-
-
-      const amount =
-        Number(
-          req.body.amount
-        );
-
-
-      if (
-        !Number.isInteger(amount) ||
-        amount < 1 ||
-        amount > 1000000
-      ) {
-
-        return res.status(400).json({
-
-          error:
-            "Количество PT должно быть от 1 до 1 000 000."
-        });
-      }
-
-
-      /*
-       * Только процентный промокод.
-       */
-
-      let promoPercent =
-        req.body.promoPercent || "";
-
-
-      /*
-       * Старое поле оставляем для совместимости.
-       * Если новое поле пустое, можем использовать promoCode.
-       */
-
-      if (
-        !String(promoPercent).trim() &&
-        String(req.body.promoCode || "").trim()
-      ) {
-
-        promoPercent =
-          req.body.promoCode;
-      }
-
-
-      /*
-       * PT-промокод через пополнение НЕ активируем.
-       * Для него используется отдельный endpoint:
-       *
-       * POST /api/promo/activate
-       */
-
-      const promoBonus =
-        String(
-          req.body.promoBonus || ""
-        ).trim();
-
-
-      /*
-       * Если по какой-то причине frontend
-       * передал PT-код в поле promoBonus,
-       * не активируем его автоматически.
-       *
-       * Это важно, чтобы один PT-код нельзя было
-       * случайно или повторно активировать
-       * через создание заявки.
-       */
-
-      if (promoBonus) {
-
-        const normalizedBonus =
-          normalizePromoCode(
-            promoBonus
-          );
-
-
-        const promo =
-          PROMOCODES[
-            normalizedBonus
-          ];
-
-
-        if (
-          promo &&
-          promo.type === "bonus"
-        ) {
-
-          return res.status(400).json({
-
-            error:
-              "PT-промокод нужно активировать отдельно в разделе «Промокод PT»."
-          });
-        }
-      }
-
-
-      /*
-       * Считаем процентный бонус.
-       */
-
-      const percentResult =
-        calculatePercentPromo(
-          user,
-          amount,
-          promoPercent
-        );
-
-
-      const percentBonus =
-        Number(
-          percentResult.bonus
-        ) || 0;
-
-
-      const fixedBonus =
-        0;
-
-
-      const totalPoints =
-        amount +
-        percentBonus +
-        fixedBonus;
-
-
-      /*
-       * Уникальный ID заявки.
-       */
-
-      const paymentId =
-        crypto.randomUUID();
-
-
-      /*
-       * Пока платёжная система
-       * реально не подключена.
-       */
-
-      const payment = {
-
-        id:
-          paymentId,
-
-        userId:
-          String(user.id),
-
-        amount,
-
-        promoPercent:
-          percentResult.code,
-
-        percentBonus,
-
-        fixedBonus,
-
-        totalPoints,
-
-        status:
-          "waiting_payment",
-
-        createdAt:
-          new Date().toISOString()
-      };
-
-
-      /*
-       * Можно хранить заявку отдельно
-       * в orders только для текущей сессии,
-       * но реальные платежи пока не подключены.
-       */
-
-      orders.set(
-        `payment_${paymentId}`,
-        payment
-      );
-
-
-      res.json({
-
-        ok: true,
-
-        paymentId,
-
-        amount,
-
-        promoPercent:
-          percentResult.code,
-
-        percent:
-          percentResult.percent,
-
-        percentBonus,
-
-        fixedBonus,
-
-        totalPoints,
-
-        /*
-         * Когда подключишь платёжку,
-         * сюда можно будет вернуть реальную ссылку.
-         */
-
-        paymentUrl:
-          null,
-
-        message:
-          "Заявка рассчитана. Ручная оплата будет подключена следующим этапом."
-
-      });
-
-    } catch (error) {
-
-      console.error(
-        "Topup create error:",
-        error
-      );
-
-
-      res.status(400).json({
-
-        error:
-          error.message ||
-          "Не удалось создать заявку на пополнение."
-      });
-
-    }
-  }
-);
-
-
-/* =========================================================
-   WEBHOOK ОПЛАТЫ
-   ========================================================= */
-
-app.post(
-  "/api/payment/webhook",
-  (req, res) => {
-
-    res.status(501).json({
-
-      ok: false,
-
-      error:
-        "Платёжная система пока не подключена."
-    });
-
-  }
-);
-
-
-/* =========================================================
-   ПОЛУЧЕНИЕ ЗАКАЗА
-   ========================================================= */
-
-app.get(
-  "/api/orders/:id",
-  (req, res) => {
-
-    try {
-
-      const order =
-        orders.get(
-          req.params.id
-        );
-
-
-      if (!order) {
-
-        return res.status(404).json({
-
-          error:
-            "Заказ не найден."
-        });
-      }
-
-
-      res.json({
-        ok: true,
-        order
-      });
-
-    } catch (error) {
-
-      res.status(500).json({
-
-        error:
-          "Ошибка получения заказа."
-      });
-
-    }
-  }
-);
-
-
-/* =========================================================
-   TELEGRAM BOT — ОТПРАВКА ЗАКАЗА СОТРУДНИКАМ
-   ========================================================= */
-
-async function telegramRequest(
-  method,
-  body
+async function handleClaim(
+  callbackQuery,
+  orderId
 ) {
 
-  if (!BOT_TOKEN) {
+  const order =
+    orders.get(orderId);
 
-    throw new Error(
-      "BOT_TOKEN не настроен."
-    );
-  }
+  if (!order) {
 
-
-  const response =
-    await fetch(
-      `https://api.telegram.org/bot${BOT_TOKEN}/${method}`,
+    await telegramRequest(
+      "answerCallbackQuery",
       {
-        method: "POST",
+        callback_query_id:
+          callbackQuery.id,
 
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
+        text:
+          "Заказ не найден.",
 
-        body:
-          JSON.stringify(body)
+        show_alert:
+          true
       }
     );
 
-
-  const result =
-    await response.json();
-
-
-  if (!response.ok || !result.ok) {
-
-    throw new Error(
-      result.description ||
-      `Telegram API error: ${response.status}`
-    );
+    return;
   }
 
 
-  return result;
+  if (
+    order.status !== "waiting"
+  ) {
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+
+        text:
+          "Этот заказ уже взят.",
+
+        show_alert:
+          true
+      }
+    );
+
+    return;
+  }
+
+
+  const staff =
+    callbackQuery.from;
+
+
+  const staffName =
+    [
+      staff.first_name,
+      staff.last_name
+    ]
+      .filter(Boolean)
+      .join(" ") ||
+    staff.username ||
+    String(staff.id);
+
+
+  order.status =
+    "claimed";
+
+
+  order.staffId =
+    String(staff.id);
+
+
+  order.staffUsername =
+    staff.username || "";
+
+
+  order.staffName =
+    staffName;
+
+
+  order.claimedAt =
+    new Date().toISOString();
+
+
+  orders.set(
+    orderId,
+    order
+  );
+
+
+  await telegramRequest(
+    "answerCallbackQuery",
+    {
+      callback_query_id:
+        callbackQuery.id,
+
+      text:
+        "Заказ взят."
+    }
+  );
+
+
+  try {
+
+    await telegramRequest(
+      "editMessageReplyMarkup",
+      {
+
+        chat_id:
+          callbackQuery.message.chat.id,
+
+        message_id:
+          callbackQuery.message.message_id,
+
+        reply_markup: {
+
+          inline_keyboard: [
+
+            [
+              {
+                text:
+                  `✅ ВЗЯТО: ${staffName}`,
+
+                callback_data:
+                  `complete:${orderId}`
+              }
+            ]
+
+          ]
+
+        }
+
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Ошибка обновления кнопки:",
+      error
+    );
+  }
 }
 
 
 /* =========================================================
-   ОТПРАВКА ЗАКАЗА В STAFF CHAT
+   TELEGRAM — ЗАВЕРШИТЬ ЗАКАЗ
    ========================================================= */
 
-async function sendOrderToStaff(
-  order
+async function handleComplete(
+  callbackQuery,
+  orderId
 ) {
 
-  if (!STAFF_CHAT_ID) {
+  const order =
+    orders.get(orderId);
 
-    throw new Error(
-      "STAFF_CHAT_ID не настроен."
+
+  if (!order) {
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+
+        text:
+          "Заказ не найден.",
+
+        show_alert:
+          true
+      }
     );
+
+    return;
   }
 
 
-  const username =
-    order.username
-      ? "@" + order.username
-      : "не указан";
+  if (
+    order.status !== "claimed"
+  ) {
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+
+        text:
+          "Этот заказ нельзя завершить.",
+
+        show_alert:
+          true
+      }
+    );
+
+    return;
+  }
 
 
-  const text =
-
-`🛒 НОВЫЙ ЗАКАЗ
-
-📦 Товар:
-${order.product}
-
-🔢 Количество:
-${order.quantity}
-
-💎 Сумма:
-${order.total} PT
-
-🎮 Game ID:
-${order.gameId}
-
-👤 Пользователь:
-${order.firstName || "Не указан"}
-
-🔗 Username:
-${username}
-
-🆔 Telegram ID:
-${order.userId}
-
-📋 Order ID:
-${order.id}`;
+  const staffId =
+    String(
+      callbackQuery.from.id
+    );
 
 
-  const keyboard = {
+  if (
+    String(order.staffId) !==
+    staffId
+  ) {
 
-    inline_keyboard: [
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
 
-      [
-        {
-          text:
-            "✅ ВЗЯТЬ ЗАКАЗ",
+        text:
+          "Завершить заказ может только тот, кто его взял.",
 
-          callback_data:
-            `claim:${order.id}`
-        }
-      ]
+        show_alert:
+          true
+      }
+    );
 
-    ]
-
-  };
+    return;
+  }
 
 
-  return telegramRequest(
-    "sendMessage",
+  order.status =
+    "completed";
+
+
+  order.completedAt =
+    new Date().toISOString();
+
+
+  orders.set(
+    orderId,
+    order
+  );
+
+
+  await telegramRequest(
+    "answerCallbackQuery",
     {
+      callback_query_id:
+        callbackQuery.id,
 
-      chat_id:
-        STAFF_CHAT_ID,
+      text:
+        "Заказ завершён."
+    }
+  );
 
-      text,
 
-      reply_markup:
-        keyboard
+  try {
+
+    await telegramRequest(
+      "editMessageReplyMarkup",
+      {
+
+        chat_id:
+          callbackQuery.message.chat.id,
+
+        message_id:
+          callbackQuery.message.message_id,
+
+        reply_markup: {
+
+          inline_keyboard: [
+
+            [
+              {
+                text:
+                  "✅ ЗАКАЗ ЗАВЕРШЁН",
+
+                callback_data:
+                  "done"
+              }
+            ]
+
+          ]
+
+        }
+
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Ошибка обновления кнопки завершения:",
+      error
+    );
+  }
+}
+
+
+/* =========================================================
+   TELEGRAM CALLBACK ROUTER
+   ========================================================= */
+
+async function handleCallback(
+  callbackQuery
+) {
+
+  const data =
+    String(
+      callbackQuery.data || ""
+    );
+
+
+  if (
+    data === "done"
+  ) {
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+
+        text:
+          "Заказ уже завершён."
+      }
+    );
+
+    return;
+  }
+
+
+  const separator =
+    data.indexOf(":");
+
+
+  if (
+    separator === -1
+  ) {
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+
+        text:
+          "Некорректная команда."
+      }
+    );
+
+    return;
+  }
+
+
+  const action =
+    data.slice(
+      0,
+      separator
+    );
+
+
+  const orderId =
+    data.slice(
+      separator + 1
+    );
+
+
+  if (
+    action === "claim"
+  ) {
+
+    await handleClaim(
+      callbackQuery,
+      orderId
+    );
+
+    return;
+  }
+
+
+  if (
+    action === "complete"
+  ) {
+
+    await handleComplete(
+      callbackQuery,
+      orderId
+    );
+
+    return;
+  }
+
+
+  await telegramRequest(
+    "answerCallbackQuery",
+    {
+      callback_query_id:
+        callbackQuery.id,
+
+      text:
+        "Неизвестная команда."
     }
   );
 }
+
+
+/* =========================================================
+   ОБРАБОТКА TELEGRAM UPDATE
+   ========================================================= */
+
+async function processTelegramUpdate(
+  update
+) {
+
+  if (
+    update &&
+    update.callback_query
+  ) {
+
+    try {
+
+      await handleCallback(
+        update.callback_query
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Callback handler error:",
+        error
+      );
+
+
+      try {
+
+        await telegramRequest(
+          "answerCallbackQuery",
+          {
+            callback_query_id:
+              update.callback_query.id,
+
+            text:
+              "Произошла ошибка."
+          }
+        );
+
+      } catch (nestedError) {
+
+        console.error(
+          "Ошибка ответа callback:",
+          nestedError
+        );
+      }
+    }
+  }
+}
+
+
+/* =========================================================
+   TELEGRAM LONG POLLING
+   ========================================================= */
+
+let telegramOffset =
+  0;
+
+
+let telegramPolling =
+  false;
+
+
+async function startTelegramPolling() {
+
+  if (
+    telegramPolling ||
+    !BOT_TOKEN
+  ) {
+    return;
+  }
+
+
+  telegramPolling =
+    true;
+
+
+  /*
+   * Убираем webhook,
+   * чтобы getUpdates работал.
+   */
+
+  try {
+
+    await telegramRequest(
+      "deleteWebhook",
+      {
+        drop_pending_updates:
+          false
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Ошибка удаления webhook:",
+      error
+    );
+  }
+
+
+  console.log(
+    "Telegram polling started."
+  );
+
+
+  while (telegramPolling) {
+
+    try {
+
+      const result =
+        await telegramRequest(
+          "getUpdates",
+          {
+
+            offset:
+              telegramOffset,
+
+            timeout:
+              25,
+
+            allowed_updates:
+              [
+                "callback_query"
+              ]
+
+          }
+        );
+
+
+      const updates =
+        Array.isArray(
+          result.result
+        )
+          ? result.result
+          : [];
+
+
+      for (
+        const update
+        of updates
+      ) {
+
+        telegramOffset =
+          Number(
+            update.update_id
+          ) + 1;
+
+
+        await processTelegramUpdate(
+          update
+        );
+      }
+
+
+    } catch (error) {
+
+      console.error(
+        "Telegram polling error:",
+        error
+      );
+
+
+      await new Promise(
+        resolve =>
+          setTimeout(
+            resolve,
+            3000
+          )
+      );
+    }
+  }
+}
+
+
+/* =========================================================
+   ПРЕДУПРЕЖДЕНИЯ О НАСТРОЙКАХ
+   ========================================================= */
+
+function checkEnvironment() {
+
+  console.log(
+    "===================================="
+  );
+
+  console.log(
+    "СК МЕТРОШОП SERVER"
+  );
+
+  console.log(
+    "PORT:",
+    PORT
+  );
+
+  console.log(
+    "BOT_TOKEN:",
+    BOT_TOKEN
+      ? "OK"
+      : "НЕ НАСТРОЕН"
+  );
+
+  console.log(
+    "STAFF_CHAT_ID:",
+    STAFF_CHAT_ID
+      ? "OK"
+      : "НЕ НАСТРОЕН"
+  );
+
+  console.log(
+    "API:",
+    API_BASE
+  );
+
+  console.log(
+    "PROMOCODES:",
+    Object.keys(PROMOCODES)
+  );
+
+  console.log(
+    "===================================="
+  );
+}
+
+
+/* =========================================================
+   ЗАПУСК СЕРВЕРА
+   ========================================================= */
+
+app.listen(
+  PORT,
+  () => {
+
+    console.log(
+      `Server started on port ${PORT}`
+    );
+
+
+    checkEnvironment();
+
+
+    if (BOT_TOKEN) {
+
+      startTelegramPolling()
+        .catch((error) => {
+
+          console.error(
+            "Telegram polling start error:",
+            error
+          );
+
+        });
+
+    } else {
+
+      console.log(
+        "Telegram polling не запущен."
+      );
+
+      console.log(
+        "Причина: BOT_TOKEN отсутствует."
+      );
+    }
+  }
+);
+
+
+/* =========================================================
+   ОБРАБОТКА ОШИБОК NODE
+   ========================================================= */
+
+process.on(
+  "unhandledRejection",
+  (error) => {
+
+    console.error(
+      "Unhandled promise rejection:",
+      error
+    );
+
+  }
+);
+
+
+process.on(
+  "uncaughtException",
+  (error) => {
+
+    console.error(
+      "Uncaught exception:",
+      error
+    );
+
+  }
+);
