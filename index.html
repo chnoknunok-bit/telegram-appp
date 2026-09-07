@@ -2,12 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>СК МЕТРОШОП</title>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -49,7 +44,7 @@
       max-width: 760px;
       margin: 0 auto;
       min-height: 100vh;
-      padding-bottom: 92px;
+      padding-bottom: 95px;
     }
 
     .header {
@@ -57,9 +52,9 @@
       top: 0;
       z-index: 50;
       padding: 14px 16px 12px;
-      background: rgba(13, 13, 18, 0.96);
+      background: rgba(13, 13, 18, .96);
       backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,.06);
     }
 
     .header-top {
@@ -84,14 +79,10 @@
       align-items: center;
       justify-content: center;
       background: linear-gradient(135deg, #8d42ff, #5724a8);
-      box-shadow: 0 8px 25px rgba(141,66,255,0.28);
+      box-shadow: 0 8px 25px rgba(141,66,255,.28);
       font-size: 20px;
       font-weight: 900;
       flex: 0 0 auto;
-    }
-
-    .brand-text {
-      min-width: 0;
     }
 
     .brand-title {
@@ -107,12 +98,12 @@
     }
 
     .header-balance {
-      flex: 0 0 auto;
       padding: 9px 12px;
       border-radius: 13px;
       background: #17171f;
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,.06);
       text-align: right;
+      flex: 0 0 auto;
     }
 
     .header-balance-label {
@@ -132,7 +123,7 @@
 
     .page {
       display: none;
-      animation: fadeIn 0.18s ease;
+      animation: fadeIn .18s ease;
     }
 
     .page.active {
@@ -155,9 +146,9 @@
       padding: 20px;
       border-radius: 22px;
       background:
-        radial-gradient(circle at top right, rgba(141,66,255,0.22), transparent 36%),
+        radial-gradient(circle at top right, rgba(141,66,255,.22), transparent 36%),
         linear-gradient(145deg, #191922, #101017);
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,.06);
       margin-bottom: 14px;
     }
 
@@ -179,8 +170,8 @@
       margin-top: 18px;
       padding: 15px;
       border-radius: 17px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.05);
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.05);
     }
 
     .balance-card-label {
@@ -208,7 +199,6 @@
       color: #fff;
       font-weight: 900;
       background: linear-gradient(135deg, #8d42ff, #6524c5);
-      box-shadow: 0 10px 24px rgba(141,66,255,0.23);
     }
 
     .promo-small-button {
@@ -217,8 +207,8 @@
       min-height: 44px;
       border-radius: 13px;
       color: #d8c5ff;
-      background: rgba(141,66,255,0.09);
-      border: 1px solid rgba(141,66,255,0.22);
+      background: rgba(141,66,255,.09);
+      border: 1px solid rgba(141,66,255,.22);
       font-weight: 800;
     }
 
@@ -248,7 +238,7 @@
       border-radius: 11px;
       background: #18181f;
       color: #a7a7b4;
-      border: 1px solid rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,.05);
       font-size: 12px;
       font-weight: 800;
     }
@@ -269,7 +259,7 @@
       padding: 15px;
       border-radius: 17px;
       background: #16161d;
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,.06);
     }
 
     .product-top {
@@ -310,11 +300,12 @@
       width: 95px;
       height: 43px;
       border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,.07);
       background: #101016;
       color: #fff;
       padding: 0 10px;
       outline: none;
+      cursor: pointer;
     }
 
     .buy-button {
@@ -331,7 +322,7 @@
     }
 
     .buy-button:disabled {
-      opacity: 0.45;
+      opacity: .45;
       cursor: not-allowed;
     }
 
@@ -341,18 +332,17 @@
       border-radius: 17px;
       color: #858593;
       background: #15151b;
-      border: 1px solid rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,.05);
       line-height: 1.5;
       font-size: 13px;
     }
 
     .profile-card,
-    .history-card,
     .topup-card {
       padding: 17px;
       border-radius: 19px;
       background: #16161d;
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,.06);
     }
 
     .profile-avatar {
@@ -382,7 +372,7 @@
     .profile-balance {
       margin-top: 18px;
       padding-top: 14px;
-      border-top: 1px solid rgba(255,255,255,0.06);
+      border-top: 1px solid rgba(255,255,255,.06);
     }
 
     .profile-balance-label {
@@ -412,7 +402,7 @@
       width: 100%;
       height: 46px;
       border-radius: 13px;
-      border: 1px solid rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,.07);
       background: #101016;
       color: #fff;
       padding: 0 13px;
@@ -420,15 +410,15 @@
     }
 
     .input:focus {
-      border-color: rgba(141,66,255,0.55);
+      border-color: rgba(141,66,255,.55);
     }
 
     .amount-preview {
       margin-top: 12px;
       padding: 13px;
       border-radius: 13px;
-      background: rgba(141,66,255,0.07);
-      border: 1px solid rgba(141,66,255,0.14);
+      background: rgba(141,66,255,.07);
+      border: 1px solid rgba(141,66,255,.14);
     }
 
     .amount-preview-row {
@@ -459,7 +449,7 @@
     }
 
     .submit-button:disabled {
-      opacity: 0.55;
+      opacity: .55;
     }
 
     .history-list {
@@ -471,7 +461,7 @@
       padding: 14px;
       border-radius: 15px;
       background: #15151c;
-      border: 1px solid rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,.05);
     }
 
     .history-item-top {
@@ -481,7 +471,11 @@
       gap: 10px;
     }
 
-    .history-type,
+    .history-type {
+      font-size: 13px;
+      font-weight: 900;
+    }
+
     .history-amount {
       font-size: 13px;
       font-weight: 900;
@@ -512,10 +506,10 @@
       gap: 6px;
       padding: 7px;
       border-radius: 18px;
-      background: rgba(24,24,31,0.96);
-      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(24,24,31,.96);
+      border: 1px solid rgba(255,255,255,.07);
       backdrop-filter: blur(15px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+      box-shadow: 0 12px 40px rgba(0,0,0,.35);
     }
 
     .nav-button {
@@ -538,7 +532,7 @@
     }
 
     .nav-button.active {
-      background: rgba(141,66,255,0.14);
+      background: rgba(141,66,255,.14);
       color: #fff;
     }
 
@@ -550,7 +544,7 @@
       align-items: flex-end;
       justify-content: center;
       padding: 12px;
-      background: rgba(0,0,0,0.68);
+      background: rgba(0,0,0,.68);
       backdrop-filter: blur(5px);
     }
 
@@ -564,10 +558,10 @@
       overflow-y: auto;
       border-radius: 23px 23px 17px 17px;
       background: #17171f;
-      border: 1px solid rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,.07);
       padding: 17px;
-      box-shadow: 0 -15px 50px rgba(0,0,0,0.35);
-      animation: modalUp 0.2s ease;
+      box-shadow: 0 -15px 50px rgba(0,0,0,.35);
+      animation: modalUp .2s ease;
     }
 
     @keyframes modalUp {
@@ -609,7 +603,7 @@
       padding: 13px;
       border-radius: 14px;
       background: #101016;
-      border: 1px solid rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,.05);
     }
 
     .order-info-row {
@@ -638,7 +632,7 @@
       margin-bottom: 12px;
       padding: 12px;
       border-radius: 13px;
-      background: rgba(255,255,255,0.035);
+      background: rgba(255,255,255,.035);
       color: #9d9daa;
       font-size: 11px;
       line-height: 1.45;
@@ -668,12 +662,12 @@
       padding: 12px 14px;
       border-radius: 13px;
       background: #21212a;
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,.08);
       color: #fff;
       font-size: 12px;
       line-height: 1.35;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.3);
-      animation: toastIn 0.2s ease;
+      box-shadow: 0 12px 35px rgba(0,0,0,.3);
+      animation: toastIn .2s ease;
     }
 
     @keyframes toastIn {
@@ -691,8 +685,8 @@
     .error-box {
       padding: 15px;
       border-radius: 14px;
-      background: rgba(255,70,70,0.08);
-      border: 1px solid rgba(255,70,70,0.15);
+      background: rgba(255,70,70,.08);
+      border: 1px solid rgba(255,70,70,.15);
       color: #ffb2b2;
       font-size: 12px;
       line-height: 1.45;
@@ -727,7 +721,7 @@
           СК
         </div>
 
-        <div class="brand-text">
+        <div>
           <div class="brand-title">
             СК МЕТРОШОП
           </div>
@@ -760,9 +754,7 @@
 
   <main class="content">
 
-    <!-- =================================================
-         МАГАЗИН
-         ================================================= -->
+    <!-- МАГАЗИН -->
 
     <section
       class="page active"
@@ -860,16 +852,12 @@
       <div
         id="productsContainer"
         class="products"
-      >
-        <!-- Товары здесь будут сразу из локального списка -->
-      </div>
+      ></div>
 
     </section>
 
 
-    <!-- =================================================
-         ПОПОЛНЕНИЕ
-         ================================================= -->
+    <!-- ПОПОЛНЕНИЕ -->
 
     <section
       class="page"
@@ -969,9 +957,7 @@
     </section>
 
 
-    <!-- =================================================
-         ИСТОРИЯ
-         ================================================= -->
+    <!-- ИСТОРИЯ -->
 
     <section
       class="page"
@@ -991,9 +977,7 @@
     </section>
 
 
-    <!-- =================================================
-         ПРОФИЛЬ
-         ================================================= -->
+    <!-- ПРОФИЛЬ -->
 
     <section
       class="page"
@@ -1023,9 +1007,7 @@
 </div>
 
 
-<!-- =====================================================
-     НИЖНЯЯ НАВИГАЦИЯ
-     ===================================================== -->
+<!-- НИЖНЯЯ НАВИГАЦИЯ -->
 
 <nav class="bottom-nav">
 
@@ -1038,12 +1020,8 @@
     <div class="nav-button-icon">
       🛒
     </div>
-
-    <div>
-      Магазин
-    </div>
+    <div>Магазин</div>
   </button>
-
 
   <button
     class="nav-button"
@@ -1054,12 +1032,8 @@
     <div class="nav-button-icon">
       💎
     </div>
-
-    <div>
-      Пополнить
-    </div>
+    <div>Пополнить</div>
   </button>
-
 
   <button
     class="nav-button"
@@ -1070,12 +1044,8 @@
     <div class="nav-button-icon">
       📜
     </div>
-
-    <div>
-      История
-    </div>
+    <div>История</div>
   </button>
-
 
   <button
     class="nav-button"
@@ -1086,18 +1056,13 @@
     <div class="nav-button-icon">
       👤
     </div>
-
-    <div>
-      Профиль
-    </div>
+    <div>Профиль</div>
   </button>
 
 </nav>
 
 
-<!-- =====================================================
-     МОДАЛКА ПОКУПКИ
-     ===================================================== -->
+<!-- МОДАЛКА ПОКУПКИ -->
 
 <div
   class="modal-overlay"
@@ -1130,9 +1095,7 @@
 </div>
 
 
-<!-- =====================================================
-     МОДАЛКА ПОПОЛНЕНИЯ
-     ===================================================== -->
+<!-- МОДАЛКА ПОПОЛНЕНИЯ -->
 
 <div
   class="modal-overlay"
@@ -1158,12 +1121,10 @@
 
     </div>
 
-
     <div class="notice">
       Введи нужное количество PT и, при наличии,
       промокод на процент.
     </div>
-
 
     <div class="form-group">
 
@@ -1188,7 +1149,6 @@
 
     </div>
 
-
     <div class="form-group">
 
       <label
@@ -1209,7 +1169,6 @@
       >
 
     </div>
-
 
     <div class="amount-preview">
 
@@ -1236,7 +1195,6 @@
 
     </div>
 
-
     <button
       class="submit-button"
       type="button"
@@ -1250,9 +1208,7 @@
 </div>
 
 
-<!-- =====================================================
-     МОДАЛКА PT-ПРОМОКОДА
-     ===================================================== -->
+<!-- МОДАЛКА PT-ПРОМОКОДА -->
 
 <div
   class="modal-overlay"
@@ -1278,12 +1234,10 @@
 
     </div>
 
-
     <div class="notice">
       Введи промокод, который получил
       в Telegram-канале.
     </div>
-
 
     <div class="form-group">
 
@@ -1304,7 +1258,6 @@
       >
 
     </div>
-
 
     <button
       class="submit-button"
@@ -1327,17 +1280,9 @@
 
 <script>
 
-  /* =====================================================
-     API
-     ===================================================== */
-
   const API_BASE =
     "https://telegram-appp.onrender.com";
 
-
-  /* =====================================================
-     TELEGRAM
-     ===================================================== */
 
   const tg =
     window.Telegram &&
@@ -1348,10 +1293,6 @@
 
   /* =====================================================
      ЛОКАЛЬНЫЕ ТОВАРЫ
-     
-     ВАЖНО:
-     Они нужны для предварительного просмотра.
-     Сервер потом отдаст актуальный список.
      ===================================================== */
 
   let products = [
@@ -1373,7 +1314,6 @@
         false
     },
 
-
     {
       name:
         "Набор фулл 6",
@@ -1390,7 +1330,6 @@
       escort:
         false
     },
-
 
     {
       name:
@@ -1409,7 +1348,6 @@
         false
     },
 
-
     {
       name:
         "Сопровождение 7кк + вещи",
@@ -1426,7 +1364,6 @@
       escort:
         true
     },
-
 
     {
       name:
@@ -1445,7 +1382,6 @@
         true
     },
 
-
     {
       name:
         "Сопровождение 20кк + вещи",
@@ -1462,7 +1398,6 @@
       escort:
         true
     },
-
 
     {
       name:
@@ -1497,19 +1432,10 @@
 
 
   let currentUser = {
-
-    id:
-      null,
-
-    username:
-      "",
-
-    firstName:
-      "",
-
-    balance:
-      0
-
+    id: null,
+    username: "",
+    firstName: "",
+    balance: 0
   };
 
 
@@ -1518,7 +1444,7 @@
 
 
   /* =====================================================
-     TELEGRAM INIT
+     TELEGRAM
      ===================================================== */
 
   function initTelegram() {
@@ -1527,11 +1453,9 @@
       return;
     }
 
-
     try {
 
       tg.ready();
-
       tg.expand();
 
     } catch (error) {
@@ -1546,11 +1470,9 @@
 
   function getInitData() {
 
-    if (!tg) {
-      return "";
-    }
-
-    return tg.initData || "";
+    return tg
+      ? tg.initData || ""
+      : "";
   }
 
 
@@ -1616,7 +1538,8 @@
 
     const response =
       await fetch(
-        API_BASE + path,
+        API_BASE +
+        path,
         options
       );
 
@@ -1625,7 +1548,7 @@
       await response.text();
 
 
-    let result = {};
+    let result;
 
 
     try {
@@ -1654,14 +1577,10 @@
     ) {
 
       throw new Error(
-
         result &&
         result.error
-
           ? result.error
-
           : `Ошибка сервера (${response.status}).`
-
       );
     }
 
@@ -1703,22 +1622,25 @@
     );
 
 
-    setTimeout(() => {
+    setTimeout(
+      () => {
 
-      toast.style.opacity =
-        "0";
-
-      toast.style.transform =
-        "translateY(-5px)";
+        toast.style.opacity =
+          "0";
 
 
-      setTimeout(() => {
+        setTimeout(
+          () => {
 
-        toast.remove();
+            toast.remove();
 
-      }, 180);
+          },
+          180
+        );
 
-    }, 2800);
+      },
+      2800
+    );
   }
 
 
@@ -1837,33 +1759,22 @@
       );
 
 
-    const navButtons = [
+    document
+      .querySelectorAll(
+        ".nav-button"
+      )
+      .forEach(
+        button => {
 
-      "navShop",
-
-      "navTopup",
-
-      "navHistory",
-
-      "navProfile"
-
-    ];
-
-
-    navButtons.forEach(
-      id => {
-
-        document
-          .getElementById(id)
-          .classList.remove(
+          button.classList.remove(
             "active"
           );
 
-      }
-    );
+        }
+      );
 
 
-    const activeNav = {
+    const activeId = {
 
       shop:
         "navShop",
@@ -1877,12 +1788,12 @@
       profile:
         "navProfile"
 
-    };
+    }[page];
 
 
     document
       .getElementById(
-        activeNav[page]
+        activeId
       )
       .classList.add(
         "active"
@@ -1990,7 +1901,9 @@
 
 
         if (input) {
+
           input.focus();
+
         }
 
       },
@@ -2041,7 +1954,9 @@
 
 
     if (
-      name.includes("оруж")
+      name.includes(
+        "оруж"
+      )
     ) {
 
       return "weapons";
@@ -2086,7 +2001,7 @@
 
 
   /* =====================================================
-     ОТРИСОВКА ТОВАРОВ
+     ТОВАРЫ
      ===================================================== */
 
   function renderProducts() {
@@ -2116,6 +2031,7 @@
             ) ===
             currentCategory
           );
+
         }
       );
 
@@ -2145,17 +2061,10 @@
               ) || 0;
 
 
-            let description =
-              "Товар для Metro Royale.";
-
-
-            if (
+            const description =
               product.escort
-            ) {
-
-              description =
-                "Сопровождение с указанным количеством денег и вещей.";
-            }
+                ? "Сопровождение с указанным количеством денег и вещей."
+                : "Товар для Metro Royale.";
 
 
             if (
@@ -2179,13 +2088,11 @@
 
                   </div>
 
-
                   <div class="product-description">
                     ${escapeHtml(
                       description
                     )}
                   </div>
-
 
                   <div class="product-actions">
 
@@ -2235,13 +2142,11 @@
 
                 </div>
 
-
                 <div class="product-description">
                   ${escapeHtml(
                     description
                   )}
                 </div>
-
 
                 <div class="product-actions">
 
@@ -2257,11 +2162,9 @@
                               length:
                                 maxQuantity
                             },
-                            (_, i) => `
-                              <option
-                                value="${i + 1}"
-                              >
-                                ${i + 1} шт.
+                            (_, index) => `
+                              <option value="${index + 1}">
+                                ${index + 1} шт.
                               </option>
                             `
                           ).join("")}
@@ -2271,16 +2174,9 @@
                       : ""
                   }
 
-
                   <button
-                    class="buy-button primary"
+                    class="buy-button primary buy-product-button"
                     type="button"
-                    onclick="openBuyModal(
-                      ${JSON.stringify(
-                        product.name
-                      )},
-                      this
-                    )"
                   >
                     Купить
                   </button>
@@ -2292,79 +2188,107 @@
           }
         )
         .join("");
-  }
 
-
-  /* =====================================================
-     ЗАГРУЗКА ТОВАРОВ С СЕРВЕРА
-     ===================================================== */
-
-  async function loadProducts() {
 
     /*
-     * Сначала обязательно показываем
-     * локальные товары.
-     * Поэтому в предпросмотре каталог
-     * уже будет виден.
+     * ВАЖНО:
+     * Кнопки подключаются через addEventListener,
+     * поэтому название товара вообще не попадает
+     * внутрь onclick.
      */
 
-    renderProducts();
-
-
-    try {
-
-      const result =
-        await api(
-          "/api/products",
-          null,
-          "GET"
-        );
-
-
-      const serverProducts =
-        Array.isArray(result)
-          ? result
-          : (
-              Array.isArray(
-                result.products
-              )
-                ? result.products
-                : []
-            );
-
-
-      /*
-       * Если сервер вернул нормальный каталог,
-       * используем его.
-       */
-
-      if (
-        serverProducts.length > 0
-      ) {
-
-        products =
-          serverProducts;
-
-        renderProducts();
-      }
-
-
-    } catch (error) {
-
-      /*
-       * В предпросмотре Render может быть
-       * недоступен — тогда оставляем
-       * локальный каталог.
-       */
-
-      console.warn(
-        "Каталог сервера недоступен, используем локальный каталог:",
-        error
+    const buttons =
+      container.querySelectorAll(
+        ".buy-product-button"
       );
 
 
-      renderProducts();
-    }
+    buttons.forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            const card =
+              button.closest(
+                ".product-card"
+              );
+
+
+            if (!card) {
+              return;
+            }
+
+
+            const nameElement =
+              card.querySelector(
+                ".product-name"
+              );
+
+
+            if (!nameElement) {
+              return;
+            }
+
+
+            const productName =
+              nameElement.textContent
+                .trim();
+
+
+            const product =
+              products.find(
+                item =>
+                  item.name ===
+                  productName
+              );
+
+
+            if (!product) {
+
+              showToast(
+                "Товар не найден."
+              );
+
+              return;
+            }
+
+
+            let quantity =
+              1;
+
+
+            if (
+              product.quantityEnabled
+            ) {
+
+              const select =
+                card.querySelector(
+                  ".product-quantity"
+                );
+
+
+              if (select) {
+
+                quantity =
+                  Number(
+                    select.value
+                  ) || 1;
+              }
+            }
+
+
+            openBuyModal(
+              product,
+              quantity
+            );
+
+          }
+        );
+
+      }
+    );
   }
 
 
@@ -2373,88 +2297,22 @@
      ===================================================== */
 
   function openBuyModal(
-    productName,
-    button
+    product,
+    quantity
   ) {
-
-    const product =
-      products.find(
-        item =>
-          item.name ===
-          productName
-      );
-
-
-    if (!product) {
-
-      showToast(
-        "Товар не найден."
-      );
-
-      return;
-    }
-
 
     selectedProduct =
       product;
 
 
-    let quantity =
-      1;
-
-
-    /*
-     * Если это набор —
-     * получаем выбранное количество
-     * из select именно этой карточки.
-     */
-
-    if (
-      product.quantityEnabled &&
-      button
-    ) {
-
-      const card =
-        button.closest(
-          ".product-card"
-        );
-
-
-      if (card) {
-
-        const select =
-          card.querySelector(
-            ".product-quantity"
-          );
-
-
-        if (select) {
-
-          quantity =
-            Number(
-              select.value
-            ) || 1;
-        }
-      }
-    }
-
-
-    /*
-     * Максимум 10 за покупку.
-     */
-
-    quantity =
+    selectedQuantity =
       Math.max(
         1,
         Math.min(
-          quantity,
+          Number(quantity) || 1,
           10
         )
       );
-
-
-    selectedQuantity =
-      quantity;
 
 
     const price =
@@ -2464,7 +2322,8 @@
 
 
     const total =
-      price * quantity;
+      price *
+      selectedQuantity;
 
 
     document.getElementById(
@@ -2495,7 +2354,7 @@
           </div>
 
           <div class="order-info-value">
-            ${quantity} шт.
+            ${selectedQuantity} шт.
           </div>
 
         </div>
@@ -2557,6 +2416,7 @@
           Игровой ID
         </label>
 
+
         <input
           id="gameIdInput"
           class="input"
@@ -2573,7 +2433,7 @@
       <button
         class="submit-button"
         type="button"
-        onclick="buySelectedProduct()"
+        id="confirmBuyButton"
       >
         ✅ Купить за ${formatPT(
           total
@@ -2581,6 +2441,23 @@
       </button>
 
     `;
+
+
+    const confirmButton =
+      document.getElementById(
+        "confirmBuyButton"
+      );
+
+
+    if (
+      confirmButton
+    ) {
+
+      confirmButton.addEventListener(
+        "click",
+        buySelectedProduct
+      );
+    }
 
 
     openModal(
@@ -2664,7 +2541,8 @@
 
 
     const total =
-      price * quantity;
+      price *
+      quantity;
 
 
     if (
@@ -2681,8 +2559,8 @@
 
 
     const button =
-      document.querySelector(
-        "#buyModal .submit-button"
+      document.getElementById(
+        "confirmBuyButton"
       );
 
 
@@ -2702,14 +2580,12 @@
         await api(
           "/api/buy",
           {
-
             product:
               selectedProduct.name,
 
             gameId,
 
             quantity
-
           }
         );
 
@@ -3048,11 +2924,11 @@
     }
 
 
-    const sortedHistory =
+    const sorted =
       [...history].sort(
         (a, b) => {
 
-          const dateA =
+          const aTime =
             new Date(
               a.createdAt ||
               a.date ||
@@ -3060,7 +2936,7 @@
             ).getTime();
 
 
-          const dateB =
+          const bTime =
             new Date(
               b.createdAt ||
               b.date ||
@@ -3068,7 +2944,7 @@
             ).getTime();
 
 
-          return dateB - dateA;
+          return bTime - aTime;
         }
       );
 
@@ -3078,141 +2954,137 @@
       <div class="history-list">
 
         ${
-          sortedHistory
-            .map(
-              item => {
+          sorted.map(
+            item => {
 
-                const type =
-                  String(
-                    item.type ||
-                    "Операция"
-                  );
-
-
-                const amount =
-                  Number(
-                    item.amount
-                  ) || 0;
+              const type =
+                String(
+                  item.type ||
+                  "Операция"
+                );
 
 
-                const description =
-                  item.description ||
-                  "Операция с балансом";
+              const amount =
+                Number(
+                  item.amount
+                ) || 0;
 
 
-                let amountText =
+              let amountText =
+                formatPT(
+                  amount
+                );
+
+
+              if (
+                amount > 0
+              ) {
+
+                amountText =
+                  "+" +
                   formatPT(
                     amount
                   );
+              }
+
+
+              const description =
+                item.description ||
+                "Операция с балансом";
+
+
+              let dateText =
+                "";
+
+
+              const rawDate =
+                item.createdAt ||
+                item.date;
+
+
+              if (
+                rawDate
+              ) {
+
+                const date =
+                  new Date(
+                    rawDate
+                  );
 
 
                 if (
-                  amount > 0
+                  !Number.isNaN(
+                    date.getTime()
+                  )
                 ) {
 
-                  amountText =
-                    "+" +
-                    formatPT(
-                      amount
+                  dateText =
+                    date.toLocaleString(
+                      "ru-RU",
+                      {
+                        day:
+                          "2-digit",
+
+                        month:
+                          "2-digit",
+
+                        year:
+                          "numeric",
+
+                        hour:
+                          "2-digit",
+
+                        minute:
+                          "2-digit"
+                      }
                     );
                 }
+              }
 
 
-                let dateText =
-                  "";
+              return `
 
+                <div class="history-item">
 
-                const rawDate =
-                  item.createdAt ||
-                  item.date;
+                  <div class="history-item-top">
 
-
-                if (
-                  rawDate
-                ) {
-
-                  const date =
-                    new Date(
-                      rawDate
-                    );
-
-
-                  if (
-                    !Number.isNaN(
-                      date.getTime()
-                    )
-                  ) {
-
-                    dateText =
-                      date.toLocaleString(
-                        "ru-RU",
-                        {
-                          day:
-                            "2-digit",
-
-                          month:
-                            "2-digit",
-
-                          year:
-                            "numeric",
-
-                          hour:
-                            "2-digit",
-
-                          minute:
-                            "2-digit"
-                        }
-                      );
-                  }
-                }
-
-
-                return `
-
-                  <div class="history-item">
-
-                    <div class="history-item-top">
-
-                      <div class="history-type">
-                        ${escapeHtml(
-                          type
-                        )}
-                      </div>
-
-                      <div class="history-amount">
-                        ${escapeHtml(
-                          amountText
-                        )}
-                      </div>
-
-                    </div>
-
-
-                    <div class="history-description">
+                    <div class="history-type">
                       ${escapeHtml(
-                        description
+                        type
                       )}
                     </div>
 
-
-                    ${
-                      dateText
-                        ? `
-                          <div class="history-date">
-                            ${escapeHtml(
-                              dateText
-                            )}
-                          </div>
-                        `
-                        : ""
-                    }
+                    <div class="history-amount">
+                      ${escapeHtml(
+                        amountText
+                      )}
+                    </div>
 
                   </div>
 
-                `;
-              }
-            )
-            .join("")
+                  <div class="history-description">
+                    ${escapeHtml(
+                      description
+                    )}
+                  </div>
+
+                  ${
+                    dateText
+                      ? `
+                        <div class="history-date">
+                          ${escapeHtml(
+                            dateText
+                          )}
+                        </div>
+                      `
+                      : ""
+                  }
+
+                </div>
+
+              `;
+            }
+          ).join("")
         }
 
       </div>
@@ -3374,7 +3246,7 @@
       ) || 0;
 
 
-    const promoCode =
+    const promo =
       promoInput
         ? promoInput.value.trim()
         : "";
@@ -3383,11 +3255,13 @@
     document.getElementById(
       "previewAmount"
     ).textContent =
-      formatPT(amount);
+      formatPT(
+        amount
+      );
 
 
     if (
-      !promoCode ||
+      !promo ||
       amount <= 0
     ) {
 
@@ -3400,7 +3274,9 @@
       document.getElementById(
         "previewTotal"
       ).textContent =
-        formatPT(amount);
+        formatPT(
+          amount
+        );
 
 
       return;
@@ -3418,7 +3294,7 @@
 
           checkPercentPromo(
             amount,
-            promoCode,
+            promo,
             "page"
           );
 
@@ -3456,7 +3332,7 @@
       ) || 0;
 
 
-    const promoCode =
+    const promo =
       promoInput
         ? promoInput.value.trim()
         : "";
@@ -3465,11 +3341,13 @@
     document.getElementById(
       "modalPreviewAmount"
     ).textContent =
-      formatPT(amount);
+      formatPT(
+        amount
+      );
 
 
     if (
-      !promoCode ||
+      !promo ||
       amount <= 0
     ) {
 
@@ -3482,7 +3360,9 @@
       document.getElementById(
         "modalPreviewTotal"
       ).textContent =
-        formatPT(amount);
+        formatPT(
+          amount
+        );
 
 
       return;
@@ -3500,7 +3380,7 @@
 
           checkPercentPromo(
             amount,
-            promoCode,
+            promo,
             "modal"
           );
 
@@ -3517,7 +3397,7 @@
 
 
   /* =====================================================
-     ПРОВЕРКА ПРОЦЕНТНОГО ПРОМОКОДА
+     ПРОВЕРКА WELCOME
      ===================================================== */
 
   async function checkPercentPromo(
@@ -3527,8 +3407,6 @@
   ) {
 
     if (
-      !promoCode ||
-      amount <= 0 ||
       !hasTelegramAuth()
     ) {
 
@@ -3542,12 +3420,10 @@
         await api(
           "/api/promo/check-percent",
           {
-
             amount,
 
             promoPercent:
               promoCode
-
           }
         );
 
@@ -3576,33 +3452,41 @@
         document.getElementById(
           "previewBonus"
         ).textContent =
-          formatPT(bonus);
+          formatPT(
+            bonus
+          );
 
 
         document.getElementById(
           "previewTotal"
         ).textContent =
-          formatPT(total);
+          formatPT(
+            total
+          );
 
       } else {
 
         document.getElementById(
           "modalPreviewBonus"
         ).textContent =
-          formatPT(bonus);
+          formatPT(
+            bonus
+          );
 
 
         document.getElementById(
           "modalPreviewTotal"
         ).textContent =
-          formatPT(total);
+          formatPT(
+            total
+          );
       }
 
 
     } catch (error) {
 
       console.error(
-        "Promo percent error:",
+        "Percent promo error:",
         error
       );
 
@@ -3620,7 +3504,9 @@
         document.getElementById(
           "previewTotal"
         ).textContent =
-          formatPT(amount);
+          formatPT(
+            amount
+          );
 
       } else {
 
@@ -3633,7 +3519,9 @@
         document.getElementById(
           "modalPreviewTotal"
         ).textContent =
-          formatPT(amount);
+          formatPT(
+            amount
+          );
       }
     }
   }
@@ -3906,16 +3794,15 @@
     tg.BackButton.onClick(
       () => {
 
-        const modals =
-          [
-            "buyModal",
-            "topupModal",
-            "ptPromoModal"
-          ];
+        const modalIds = [
+          "buyModal",
+          "topupModal",
+          "ptPromoModal"
+        ];
 
 
         for (
-          const id of modals
+          const id of modalIds
         ) {
 
           const modal =
@@ -3966,12 +3853,12 @@
           ".modal-overlay"
         )
       )
-        .some(
-          modal =>
-            modal.classList.contains(
-              "open"
-            )
-        );
+      .some(
+        modal =>
+          modal.classList.contains(
+            "open"
+          )
+      );
 
 
     if (opened) {
@@ -3986,7 +3873,7 @@
 
 
   /* =====================================================
-     ENTER — PT-ПРОМОКОД
+     ENTER — ПРОМОКОД PT
      ===================================================== */
 
   document.addEventListener(
@@ -4002,13 +3889,13 @@
       }
 
 
-      const element =
+      const active =
         document.activeElement;
 
 
       if (
-        element &&
-        element.id ===
+        active &&
+        active.id ===
           "ptPromoCode"
       ) {
 
@@ -4019,7 +3906,7 @@
 
 
   /* =====================================================
-     ОБНОВЛЕНИЕ ПРИ ВОЗВРАТЕ
+     АКТИВНОСТЬ
      ===================================================== */
 
   document.addEventListener(
@@ -4050,7 +3937,6 @@
       } catch (error) {
 
         console.error(
-          "Refresh profile error:",
           error
         );
       }
@@ -4059,7 +3945,7 @@
 
 
   /* =====================================================
-     ЗАПУСК
+     ИНИЦИАЛИЗАЦИЯ
      ===================================================== */
 
   async function initApp() {
@@ -4070,16 +3956,63 @@
 
 
     /*
-     * Сначала показываем каталог.
+     * Очень важно:
+     * сначала рисуем локальные товары.
      */
 
-    await loadProducts();
+    renderProducts();
 
 
     /*
-     * Потом загружаем профиль,
-     * только если приложение открыто
-     * через Telegram.
+     * Потом пытаемся взять актуальные
+     * товары с сервера.
+     */
+
+    try {
+
+      const result =
+        await api(
+          "/api/products",
+          null,
+          "GET"
+        );
+
+
+      const serverProducts =
+        Array.isArray(
+          result
+        )
+          ? result
+          : (
+              Array.isArray(
+                result.products
+              )
+                ? result.products
+                : []
+            );
+
+
+      if (
+        serverProducts.length
+      ) {
+
+        products =
+          serverProducts;
+
+        renderProducts();
+      }
+
+    } catch (error) {
+
+      console.warn(
+        "Серверный каталог недоступен, оставляем локальный каталог.",
+        error
+      );
+    }
+
+
+    /*
+     * Профиль.
      */
 
     if (
