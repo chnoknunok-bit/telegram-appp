@@ -99,18 +99,295 @@ const PRODUCTS = {
 ==================================================
             ВРЕМЕННОЕ ХРАНИЛИЩЕ
 ==================================================
-
-ВАЖНО:
-После перезапуска Render данные сбросятся.
-
-Для настоящего магазина потом перенесём
-пользователей, балансы и заказы в PostgreSQL.
-==================================================
 */
 
 const users = new Map();
 const orders = new Map();
 const transactions = new Map();
+
+
+/*
+==================================================
+                  ПРОМОКОДЫ
+==================================================
+
+WELCOME   -> +25%, максимум 15 активаций
+KavaSex67 -> +500 PT, 1 активация
+Cheez     -> +750 PT, 1 активация
+
+Регистр букв не важен:
+welcome = WELCOME
+KAVASEX67 = KavaSex67
+CHEEZ = Cheez
+==================================================
+*/
+
+const PROMOCODES = {
+
+    WELCOME: {
+        type: "percent",
+        percent: 25,
+        bonus: 0,
+        maxUses: 15,
+        uses: 0,
+        active: true
+    },
+
+    KAVASEX67: {
+        type: "bonus",
+        percent: 0,
+        bonus: 500,
+        maxUses: 1,
+        uses: 0,
+        active: true
+    },
+
+    CHEEZ: {
+        type: "bonus",
+        percent: 0,
+        bonus: 750,
+        maxUses: 1,
+        uses: 0,
+        active: true
+    }
+
+};
+
+
+/*
+==================================================
+              НОРМАЛИЗАЦИЯ ПРОМО
+==================================================
+*/
+
+function normalizePromoCode(code) {
+
+    if (
+        typeof code !== "string"
+    ) {
+        return "";
+    }
+
+    return code
+        .trim()
+        .toUpperCase();
+}
+
+
+/*
+==================================================
+              РАСЧЁТ ПРОМОКОДА
+==================================================
+*/
+
+function calculatePromo(
+    user,
+    amount,
+    promoCode
+) {
+
+    const code =
+        normalizePromoCode(
+            promoCode
+        );
+
+    const basePoints =
+        Number(amount);
+
+
+    /*
+    Если промокод не введён
+    */
+
+    if (!code) {
+
+        return {
+
+            ok: true,
+
+            promoApplied: false,
+
+            promoCode: null,
+
+            basePoints,
+
+            bonusPoints: 0,
+
+            totalPoints:
+                basePoints
+        };
+    }
+
+
+    /*
+    Проверяем существование
+    */
+
+    const promo =
+        PROMOCODES[code];
+
+    if (!promo) {
+
+        return {
+
+            ok: false,
+
+            error:
+                "Промокод не найден"
+        };
+    }
+
+
+    /*
+    Проверяем включён ли промокод
+    */
+
+    if (!promo.active) {
+
+        return {
+
+            ok: false,
+
+            error:
+                "Промокод отключён"
+        };
+    }
+
+
+    /*
+    Проверяем лимит активаций
+    */
+
+    if (
+        promo.maxUses !== null &&
+        promo.uses >= promo.maxUses
+    ) {
+
+        return {
+
+            ok: false,
+
+            error:
+                "Лимит активаций промокода исчерпан"
+        };
+    }
+
+
+    /*
+    Проверяем, использовал ли
+    этот пользователь промокод
+    */
+
+    if (
+        user.usedPromoCodes &&
+        user.usedPromoCodes.has(code)
+    ) {
+
+        return {
+
+            ok: false,
+
+            error:
+                "Ты уже использовал этот промокод"
+        };
+    }
+
+
+    let bonusPoints = 0;
+
+
+    /*
+    Процентный бонус
+    */
+
+    if (
+        promo.type === "percent"
+    ) {
+
+        bonusPoints =
+            Math.floor(
+                basePoints *
+                promo.percent /
+                100
+            );
+    }
+
+
+    /*
+    Фиксированный бонус
+    */
+
+    if (
+        promo.type === "bonus"
+    ) {
+
+        bonusPoints =
+            promo.bonus;
+    }
+
+
+    return {
+
+        ok: true,
+
+        promoApplied: true,
+
+        promoCode: code,
+
+        basePoints,
+
+        bonusPoints,
+
+        totalPoints:
+            basePoints +
+            bonusPoints
+    };
+}
+
+
+/*
+==================================================
+          АКТИВАЦИЯ ПРОМОКОДА
+==================================================
+*/
+
+function activatePromoCode(
+    user,
+    promoCode
+) {
+
+    const code =
+        normalizePromoCode(
+            promoCode
+        );
+
+    if (!code) {
+        return;
+    }
+
+    const promo =
+        PROMOCODES[code];
+
+    if (!promo) {
+        return;
+    }
+
+
+    promo.uses++;
+
+
+    if (!user.usedPromoCodes) {
+
+        user.usedPromoCodes =
+            new Set();
+    }
+
+
+    user.usedPromoCodes.add(
+        code
+    );
+}
+
 
 let orderCounter = 1000;
 let transactionCounter = 1;
@@ -122,20 +399,27 @@ let transactionCounter = 1;
 ==================================================
 */
 
-async function telegram(method, data) {
+async function telegram(
+    method,
+    data
+) {
 
-    const response = await fetch(
-        `https://api.telegram.org/bot${BOT_TOKEN}/${method}`,
-        {
-            method: "POST",
+    const response =
+        await fetch(
+            `https://api.telegram.org/bot${BOT_TOKEN}/${method}`,
+            {
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+                method: "POST",
 
-            body: JSON.stringify(data)
-        }
-    );
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:
+                    JSON.stringify(data)
+            }
+        );
 
     return await response.json();
 }
@@ -147,36 +431,51 @@ async function telegram(method, data) {
 ==================================================
 */
 
-function checkTelegramData(initData) {
+function checkTelegramData(
+    initData
+) {
 
-    if (!initData || !BOT_TOKEN) {
+    if (
+        !initData ||
+        !BOT_TOKEN
+    ) {
+
         return null;
     }
+
 
     try {
 
         const params =
-            new URLSearchParams(initData);
+            new URLSearchParams(
+                initData
+            );
+
 
         const hash =
             params.get("hash");
+
 
         if (!hash) {
             return null;
         }
 
+
         params.delete("hash");
+
 
         const dataCheckString =
             [...params.entries()]
-                .sort(([a], [b]) =>
-                    a.localeCompare(b)
+                .sort(
+                    ([a], [b]) =>
+                        a.localeCompare(b)
                 )
                 .map(
                     ([key, value]) =>
                         `${key}=${value}`
                 )
                 .join("\n");
+
 
         const secretKey =
             crypto
@@ -187,6 +486,7 @@ function checkTelegramData(initData) {
                 .update(BOT_TOKEN)
                 .digest();
 
+
         const calculatedHash =
             crypto
                 .createHmac(
@@ -196,18 +496,27 @@ function checkTelegramData(initData) {
                 .update(dataCheckString)
                 .digest("hex");
 
-        if (calculatedHash !== hash) {
+
+        if (
+            calculatedHash !== hash
+        ) {
+
             return null;
         }
 
+
         const userRaw =
             params.get("user");
+
 
         if (!userRaw) {
             return null;
         }
 
-        return JSON.parse(userRaw);
+
+        return JSON.parse(
+            userRaw
+        );
 
     } catch (error) {
 
@@ -223,38 +532,62 @@ function checkTelegramData(initData) {
 
 /*
 ==================================================
-              ПОЛЬЗОВАТЕЛЬ
+                 ПОЛЬЗОВАТЕЛЬ
 ==================================================
 */
 
-function getOrCreateUser(user) {
+function getOrCreateUser(
+    user
+) {
 
-    if (!users.has(user.id)) {
+    if (
+        !users.has(user.id)
+    ) {
 
-        users.set(user.id, {
+        users.set(
+            user.id,
+            {
 
-            id: user.id,
+                id:
+                    user.id,
 
-            username:
-                user.username || "",
+                username:
+                    user.username || "",
 
-            firstName:
-                user.first_name || "",
+                firstName:
+                    user.first_name || "",
 
-            balance: 0
-        });
+                balance: 0,
+
+                usedPromoCodes:
+                    new Set()
+            }
+        );
     }
+
 
     const saved =
         users.get(user.id);
+
 
     saved.username =
         user.username ||
         saved.username;
 
+
     saved.firstName =
         user.first_name ||
         saved.firstName;
+
+
+    if (
+        !saved.usedPromoCodes
+    ) {
+
+        saved.usedPromoCodes =
+            new Set();
+    }
+
 
     return saved;
 }
@@ -262,7 +595,7 @@ function getOrCreateUser(user) {
 
 /*
 ==================================================
-              ТРАНЗАКЦИИ
+                  ТРАНЗАКЦИИ
 ==================================================
 */
 
@@ -275,6 +608,7 @@ function addTransaction(
 
     const id =
         transactionCounter++;
+
 
     const transaction = {
 
@@ -292,7 +626,10 @@ function addTransaction(
             new Date().toISOString()
     };
 
-    if (!transactions.has(userId)) {
+
+    if (
+        !transactions.has(userId)
+    ) {
 
         transactions.set(
             userId,
@@ -300,9 +637,13 @@ function addTransaction(
         );
     }
 
+
     transactions
         .get(userId)
-        .unshift(transaction);
+        .unshift(
+            transaction
+        );
+
 
     return transaction;
 }
@@ -314,22 +655,25 @@ function addTransaction(
 ==================================================
 */
 
-app.get("/", (req, res) => {
+app.get(
+    "/",
+    (req, res) => {
 
-    res.json({
+        res.json({
 
-        ok: true,
+            ok: true,
 
-        service:
-            "СК МЕТРОШОП",
+            service:
+                "СК МЕТРОШОП",
 
-        currency:
-            "POINT",
+            currency:
+                "POINT",
 
-        currencyShort:
-            "PT"
-    });
-});
+            currencyShort:
+                "PT"
+        });
+    }
+);
 
 
 /*
@@ -346,10 +690,12 @@ app.post(
             initData
         } = req.body;
 
+
         const tgUser =
             checkTelegramData(
                 initData
             );
+
 
         if (!tgUser) {
 
@@ -364,10 +710,12 @@ app.post(
                 });
         }
 
+
         const user =
             getOrCreateUser(
                 tgUser
             );
+
 
         res.json({
 
@@ -406,10 +754,12 @@ app.post(
             initData
         } = req.body;
 
+
         const tgUser =
             checkTelegramData(
                 initData
             );
+
 
         if (!tgUser) {
 
@@ -424,10 +774,12 @@ app.post(
                 });
         }
 
+
         const history =
             transactions.get(
                 tgUser.id
             ) || [];
+
 
         res.json({
 
@@ -471,6 +823,7 @@ app.get(
                 })
             );
 
+
         res.json({
 
             ok: true,
@@ -484,32 +837,26 @@ app.get(
 
 /*
 ==================================================
-          СОЗДАТЬ ЗАКАЗ ЗА POINT
+             ПРОВЕРКА ПРОМОКОДА
 ==================================================
 */
 
 app.post(
-    "/api/buy",
-    async (req, res) => {
+    "/api/promo/check",
+    (req, res) => {
 
         const {
             initData,
-            product,
-            gameId,
-            quantity
+            amount,
+            promoCode
         } = req.body;
 
-
-        /*
-        ------------------------------------------
-        Проверяем Telegram
-        ------------------------------------------
-        */
 
         const tgUser =
             checkTelegramData(
                 initData
             );
+
 
         if (!tgUser) {
 
@@ -525,13 +872,132 @@ app.post(
         }
 
 
-        /*
-        ------------------------------------------
-        Проверяем товар и Game ID
-        ------------------------------------------
-        */
+        const points =
+            Number(amount);
 
-        if (!product || !gameId) {
+
+        if (
+            !Number.isInteger(
+                points
+            ) ||
+            points <= 0
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    ok: false,
+
+                    error:
+                        "Количество PT должно быть целым числом больше 0"
+                });
+        }
+
+
+        if (
+            points > 1000000
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    ok: false,
+
+                    error:
+                        "Максимум за одно пополнение — 1 000 000 PT"
+                });
+        }
+
+
+        const user =
+            getOrCreateUser(
+                tgUser
+            );
+
+
+        const result =
+            calculatePromo(
+                user,
+                points,
+                promoCode
+            );
+
+
+        if (!result.ok) {
+
+            return res
+                .status(400)
+                .json(result);
+        }
+
+
+        res.json({
+
+            ok: true,
+
+            basePoints:
+                result.basePoints,
+
+            bonusPoints:
+                result.bonusPoints,
+
+            totalPoints:
+                result.totalPoints,
+
+            promoApplied:
+                result.promoApplied,
+
+            promoCode:
+                result.promoCode
+        });
+    }
+);
+
+
+/*
+==================================================
+       СОЗДАТЬ ЗАКАЗ ЗА POINT
+==================================================
+*/
+
+app.post(
+    "/api/buy",
+    async (req, res) => {
+
+        const {
+            initData,
+            product,
+            gameId,
+            quantity
+        } = req.body;
+
+
+        const tgUser =
+            checkTelegramData(
+                initData
+            );
+
+
+        if (!tgUser) {
+
+            return res
+                .status(401)
+                .json({
+
+                    ok: false,
+
+                    error:
+                        "Неверные данные Telegram"
+                });
+        }
+
+
+        if (
+            !product ||
+            !gameId
+        ) {
 
             return res
                 .status(400)
@@ -544,8 +1010,10 @@ app.post(
                 });
         }
 
+
         const productInfo =
             PRODUCTS[product];
+
 
         if (!productInfo) {
 
@@ -560,12 +1028,6 @@ app.post(
                 });
         }
 
-
-        /*
-        ------------------------------------------
-        Проверяем цену
-        ------------------------------------------
-        */
 
         if (
             !productInfo.price ||
@@ -584,18 +1046,16 @@ app.post(
         }
 
 
-        /*
-        ------------------------------------------
-        КОЛИЧЕСТВО
-        ------------------------------------------
-        */
-
         let finalQuantity = 1;
 
-        if (productInfo.quantityEnabled) {
+
+        if (
+            productInfo.quantityEnabled
+        ) {
 
             finalQuantity =
                 Number(quantity);
+
 
             if (
                 !Number.isInteger(
@@ -614,6 +1074,7 @@ app.post(
                     });
             }
 
+
             if (
                 finalQuantity < 1 ||
                 finalQuantity >
@@ -630,38 +1091,19 @@ app.post(
                             `Количество должно быть от 1 до ${productInfo.maxQuantity}`
                     });
             }
-
         }
 
-
-        /*
-        ------------------------------------------
-        ИТОГОВАЯ ЦЕНА
-        ------------------------------------------
-        */
 
         const totalPrice =
             productInfo.price *
             finalQuantity;
 
 
-        /*
-        ------------------------------------------
-        ПОЛЬЗОВАТЕЛЬ
-        ------------------------------------------
-        */
-
         const user =
             getOrCreateUser(
                 tgUser
             );
 
-
-        /*
-        ------------------------------------------
-        ПРОВЕРКА БАЛАНСА
-        ------------------------------------------
-        */
 
         if (
             user.balance <
@@ -686,21 +1128,9 @@ app.post(
         }
 
 
-        /*
-        ------------------------------------------
-        СПИСЫВАЕМ POINT
-        ------------------------------------------
-        */
-
         user.balance -=
             totalPrice;
 
-
-        /*
-        ------------------------------------------
-        СОЗДАЁМ ЗАКАЗ
-        ------------------------------------------
-        */
 
         const orderId =
             orderCounter++;
@@ -751,12 +1181,6 @@ app.post(
         );
 
 
-        /*
-        ------------------------------------------
-        ЗАПИСЫВАЕМ ОПЕРАЦИЮ
-        ------------------------------------------
-        */
-
         addTransaction(
 
             user.id,
@@ -769,19 +1193,13 @@ app.post(
         );
 
 
-        /*
-        ==========================================
-                ОТПРАВКА В STAFF CHAT
-        ==========================================
-        */
-
         const maxEmployees =
             productInfo.escort
                 ? 3
                 : 1;
 
 
-        let text =
+        const text =
 
             `🟡 <b>ЗАКАЗ В ОЖИДАНИИ</b>\n\n` +
 
@@ -855,12 +1273,6 @@ app.post(
         }
 
 
-        /*
-        ------------------------------------------
-        ЕСЛИ TELEGRAM НЕ ПРИНЯЛ ЗАКАЗ
-        ------------------------------------------
-        */
-
         if (
             !message ||
             !message.ok
@@ -905,21 +1317,9 @@ app.post(
         }
 
 
-        /*
-        ------------------------------------------
-        СОХРАНЯЕМ MESSAGE ID
-        ------------------------------------------
-        */
-
         order.staffMessageId =
             message.result.message_id;
 
-
-        /*
-        ------------------------------------------
-        ОТВЕТ MINI APP
-        ------------------------------------------
-        */
 
         res.json({
 
@@ -942,10 +1342,7 @@ app.post(
             totalPrice
         });
     }
-);
-
-
-/*
+);/*
 ==================================================
            ПОПОЛНЕНИЕ POINT
 ==================================================
@@ -957,7 +1354,8 @@ app.post(
 
         const {
             initData,
-            amount
+            amount,
+            promoCode
         } = req.body;
 
 
@@ -965,6 +1363,7 @@ app.post(
             checkTelegramData(
                 initData
             );
+
 
         if (!tgUser) {
 
@@ -980,15 +1379,15 @@ app.post(
         }
 
 
-        const rubles =
+        const points =
             Number(amount);
 
 
         if (
             !Number.isInteger(
-                rubles
+                points
             ) ||
-            rubles <= 0
+            points <= 0
         ) {
 
             return res
@@ -998,8 +1397,46 @@ app.post(
                     ok: false,
 
                     error:
-                        "Неверная сумма"
+                        "Количество PT должно быть целым числом больше 0"
                 });
+        }
+
+
+        if (
+            points > 1000000
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    ok: false,
+
+                    error:
+                        "Максимум за одно пополнение — 1 000 000 PT"
+                });
+        }
+
+
+        const user =
+            getOrCreateUser(
+                tgUser
+            );
+
+
+        const promoResult =
+            calculatePromo(
+                user,
+                points,
+                promoCode
+            );
+
+
+        if (!promoResult.ok) {
+
+            return res
+                .status(400)
+                .json(promoResult);
         }
 
 
@@ -1013,6 +1450,18 @@ app.post(
             );
 
 
+        /*
+        ВАЖНО:
+        Баланс здесь НЕ увеличивается.
+
+        Промокод также пока НЕ списывается
+        из доступных активаций.
+
+        Это будет сделано при подтверждении
+        ручной оплаты.
+        */
+
+
         res.json({
 
             ok: true,
@@ -1020,16 +1469,28 @@ app.post(
             paymentId,
 
             amount:
-                rubles,
+                points,
+
+            basePoints:
+                promoResult.basePoints,
+
+            bonusPoints:
+                promoResult.bonusPoints,
 
             points:
-                rubles,
+                promoResult.totalPoints,
+
+            promoApplied:
+                promoResult.promoApplied,
+
+            promoCode:
+                promoResult.promoCode,
 
             paymentUrl:
                 null,
 
             message:
-                "СБП пока не подключено. Сначала подключите платёжного провайдера."
+                "Заявка рассчитана. Ручная оплата будет подключена следующим этапом."
         });
     }
 );
@@ -1052,7 +1513,7 @@ app.post(
                 ok: false,
 
                 error:
-                    "Webhook СБП ещё не подключён"
+                    "Ручная оплата ещё не подключена"
             });
     }
 );
@@ -1060,7 +1521,7 @@ app.post(
 
 /*
 ==================================================
-            ВЗЯТИЕ ЗАКАЗА
+             ВЗЯТИЕ ЗАКАЗА
 ==================================================
 */
 
@@ -1340,7 +1801,7 @@ async function handleClaim(
 
 /*
 ==================================================
-            ЗАВЕРШЕНИЕ ЗАКАЗА
+             ЗАВЕРШЕНИЕ ЗАКАЗА
 ==================================================
 */
 
@@ -1547,12 +2008,9 @@ async function handleComplete(
                 "HTML"
         }
     );
-}
-
-
-/*
+}/*
 ==================================================
-              ОБРАБОТКА CALLBACK
+               ОБРАБОТКА CALLBACK
 ==================================================
 */
 
@@ -1571,6 +2029,7 @@ async function handleCallback(
         const orderId =
             data.split(":")[1];
 
+
         await handleClaim(
             callbackQuery,
             orderId
@@ -1586,6 +2045,7 @@ async function handleCallback(
 
         const orderId =
             data.split(":")[1];
+
 
         await handleComplete(
             callbackQuery,
@@ -1609,7 +2069,7 @@ async function handleCallback(
 
 /*
 ==================================================
-                 TELEGRAM BOT
+                  TELEGRAM BOT
 ==================================================
 */
 
@@ -1631,6 +2091,7 @@ async function startBot() {
     await telegram(
         "deleteWebhook",
         {
+
             drop_pending_updates:
                 false
         }
@@ -1657,8 +2118,11 @@ async function startBot() {
                             25,
 
                         allowed_updates: [
+
                             "message",
+
                             "callback_query"
+
                         ]
                     }
                 );
@@ -1710,6 +2174,7 @@ async function startBot() {
                             "Ошибка callback:",
                             error
                         );
+
 
                         try {
 
