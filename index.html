@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -14,31 +12,27 @@
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-
   <style>
-
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
     }
-
 
     html,
     body {
       margin: 0;
       padding: 0;
       min-height: 100%;
+      background: #09060f;
+      color: #ffffff;
       font-family: Arial, Helvetica, sans-serif;
-      background: #0d0d12;
-      color: #fff;
     }
-
 
     body {
       min-height: 100vh;
       overflow-x: hidden;
+      padding-bottom: 90px;
     }
-
 
     button,
     input,
@@ -46,3477 +40,2117 @@
       font: inherit;
     }
 
-
     button {
-      border: 0;
+      border: none;
       cursor: pointer;
     }
 
-
     .app {
       width: 100%;
-      max-width: 760px;
+      max-width: 620px;
       margin: 0 auto;
-      min-height: 100vh;
-      padding-bottom: 95px;
+      padding: 14px;
     }
 
+    .top-space {
+      height: 4px;
+    }
 
     .header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      padding: 14px 16px 12px;
-      background: rgba(13, 13, 18, .96);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-
-
-    .header-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-
-    .brand-logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #8d42ff, #5724a8);
-      box-shadow: 0 8px 25px rgba(141,66,255,.28);
-      font-size: 20px;
-      font-weight: 900;
-      flex: 0 0 auto;
-    }
-
-
-    .brand-title {
-      font-size: 17px;
-      font-weight: 900;
-      line-height: 1.1;
-    }
-
-
-    .brand-subtitle {
-      margin-top: 3px;
-      color: #8e8e9d;
-      font-size: 12px;
-    }
-
-
-    .header-balance {
-      padding: 9px 12px;
-      border-radius: 13px;
-      background: #17171f;
-      border: 1px solid rgba(255,255,255,.06);
-      text-align: right;
-      flex: 0 0 auto;
-    }
-
-
-    .header-balance-label {
-      color: #858592;
-      font-size: 10px;
-      margin-bottom: 2px;
-    }
-
-
-    .header-balance-value {
-      font-size: 14px;
-      font-weight: 900;
-    }
-
-
-    .content {
-      padding: 16px;
-    }
-
-
-    .page {
-      display: none;
-      animation: fadeIn .18s ease;
-    }
-
-
-    .page.active {
-      display: block;
-    }
-
-
-    @keyframes fadeIn {
-
-      from {
-        opacity: 0;
-        transform: translateY(4px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-    }
-
-
-    .hero {
-      padding: 20px;
-      border-radius: 22px;
-
-      background:
-        radial-gradient(
-          circle at top right,
-          rgba(141,66,255,.22),
-          transparent 36%
-        ),
-        linear-gradient(
-          145deg,
-          #191922,
-          #101017
-        );
-
-      border: 1px solid rgba(255,255,255,.06);
       margin-bottom: 14px;
     }
 
-
-    .hero-title {
-      margin: 0;
-      font-size: 25px;
-      line-height: 1.1;
-      font-weight: 950;
+    .brand {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
     }
 
+    .brand span {
+      color: #9b5cff;
+    }
 
-    .hero-text {
-      margin: 9px 0 0;
-      color: #a2a2b1;
+    .subtitle {
+      margin-top: 4px;
+      color: #918a9d;
       font-size: 13px;
-      line-height: 1.45;
     }
 
+    .card {
+      background: linear-gradient(
+        145deg,
+        #17101f 0%,
+        #100b17 100%
+      );
+      border: 1px solid #2c2039;
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.22);
+    }
 
     .balance-card {
-      margin-top: 18px;
-      padding: 15px;
-      border-radius: 17px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.05);
+      margin-bottom: 14px;
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(155, 92, 255, 0.2),
+          transparent 45%
+        ),
+        linear-gradient(
+          145deg,
+          #1b1127,
+          #100a17
+        );
     }
 
-
-    .balance-card-label {
-      color: #888896;
-      font-size: 12px;
+    .balance-title {
+      color: #a49bab;
+      font-size: 13px;
       margin-bottom: 6px;
     }
 
-
-    .balance-card-value {
-      font-size: 28px;
-      font-weight: 950;
-    }
-
-
-    .balance-card-value span {
-      color: #bcbcc9;
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-
-    .topup-button {
-      width: 100%;
-      margin-top: 12px;
-      min-height: 48px;
-      border-radius: 14px;
-      color: #fff;
+    .balance-value {
+      font-size: 30px;
+      line-height: 1;
       font-weight: 900;
-      background: linear-gradient(135deg, #8d42ff, #6524c5);
-      box-shadow: 0 10px 24px rgba(141,66,255,.23);
     }
 
+    .balance-value span {
+      font-size: 16px;
+      color: #9b5cff;
+      margin-left: 4px;
+    }
 
-    .promo-small-button {
-      width: 100%;
-      margin-top: 10px;
+    .balance-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .primary-button,
+    .secondary-button,
+    .danger-button,
+    .buy-button {
       min-height: 44px;
       border-radius: 13px;
-      color: #d8c5ff;
-      background: rgba(141,66,255,.09);
-      border: 1px solid rgba(141,66,255,.22);
+      padding: 11px 14px;
       font-weight: 800;
+      transition: 0.15s ease;
     }
 
+    .primary-button {
+      background: linear-gradient(
+        135deg,
+        #9b5cff,
+        #7133cf
+      );
+      color: #ffffff;
+    }
+
+    .secondary-button {
+      background: #21152d;
+      border: 1px solid #39264a;
+      color: #ffffff;
+    }
+
+    .danger-button {
+      background: #32171d;
+      color: #ff9ca8;
+      border: 1px solid #5a2730;
+    }
+
+    .primary-button:active,
+    .secondary-button:active,
+    .danger-button:active,
+    .buy-button:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
 
     .section-title {
-      margin: 20px 0 11px;
-      font-size: 18px;
-      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 18px 2px 11px;
     }
 
+    .section-title h2 {
+      margin: 0;
+      font-size: 19px;
+    }
 
-    .category-row {
+    .section-title small {
+      color: #8f8798;
+    }
+
+    .categories {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding-bottom: 4px;
-      margin-bottom: 12px;
+      padding-bottom: 3px;
       scrollbar-width: none;
     }
 
-
-    .category-row::-webkit-scrollbar {
+    .categories::-webkit-scrollbar {
       display: none;
     }
-
 
     .category-button {
       flex: 0 0 auto;
       min-height: 38px;
-      padding: 0 14px;
-      border-radius: 11px;
-      background: #18181f;
-      color: #a7a7b4;
-      border: 1px solid rgba(255,255,255,.05);
-      font-size: 12px;
-      font-weight: 800;
+      padding: 9px 14px;
+      border-radius: 12px;
+      background: #151019;
+      border: 1px solid #2a2033;
+      color: #b8b0c0;
+      font-weight: 700;
     }
-
 
     .category-button.active {
-      background: #8d42ff;
-      color: #fff;
-      border-color: #8d42ff;
+      background: #9b5cff;
+      color: #ffffff;
+      border-color: #9b5cff;
     }
-
 
     .products {
       display: grid;
-      grid-template-columns: 1fr;
       gap: 11px;
+      margin-top: 12px;
     }
-
 
     .product-card {
-      padding: 15px;
-      border-radius: 17px;
-      background: #16161d;
-      border: 1px solid rgba(255,255,255,.06);
+      background: #120d17;
+      border: 1px solid #2b2034;
+      border-radius: 18px;
+      padding: 14px;
     }
-
 
     .product-top {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
     }
-
 
     .product-name {
-      font-size: 15px;
-      line-height: 1.3;
-      font-weight: 900;
+      font-size: 16px;
+      font-weight: 850;
+      line-height: 1.25;
     }
 
+    .product-category {
+      margin-top: 6px;
+      color: #8f8798;
+      font-size: 12px;
+    }
 
     .product-price {
-      white-space: nowrap;
-      color: #cfb8ff;
-      font-size: 14px;
-      font-weight: 900;
-    }
-
-
-    .product-description {
-      margin-top: 7px;
-      color: #8e8e9b;
-      font-size: 12px;
-      line-height: 1.4;
-    }
-
-
-    .product-actions {
       margin-top: 13px;
       display: flex;
-      gap: 8px;
       align-items: center;
+      justify-content: space-between;
+      gap: 10px;
     }
 
-
-    .product-quantity {
-      width: 95px;
-      height: 43px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.07);
-      background: #101016;
-      color: #fff;
-      padding: 0 10px;
-      outline: none;
-      cursor: pointer;
-    }
-
-
-    .buy-button {
-      flex: 1;
-      min-height: 43px;
-      border-radius: 12px;
-      background: #28232f;
-      color: #fff;
+    .price {
+      font-size: 17px;
       font-weight: 900;
     }
 
-
-    .buy-button.primary {
-      background: linear-gradient(135deg, #8d42ff, #6524c5);
+    .price.free {
+      color: #77717f;
+      font-size: 14px;
     }
 
-
-    .buy-button:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-    }
-
-
-    .empty-box {
-      padding: 24px 16px;
-      text-align: center;
-      border-radius: 17px;
-      color: #858593;
-      background: #15151b;
-      border: 1px solid rgba(255,255,255,.05);
-      line-height: 1.5;
-      font-size: 13px;
-    }
-
-
-    .profile-card,
-    .topup-card {
-      padding: 17px;
-      border-radius: 19px;
-      background: #16161d;
-      border: 1px solid rgba(255,255,255,.06);
-    }
-
-
-    .profile-avatar {
-      width: 58px;
-      height: 58px;
-      border-radius: 18px;
+    .product-controls {
       display: flex;
       align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #8d42ff, #5724a8);
-      font-size: 24px;
-      font-weight: 950;
-      margin-bottom: 12px;
+      gap: 8px;
     }
 
-
-    .profile-name {
-      font-size: 20px;
-      font-weight: 900;
+    .quantity-select {
+      width: 68px;
+      min-height: 42px;
+      border-radius: 11px;
+      padding: 0 8px;
+      color: #ffffff;
+      background: #1b1324;
+      border: 1px solid #38274a;
+      outline: none;
     }
 
+    .buy-button {
+      background: linear-gradient(
+        135deg,
+        #9b5cff,
+        #7133cf
+      );
+      color: #fff;
+      min-width: 96px;
+    }
 
-    .profile-username {
-      margin-top: 4px;
-      color: #8d8d9a;
+    .buy-button.disabled {
+      background: #221b28;
+      color: #756d7c;
+      border: 1px solid #332a39;
+      cursor: default;
+    }
+
+    .empty {
+      padding: 22px;
+      text-align: center;
+      color: #8e8795;
+      background: #120d17;
+      border: 1px solid #2b2034;
+      border-radius: 16px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .profile-row,
+    .history-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid #241b2c;
+    }
+
+    .profile-row:last-child,
+    .history-row:last-child {
+      border-bottom: none;
+    }
+
+    .row-label {
+      color: #8f8798;
       font-size: 13px;
     }
 
-
-    .profile-balance {
-      margin-top: 18px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(255,255,255,.06);
+    .row-value {
+      text-align: right;
+      font-weight: 700;
+      word-break: break-word;
     }
 
+    .history-left {
+      min-width: 0;
+    }
 
-    .profile-balance-label {
+    .history-title {
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .history-date {
+      color: #7f7787;
       font-size: 11px;
-      color: #858591;
-    }
-
-
-    .profile-balance-value {
       margin-top: 4px;
-      font-size: 25px;
-      font-weight: 950;
     }
 
+    .history-amount {
+      white-space: nowrap;
+      font-weight: 900;
+    }
+
+    .history-amount.plus {
+      color: #73e6a4;
+    }
+
+    .history-amount.minus {
+      color: #ff8997;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 620px;
+      max-height: 92vh;
+      overflow-y: auto;
+      background: #100b16;
+      border: 1px solid #31233d;
+      border-radius: 24px 24px 0 0;
+      padding: 18px;
+      animation: slideUp 0.18s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(35px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .close-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: #21172b;
+      color: #ffffff;
+      font-size: 20px;
+    }
 
     .form-group {
       margin-bottom: 13px;
     }
 
-
     .form-label {
       display: block;
       margin-bottom: 7px;
+      color: #968e9e;
       font-size: 12px;
-      color: #a1a1ad;
       font-weight: 700;
     }
 
-
-    .input {
+    .input,
+    .select {
       width: 100%;
-      height: 46px;
+      min-height: 46px;
       border-radius: 13px;
-      border: 1px solid rgba(255,255,255,.07);
-      background: #101016;
-      color: #fff;
-      padding: 0 13px;
+      border: 1px solid #35263f;
+      background: #17101f;
+      color: #ffffff;
+      padding: 12px 13px;
       outline: none;
     }
 
-
-    .input:focus {
-      border-color: rgba(141,66,255,.55);
+    .input:focus,
+    .select:focus {
+      border-color: #9b5cff;
     }
 
-
-    .amount-preview {
-      margin-top: 12px;
+    .summary {
+      background: #17101f;
+      border: 1px solid #2d2138;
+      border-radius: 15px;
       padding: 13px;
-      border-radius: 13px;
-      background: rgba(141,66,255,.07);
-      border: 1px solid rgba(141,66,255,.14);
+      margin: 12px 0;
     }
 
-
-    .amount-preview-row {
+    .summary-row {
       display: flex;
-      align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 7px;
-      color: #9b9ba8;
+      margin: 7px 0;
+    }
+
+    .summary-row span:first-child {
+      color: #8f8798;
+    }
+
+    .summary-total {
+      border-top: 1px solid #2b2034;
+      padding-top: 10px;
+      margin-top: 10px;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .promo-result {
+      margin-top: 7px;
+      min-height: 18px;
       font-size: 12px;
     }
 
-
-    .amount-preview-row:last-child {
-      margin-bottom: 0;
-      color: #fff;
-      font-weight: 900;
-      font-size: 14px;
+    .promo-result.success {
+      color: #73e6a4;
     }
 
-
-    .submit-button {
-      width: 100%;
-      min-height: 48px;
-      border-radius: 14px;
-      margin-top: 5px;
-      background: linear-gradient(135deg, #8d42ff, #6524c5);
-      color: #fff;
-      font-weight: 900;
+    .promo-result.error {
+      color: #ff8997;
     }
 
-
-    .submit-button:disabled {
-      opacity: .55;
-    }
-
-
-    .history-list {
-      display: grid;
-      gap: 9px;
-    }
-
-
-    .history-item {
-      padding: 14px;
-      border-radius: 15px;
-      background: #15151c;
-      border: 1px solid rgba(255,255,255,.05);
-    }
-
-
-    .history-item-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-
-    .history-type {
-      font-size: 13px;
-      font-weight: 900;
-    }
-
-
-    .history-amount {
-      font-size: 13px;
-      font-weight: 900;
-    }
-
-
-    .history-description {
-      margin-top: 6px;
-      color: #9696a3;
+    .notice {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 13px;
+      background: #191220;
+      border: 1px solid #30223b;
+      color: #a89faf;
       font-size: 12px;
       line-height: 1.4;
     }
 
-
-    .history-date {
-      margin-top: 7px;
-      color: #6f6f7a;
-      font-size: 10px;
+    .payment-details {
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(155, 92, 255, 0.15),
+          transparent 50%
+        ),
+        #17101f;
+      border: 1px solid #39294a;
+      border-radius: 16px;
+      padding: 14px;
+      margin: 12px 0;
     }
 
+    .payment-detail-row {
+      padding: 9px 0;
+      border-bottom: 1px solid #2a2032;
+    }
+
+    .payment-detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .payment-detail-label {
+      color: #8d8596;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .payment-detail-value {
+      font-size: 16px;
+      font-weight: 850;
+      word-break: break-word;
+    }
+
+    .payment-status {
+      text-align: center;
+      padding: 14px 10px;
+      border-radius: 14px;
+      background: #191220;
+      border: 1px solid #30223b;
+      margin: 12px 0;
+      font-weight: 800;
+      line-height: 1.4;
+    }
 
     .bottom-nav {
       position: fixed;
-      z-index: 100;
+      z-index: 900;
       left: 50%;
       bottom: 10px;
       transform: translateX(-50%);
-      width: min(730px, calc(100% - 20px));
+      width: min(620px, calc(100% - 18px));
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
+      gap: 5px;
       padding: 7px;
       border-radius: 18px;
-      background: rgba(24,24,31,.96);
-      border: 1px solid rgba(255,255,255,.07);
-      backdrop-filter: blur(15px);
-      box-shadow: 0 12px 40px rgba(0,0,0,.35);
+      background: rgba(20, 13, 27, 0.94);
+      border: 1px solid #30223b;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
     }
-
 
     .nav-button {
-      min-height: 54px;
+      min-height: 52px;
       border-radius: 13px;
       background: transparent;
-      color: #7e7e8c;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      font-size: 10px;
+      color: #807788;
+      font-size: 11px;
       font-weight: 800;
     }
-
-
-    .nav-button-icon {
-      font-size: 18px;
-      line-height: 1;
-    }
-
 
     .nav-button.active {
-      background: rgba(141,66,255,.14);
-      color: #fff;
+      background: #241533;
+      color: #ffffff;
     }
 
-
-    .modal-overlay {
-      position: fixed;
-      z-index: 200;
-      inset: 0;
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 12px;
-      background: rgba(0,0,0,.68);
-      backdrop-filter: blur(5px);
+    .nav-icon {
+      display: block;
+      font-size: 19px;
+      line-height: 20px;
+      margin-bottom: 3px;
     }
-
-
-    .modal-overlay.open {
-      display: flex;
-    }
-
-
-    .modal {
-      width: min(760px, 100%);
-      max-height: 88vh;
-      overflow-y: auto;
-      border-radius: 23px 23px 17px 17px;
-      background: #17171f;
-      border: 1px solid rgba(255,255,255,.07);
-      padding: 17px;
-      box-shadow: 0 -15px 50px rgba(0,0,0,.35);
-      animation: modalUp .2s ease;
-    }
-
-
-    @keyframes modalUp {
-
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-    }
-
-
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-
-    .modal-title {
-      font-size: 18px;
-      font-weight: 950;
-    }
-
-
-    .modal-close {
-      width: 36px;
-      height: 36px;
-      border-radius: 11px;
-      background: #24242c;
-      color: #b1b1bd;
-      font-size: 18px;
-    }
-
-
-    .order-info {
-      margin-bottom: 14px;
-      padding: 13px;
-      border-radius: 14px;
-      background: #101016;
-      border: 1px solid rgba(255,255,255,.05);
-    }
-
-
-    .order-info-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 7px;
-      font-size: 12px;
-    }
-
-
-    .order-info-row:last-child {
-      margin-bottom: 0;
-    }
-
-
-    .order-info-label {
-      color: #858591;
-    }
-
-
-    .order-info-value {
-      color: #fff;
-      font-weight: 800;
-      text-align: right;
-    }
-
-
-    .notice {
-      margin-bottom: 12px;
-      padding: 12px;
-      border-radius: 13px;
-      background: rgba(255,255,255,.035);
-      color: #9d9daa;
-      font-size: 11px;
-      line-height: 1.45;
-    }
-
 
     .loading {
-      padding: 24px 12px;
       text-align: center;
-      color: #7f7f8b;
-      font-size: 13px;
+      padding: 22px;
+      color: #8f8798;
     }
-
-
-    .toast-container {
-      position: fixed;
-      z-index: 500;
-      left: 50%;
-      top: 14px;
-      transform: translateX(-50%);
-      width: min(470px, calc(100% - 24px));
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
-    }
-
-
-    .toast {
-      padding: 12px 14px;
-      border-radius: 13px;
-      background: #21212a;
-      border: 1px solid rgba(255,255,255,.08);
-      color: #fff;
-      font-size: 12px;
-      line-height: 1.35;
-      box-shadow: 0 12px 35px rgba(0,0,0,.3);
-      animation: toastIn .2s ease;
-    }
-
-
-    @keyframes toastIn {
-
-      from {
-        opacity: 0;
-        transform: translateY(-7px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-    }
-
 
     .error-box {
-      padding: 15px;
-      border-radius: 14px;
-      background: rgba(255,70,70,.08);
-      border: 1px solid rgba(255,70,70,.15);
-      color: #ffb2b2;
-      font-size: 12px;
-      line-height: 1.45;
+      margin: 12px 0;
+      padding: 12px;
+      border-radius: 13px;
+      background: #30161c;
+      border: 1px solid #572830;
+      color: #ff9ba7;
+      font-size: 13px;
+      line-height: 1.4;
     }
 
-
-    @media (min-width: 600px) {
-
-      .content {
-        padding: 20px;
-      }
-
-      .products {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .hero-title {
-        font-size: 28px;
-      }
-
+    .success-box {
+      margin: 12px 0;
+      padding: 12px;
+      border-radius: 13px;
+      background: #15291e;
+      border: 1px solid #274e36;
+      color: #83e7ad;
+      font-size: 13px;
+      line-height: 1.4;
     }
 
+    @media (max-width: 430px) {
+      .balance-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .product-price {
+        align-items: flex-end;
+      }
+
+      .product-controls {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .buy-button {
+        min-width: 88px;
+      }
+    }
   </style>
-
 </head>
-
 
 <body>
 
   <div class="app">
 
+    <div class="top-space"></div>
 
     <header class="header">
+      <div class="brand">
+        СК <span>МЕТРОШОП</span>
+      </div>
 
-      <div class="header-top">
+      <div class="subtitle">
+        Metro Royale • Быстрые заказы
+      </div>
+    </header>
 
+    <!-- =========================
+         СТРАНИЦА МАГАЗИНА
+    ========================== -->
 
-        <div class="brand">
+    <section
+      id="shopPage"
+      class="page active"
+    >
 
-          <div class="brand-logo">
-            СК
-          </div>
+      <div class="card balance-card">
 
-
-          <div>
-
-            <div class="brand-title">
-              СК МЕТРОШОП
-            </div>
-
-
-            <div class="brand-subtitle">
-              Metro Royale • магазин
-            </div>
-
-          </div>
-
+        <div class="balance-title">
+          Ваш баланс
         </div>
 
+        <div class="balance-value">
+          <span id="balanceValue">0</span>
+          <span>PT</span>
+        </div>
 
-        <div class="header-balance">
+        <div class="balance-actions">
 
-          <div class="header-balance-label">
+          <button
+            id="openTopupButton"
+            class="primary-button"
+            type="button"
+          >
+            💎 Пополнить PT
+          </button>
+
+          <button
+            id="openBonusPromoButton"
+            class="secondary-button"
+            type="button"
+          >
+            🎟️ Промокод PT
+          </button>
+
+        </div>
+      </div>
+
+      <div class="section-title">
+        <h2>Каталог</h2>
+        <small id="productCount">0 товаров</small>
+      </div>
+
+      <div
+        id="categories"
+        class="categories"
+      ></div>
+
+      <div
+        id="products"
+        class="products"
+      >
+        <div class="loading">
+          Загрузка каталога...
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         СТРАНИЦА ИСТОРИИ
+    ========================== -->
+
+    <section
+      id="historyPage"
+      class="page"
+    >
+
+      <div class="section-title">
+        <h2>История</h2>
+      </div>
+
+      <div
+        id="historyList"
+        class="card"
+      >
+        <div class="loading">
+          Загрузка истории...
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         СТРАНИЦА ПРОФИЛЯ
+    ========================== -->
+
+    <section
+      id="profilePage"
+      class="page"
+    >
+
+      <div class="section-title">
+        <h2>Профиль</h2>
+      </div>
+
+      <div class="card">
+
+        <div class="profile-row">
+          <div class="row-label">
+            Имя
+          </div>
+
+          <div
+            id="profileName"
+            class="row-value"
+          >
+            —
+          </div>
+        </div>
+
+        <div class="profile-row">
+          <div class="row-label">
+            Username
+          </div>
+
+          <div
+            id="profileUsername"
+            class="row-value"
+          >
+            —
+          </div>
+        </div>
+
+        <div class="profile-row">
+          <div class="row-label">
+            Telegram ID
+          </div>
+
+          <div
+            id="profileTelegramId"
+            class="row-value"
+          >
+            —
+          </div>
+        </div>
+
+        <div class="profile-row">
+          <div class="row-label">
             Баланс
           </div>
 
-
           <div
-            class="header-balance-value"
-            id="headerBalance"
+            id="profileBalance"
+            class="row-value"
           >
             0 PT
           </div>
-
         </div>
-
 
       </div>
 
-    </header>
-
-
-    <main class="content">
-
-
-      <!-- =================================================
-           МАГАЗИН
-           ================================================= -->
-
-      <section
-        class="page active"
-        id="pageShop"
-      >
-
-
-        <div class="hero">
-
-
-          <h1 class="hero-title">
-            Добро пожаловать 👋
-          </h1>
-
-
-          <p class="hero-text">
-            Здесь можно купить наборы, оружие
-            и сопровождения для Metro Royale.
-          </p>
-
-
-          <div class="balance-card">
-
-
-            <div class="balance-card-label">
-              Ваш баланс
-            </div>
-
-
-            <div class="balance-card-value">
-
-              <span id="shopBalance">
-                0
-              </span>
-
-              <span>
-                PT
-              </span>
-
-            </div>
-
-
-            <button
-              class="topup-button"
-              type="button"
-              onclick="openTopupModal()"
-            >
-              💎 Пополнить PT
-            </button>
-
-
-            <button
-              class="promo-small-button"
-              type="button"
-              onclick="openPtPromoModal()"
-            >
-              🎟️ Промокод PT
-            </button>
-
-
-          </div>
-
-
-        </div>
-
-
-        <div class="section-title">
-          Каталог
-        </div>
-
-
-        <div
-          class="category-row"
-          id="categoryRow"
-        >
-
-
-          <button
-            class="category-button active"
-            type="button"
-            onclick="filterCategory('all', this)"
-          >
-            Все
-          </button>
-
-
-          <button
-            class="category-button"
-            type="button"
-            onclick="filterCategory('sets', this)"
-          >
-            Наборы
-          </button>
-
-
-          <button
-            class="category-button"
-            type="button"
-            onclick="filterCategory('weapons', this)"
-          >
-            Оружие
-          </button>
-
-
-          <button
-            class="category-button"
-            type="button"
-            onclick="filterCategory('escort', this)"
-          >
-            Сопровождение
-          </button>
-
-
-        </div>
-
-
-        <div
-          id="productsContainer"
-          class="products"
-        ></div>
-
-
-      </section>
-
-
-      <!-- =================================================
-           ПОПОЛНЕНИЕ
-           ================================================= -->
-
-      <section
-        class="page"
-        id="pageTopup"
-      >
-
-
-        <div class="section-title">
-          💎 Пополнение PT
-        </div>
-
-
-        <div class="topup-card">
-
-
-          <div class="notice">
-            Укажи количество PT, которое хочешь
-            пополнить. Промокод на процент
-            вводится отдельно.
-          </div>
-
-
-          <div class="form-group">
-
-            <label
-              class="form-label"
-              for="topupAmount"
-            >
-              Количество PT
-            </label>
-
-
-            <input
-              id="topupAmount"
-              class="input"
-              type="number"
-              min="1"
-              max="1000000"
-              step="1"
-              placeholder="Например: 1000"
-              inputmode="numeric"
-              oninput="updateTopupPreview()"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label
-              class="form-label"
-              for="promoPercent"
-            >
-              Промокод на процент
-            </label>
-
-
-            <input
-              id="promoPercent"
-              class="input"
-              type="text"
-              maxlength="50"
-              placeholder="Введите промокод"
-              autocomplete="off"
-              oninput="updateTopupPreview()"
-            >
-
-          </div>
-
-
-          <div class="amount-preview">
-
-
-            <div class="amount-preview-row">
-
-              <span>
-                Пополнение
-              </span>
-
-              <span id="previewAmount">
-                0 PT
-              </span>
-
-            </div>
-
-
-            <div class="amount-preview-row">
-
-              <span>
-                Бонус
-              </span>
-
-              <span id="previewBonus">
-                0 PT
-              </span>
-
-            </div>
-
-
-            <div class="amount-preview-row">
-
-              <span>
-                Итого
-              </span>
-
-              <span id="previewTotal">
-                0 PT
-              </span>
-
-            </div>
-
-
-          </div>
-
-
-          <button
-            class="submit-button"
-            type="button"
-            onclick="createTopup()"
-          >
-            💳 Создать заявку
-          </button>
-
-
-        </div>
-
-
-      </section>
-
-
-      <!-- =================================================
-           ИСТОРИЯ
-           ================================================= -->
-
-      <section
-        class="page"
-        id="pageHistory"
-      >
-
-
-        <div class="section-title">
-          📜 История
-        </div>
-
-
-        <div id="historyContainer">
-
-          <div class="loading">
-            Загрузка истории...
-          </div>
-
-        </div>
-
-
-      </section>
-
-
-      <!-- =================================================
-           ПРОФИЛЬ
-           ================================================= -->
-
-      <section
-        class="page"
-        id="pageProfile"
-      >
-
-
-        <div class="section-title">
-          👤 Профиль
-        </div>
-
-
-        <div id="profileContainer">
-
-
-          <div class="profile-card">
-
-            <div class="loading">
-              Загрузка профиля...
-            </div>
-
-          </div>
-
-
-        </div>
-
-
-      </section>
-
-
-    </main>
-
+    </section>
 
   </div>
 
 
-  <!-- =====================================================
+  <!-- =========================
        НИЖНЯЯ НАВИГАЦИЯ
-       ===================================================== -->
+  ========================== -->
 
   <nav class="bottom-nav">
 
-
     <button
       class="nav-button active"
-      id="navShop"
+      data-page="shopPage"
       type="button"
-      onclick="showPage('shop')"
     >
-
-      <div class="nav-button-icon">
-        🛒
-      </div>
-
-      <div>
-        Магазин
-      </div>
-
+      <span class="nav-icon">🛒</span>
+      Магазин
     </button>
-
 
     <button
       class="nav-button"
-      id="navTopup"
+      data-open-topup="1"
       type="button"
-      onclick="showPage('topup')"
     >
-
-      <div class="nav-button-icon">
-        💎
-      </div>
-
-      <div>
-        Пополнить
-      </div>
-
+      <span class="nav-icon">💎</span>
+      Пополнить
     </button>
-
 
     <button
       class="nav-button"
-      id="navHistory"
+      data-page="historyPage"
       type="button"
-      onclick="showPage('history')"
     >
-
-      <div class="nav-button-icon">
-        📜
-      </div>
-
-      <div>
-        История
-      </div>
-
+      <span class="nav-icon">📜</span>
+      История
     </button>
-
 
     <button
       class="nav-button"
-      id="navProfile"
+      data-page="profilePage"
       type="button"
-      onclick="showPage('profile')"
     >
-
-      <div class="nav-button-icon">
-        👤
-      </div>
-
-      <div>
-        Профиль
-      </div>
-
+      <span class="nav-icon">👤</span>
+      Профиль
     </button>
-
 
   </nav>
 
 
-  <!-- =====================================================
+  <!-- =========================
        МОДАЛКА ПОКУПКИ
-       ===================================================== -->
+  ========================== -->
 
   <div
-    class="modal-overlay"
     id="buyModal"
-    onclick="closeModalByOverlay(event, 'buyModal')"
-  >
-
-
-    <div class="modal">
-
-
-      <div class="modal-header">
-
-        <div class="modal-title">
-          🛒 Покупка
-        </div>
-
-
-        <button
-          class="modal-close"
-          type="button"
-          onclick="closeBuyModal()"
-        >
-          ✕
-        </button>
-
-      </div>
-
-
-      <div id="buyModalContent"></div>
-
-
-    </div>
-
-
-  </div>
-
-
-  <!-- =====================================================
-       МОДАЛКА ПОПОЛНЕНИЯ
-       ===================================================== -->
-
-  <div
     class="modal-overlay"
-    id="topupModal"
-    onclick="closeModalByOverlay(event, 'topupModal')"
   >
-
 
     <div class="modal">
 
+      <div class="modal-head">
 
-      <div class="modal-header">
-
-        <div class="modal-title">
-          💎 Пополнение PT
+        <div
+          id="buyModalTitle"
+          class="modal-title"
+        >
+          Покупка
         </div>
 
-
         <button
-          class="modal-close"
+          id="closeBuyModal"
+          class="close-button"
           type="button"
-          onclick="closeTopupModal()"
         >
-          ✕
+          ×
         </button>
 
       </div>
 
-
-      <div class="notice">
-        Введи нужное количество PT и, при наличии,
-        промокод на процент.
-      </div>
-
+      <div
+        id="buyProductInfo"
+        class="summary"
+      ></div>
 
       <div class="form-group">
 
-
         <label
           class="form-label"
-          for="modalTopupAmount"
+          for="gameIdInput"
         >
-          Количество PT
+          Game ID
         </label>
 
-
         <input
-          id="modalTopupAmount"
-          class="input"
-          type="number"
-          min="1"
-          max="1000000"
-          step="1"
-          placeholder="Например: 1000"
-          inputmode="numeric"
-          oninput="updateModalTopupPreview()"
-        >
-
-
-      </div>
-
-
-      <div class="form-group">
-
-
-        <label
-          class="form-label"
-          for="modalPromoPercent"
-        >
-          Промокод на процент
-        </label>
-
-
-        <input
-          id="modalPromoPercent"
+          id="gameIdInput"
           class="input"
           type="text"
-          maxlength="50"
-          placeholder="Введите промокод"
+          inputmode="numeric"
           autocomplete="off"
-          oninput="updateModalTopupPreview()"
+          placeholder="Введите Game ID"
         >
 
-
       </div>
 
-
-      <div class="amount-preview">
-
-
-        <div class="amount-preview-row">
-
-          <span>
-            Пополнение
-          </span>
-
-          <span id="modalPreviewAmount">
-            0 PT
-          </span>
-
-        </div>
-
-
-        <div class="amount-preview-row">
-
-          <span>
-            Бонус
-          </span>
-
-          <span id="modalPreviewBonus">
-            0 PT
-          </span>
-
-        </div>
-
-
-        <div class="amount-preview-row">
-
-          <span>
-            Итого
-          </span>
-
-          <span id="modalPreviewTotal">
-            0 PT
-          </span>
-
-        </div>
-
-
-      </div>
-
+      <div
+        id="buyError"
+        class="error-box"
+        style="display:none;"
+      ></div>
 
       <button
-        class="submit-button"
+        id="confirmBuyButton"
+        class="primary-button"
         type="button"
-        onclick="createTopupFromModal()"
+        style="width:100%;"
       >
-        💳 Создать заявку
+        ✅ Подтвердить покупку
       </button>
 
-
     </div>
-
 
   </div>
 
 
-  <!-- =====================================================
-       МОДАЛКА PT-ПРОМОКОДА
-       ===================================================== -->
+  <!-- =========================
+       МОДАЛКА PT ПРОМО
+  ========================== -->
 
   <div
+    id="bonusPromoModal"
     class="modal-overlay"
-    id="ptPromoModal"
-    onclick="closeModalByOverlay(event, 'ptPromoModal')"
   >
-
 
     <div class="modal">
 
-
-      <div class="modal-header">
+      <div class="modal-head">
 
         <div class="modal-title">
           🎟️ Промокод PT
         </div>
 
-
         <button
-          class="modal-close"
+          id="closeBonusPromoModal"
+          class="close-button"
           type="button"
-          onclick="closePtPromoModal()"
         >
-          ✕
+          ×
         </button>
 
       </div>
 
-
       <div class="notice">
-        Введи промокод, который получил
-        в Telegram-канале.
+        Введите промокод, который получили
+        в официальном Telegram-канале магазина.
       </div>
 
-
-      <div class="form-group">
-
+      <div
+        class="form-group"
+        style="margin-top:14px;"
+      >
 
         <label
           class="form-label"
-          for="ptPromoCode"
+          for="bonusPromoInput"
         >
           Промокод
         </label>
 
-
         <input
-          id="ptPromoCode"
+          id="bonusPromoInput"
           class="input"
           type="text"
-          maxlength="50"
-          placeholder="Введите промокод"
           autocomplete="off"
+          autocapitalize="characters"
+          placeholder="Введите промокод"
         >
-
 
       </div>
 
+      <div
+        id="bonusPromoResult"
+        class="promo-result"
+      ></div>
 
       <button
-        class="submit-button"
-        type="button"
         id="activatePromoButton"
+        class="primary-button"
+        type="button"
+        style="width:100%; margin-top:10px;"
       >
         🎁 Активировать
       </button>
 
-
     </div>
-
 
   </div>
 
 
+  <!-- =========================
+       МОДАЛКА ПОПОЛНЕНИЯ
+  ========================== -->
+
   <div
-    class="toast-container"
-    id="toastContainer"
-  ></div>
+    id="topupModal"
+    class="modal-overlay"
+  >
+
+    <div class="modal">
+
+      <div class="modal-head">
+
+        <div class="modal-title">
+          💎 Пополнение PT
+        </div>
+
+        <button
+          id="closeTopupModal"
+          class="close-button"
+          type="button"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div class="form-group">
+
+        <label
+          class="form-label"
+          for="topupAmountInput"
+        >
+          Сколько PT пополнить
+        </label>
+
+        <input
+          id="topupAmountInput"
+          class="input"
+          type="number"
+          min="1"
+          step="1"
+          inputmode="numeric"
+          placeholder="Например: 1000"
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label
+          class="form-label"
+          for="percentPromoInput"
+        >
+          Промокод на процент к пополнению
+        </label>
+
+        <input
+          id="percentPromoInput"
+          class="input"
+          type="text"
+          autocomplete="off"
+          autocapitalize="characters"
+          placeholder="Например: WELCOME"
+        >
+
+        <div
+          id="percentPromoResult"
+          class="promo-result"
+        ></div>
+
+      </div>
+
+      <div
+        id="topupPreview"
+        class="summary"
+        style="display:none;"
+      ></div>
+
+      <div
+        id="topupError"
+        class="error-box"
+        style="display:none;"
+      ></div>
+
+      <button
+        id="createTopupButton"
+        class="primary-button"
+        type="button"
+        style="width:100%;"
+      >
+        💳 Создать заявку
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       МОДАЛКА ОПЛАТЫ
+  ========================== -->
+
+  <div
+    id="paymentModal"
+    class="modal-overlay"
+  >
+
+    <div class="modal">
+
+      <div class="modal-head">
+
+        <div class="modal-title">
+          💳 Оплата пополнения
+        </div>
+
+        <button
+          id="closePaymentModal"
+          class="close-button"
+          type="button"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div
+        id="paymentSummary"
+        class="summary"
+      ></div>
+
+      <div
+        id="paymentDetails"
+        class="payment-details"
+      ></div>
+
+      <div
+        class="notice"
+      >
+        После перевода нажмите
+        <b>«✅ Я оплатил»</b>.
+        Зачисление PT произойдёт только после
+        проверки платежа сотрудником.
+      </div>
+
+      <div
+        id="paymentStatus"
+        class="payment-status"
+      >
+        Ожидается оплата
+      </div>
+
+      <div
+        id="paymentError"
+        class="error-box"
+        style="display:none;"
+      ></div>
+
+      <button
+        id="markPaidButton"
+        class="primary-button"
+        type="button"
+        style="width:100%;"
+      >
+        ✅ Я оплатил
+      </button>
+
+    </div>
+
+  </div>
 
 
   <script>
+    // ==========================================
+    // ОСНОВНАЯ НАСТРОЙКА TELEGRAM
+    // ==========================================
 
-    /* =====================================================
-       API
-       ===================================================== */
+    const tg = window.Telegram?.WebApp;
+
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
 
     const API_BASE =
       "https://telegram-appp.onrender.com";
 
 
-    /* =====================================================
-       TELEGRAM
-       ===================================================== */
+    // ==========================================
+    // СОСТОЯНИЕ
+    // ==========================================
 
-    const tg =
-      window.Telegram &&
-      window.Telegram.WebApp
-        ? window.Telegram.WebApp
-        : null;
+    let balance = 0;
+
+    let currentProducts = [];
+
+    let activeCategory = "Все";
+
+    let selectedProduct = null;
+
+    let selectedQuantity = 1;
+
+    let currentTopup = null;
 
 
-    /* =====================================================
-       ЛОКАЛЬНЫЕ ТОВАРЫ
-       ===================================================== */
+    // ==========================================
+    // ЛОКАЛЬНЫЕ ТОВАРЫ
+    // ==========================================
 
-    let products = [
-
+    const localProducts = [
       {
-        name:
-          "Набор Фулл 6 + МК вк на обвесах",
-
-        price:
-          25,
-
-        quantityEnabled:
-          true,
-
-        maxQuantity:
-          10,
-
-        escort:
-          false
+        id: "set_full6_mk",
+        name: "Набор Фулл 6 + МК вк на обвесах",
+        category: "Наборы",
+        price: 25,
+        available: true,
+        quantityEnabled: true,
+        maxQuantity: 10
       },
 
-
       {
-        name:
-          "Набор фулл 6",
-
-        price:
-          18,
-
-        quantityEnabled:
-          true,
-
-        maxQuantity:
-          10,
-
-        escort:
-          false
+        id: "set_full6",
+        name: "Набор фулл 6",
+        category: "Наборы",
+        price: 18,
+        available: true,
+        quantityEnabled: true,
+        maxQuantity: 10
       },
 
-
       {
-        name:
-          "Оружие МК вк",
-
-        price:
-          0,
-
-        quantityEnabled:
-          false,
-
-        maxQuantity:
-          1,
-
-        escort:
-          false
+        id: "weapon_mk",
+        name: "Оружие МК вк",
+        category: "Оружие",
+        price: 0,
+        available: false,
+        quantityEnabled: false,
+        maxQuantity: 1
       },
 
-
       {
-        name:
-          "Сопровождение 7кк + вещи",
-
-        price:
-          0,
-
-        quantityEnabled:
-          false,
-
-        maxQuantity:
-          1,
-
-        escort:
-          true
+        id: "escort_7",
+        name: "Сопровождение 7кк + вещи",
+        category: "Сопровождение",
+        price: 0,
+        available: false,
+        quantityEnabled: false,
+        maxQuantity: 1
       },
 
-
       {
-        name:
-          "Сопровождение 15кк + вещи",
-
-        price:
-          0,
-
-        quantityEnabled:
-          false,
-
-        maxQuantity:
-          1,
-
-        escort:
-          true
+        id: "escort_15",
+        name: "Сопровождение 15кк + вещи",
+        category: "Сопровождение",
+        price: 0,
+        available: false,
+        quantityEnabled: false,
+        maxQuantity: 1
       },
 
-
       {
-        name:
-          "Сопровождение 20кк + вещи",
-
-        price:
-          0,
-
-        quantityEnabled:
-          false,
-
-        maxQuantity:
-          1,
-
-        escort:
-          true
+        id: "escort_20",
+        name: "Сопровождение 20кк + вещи",
+        category: "Сопровождение",
+        price: 0,
+        available: false,
+        quantityEnabled: false,
+        maxQuantity: 1
       },
 
-
       {
-        name:
-          "Сопровождение 25кк + вещи",
-
-        price:
-          0,
-
-        quantityEnabled:
-          false,
-
-        maxQuantity:
-          1,
-
-        escort:
-          true
+        id: "escort_25",
+        name: "Сопровождение 25кк + вещи",
+        category: "Сопровождение",
+        price: 0,
+        available: false,
+        quantityEnabled: false,
+        maxQuantity: 1
       }
-
     ];
 
 
-    let currentCategory =
-      "all";
+    currentProducts = [...localProducts];
 
 
-    let selectedProduct =
-      null;
+    // ==========================================
+    // API
+    // ==========================================
 
-
-    let selectedQuantity =
-      1;
-
-
-    let currentUser = {
-
-      id:
-        null,
-
-      username:
-        "",
-
-      firstName:
-        "",
-
-      balance:
-        0
-
-    };
-
-
-    let percentPromoCheckTimer =
-      null;
-
-
-    /* =====================================================
-       TELEGRAM INIT
-       ===================================================== */
-
-    function initTelegram() {
-
-      if (!tg) {
-        return;
-      }
-
-
+    async function api(path, body = {}) {
       try {
-
-        tg.ready();
-
-        tg.expand();
-
-      } catch (error) {
-
-        console.error(
-          "Telegram init error:",
-          error
-        );
-
-      }
-    }
-
-
-    function getInitData() {
-
-      return tg
-        ? tg.initData || ""
-        : "";
-    }
-
-
-    function hasTelegramAuth() {
-
-      return Boolean(
-        getInitData()
-      );
-    }
-
-
-    /* =====================================================
-       API ЗАПРОС
-       ===================================================== */
-
-    async function api(
-      path,
-      data = null,
-      method = null
-    ) {
-
-      const requestMethod =
-        method ||
-        (
-          data === null
-            ? "GET"
-            : "POST"
-        );
-
-
-      const options = {
-
-        method:
-          requestMethod,
-
-        headers: {}
-
-      };
-
-
-      if (
-        requestMethod !==
-        "GET"
-      ) {
-
-        options.headers[
-          "Content-Type"
-        ] =
-          "application/json";
-
-
-        options.body =
-          JSON.stringify({
-
-            ...(data || {}),
-
-            initData:
-              getInitData()
-
-          });
-      }
-
-
-      const response =
-        await fetch(
-          API_BASE +
-          path,
-          options
-        );
-
-
-      const text =
-        await response.text();
-
-
-      let result =
-        {};
-
-
-      try {
-
-        result =
-          text
-            ? JSON.parse(text)
-            : {};
-
-      } catch (error) {
-
-        console.error(
-          "Raw server response:",
-          text
-        );
-
-
-        throw new Error(
-          `Сервер вернул некорректный ответ (${response.status}).`
-        );
-      }
-
-
-      if (
-        !response.ok
-      ) {
-
-        throw new Error(
-
-          result &&
-          result.error
-
-            ? result.error
-
-            : `Ошибка сервера (${response.status}).`
-
-        );
-      }
-
-
-      return result;
-    }
-
-
-    /* =====================================================
-       TOAST
-       ===================================================== */
-
-    function showToast(
-      message
-    ) {
-
-      const container =
-        document.getElementById(
-          "toastContainer"
-        );
-
-
-      const toast =
-        document.createElement(
-          "div"
-        );
-
-
-      toast.className =
-        "toast";
-
-
-      toast.textContent =
-        message;
-
-
-      container.appendChild(
-        toast
-      );
-
-
-      setTimeout(
-        () => {
-
-          toast.style.opacity =
-            "0";
-
-
-          setTimeout(
-            () => {
-
-              toast.remove();
-
+        const response = await fetch(
+          API_BASE + path,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json"
             },
-            180
-          );
 
-        },
-        2800
-      );
-    }
-
-
-    /* =====================================================
-       ФОРМАТ PT
-       ===================================================== */
-
-    function formatPT(
-      value
-    ) {
-
-      const number =
-        Number(value) || 0;
-
-
-      return (
-        new Intl.NumberFormat(
-          "ru-RU"
-        ).format(
-          number
-        )
-        + " PT"
-      );
-    }
-
-
-    /* =====================================================
-       БАЛАНС
-       ===================================================== */
-
-    function updateBalance(
-      balance
-    ) {
-
-      currentUser.balance =
-        Number(balance) || 0;
-
-
-      const header =
-        document.getElementById(
-          "headerBalance"
-        );
-
-
-      const shop =
-        document.getElementById(
-          "shopBalance"
-        );
-
-
-      if (header) {
-
-        header.textContent =
-          formatPT(
-            currentUser.balance
-          );
-      }
-
-
-      if (shop) {
-
-        shop.textContent =
-          new Intl.NumberFormat(
-            "ru-RU"
-          ).format(
-            currentUser.balance
-          );
-      }
-    }
-
-
-    /* =====================================================
-       НАВИГАЦИЯ
-       ===================================================== */
-
-    function showPage(
-      page
-    ) {
-
-      const pages = {
-
-        shop:
-          "pageShop",
-
-        topup:
-          "pageTopup",
-
-        history:
-          "pageHistory",
-
-        profile:
-          "pageProfile"
-
-      };
-
-
-      Object.values(
-        pages
-      ).forEach(
-        id => {
-
-          document
-            .getElementById(id)
-            .classList.remove(
-              "active"
-            );
-
-        }
-      );
-
-
-      document
-        .getElementById(
-          pages[page]
-        )
-        .classList.add(
-          "active"
-        );
-
-
-      document
-        .querySelectorAll(
-          ".nav-button"
-        )
-        .forEach(
-          button => {
-
-            button.classList.remove(
-              "active"
-            );
-
+            body: JSON.stringify({
+              ...body,
+              initData: tg?.initData || ""
+            })
           }
         );
 
+        const text = await response.text();
 
-      const activeId =
-        {
+        let data = null;
 
-          shop:
-            "navShop",
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error(
+            `Сервер вернул некорректный ответ (${response.status})`
+          );
+        }
 
-          topup:
-            "navTopup",
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            `Ошибка сервера (${response.status})`
+          );
+        }
 
-          history:
-            "navHistory",
+        return data;
 
-          profile:
-            "navProfile"
+      } catch (error) {
+        console.error("API ERROR:", path, error);
 
-        }[page];
+        throw error;
+      }
+    }
 
 
-      document
-        .getElementById(
-          activeId
-        )
-        .classList.add(
-          "active"
+    // ==========================================
+    // УТИЛИТЫ
+    // ==========================================
+
+    function formatNumber(value) {
+      return Number(value || 0).toLocaleString("ru-RU");
+    }
+
+
+    function formatDate(value) {
+      if (!value) {
+        return "—";
+      }
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return "—";
+      }
+
+      return date.toLocaleString("ru-RU");
+    }
+
+
+    function showElement(id) {
+      const element = document.getElementById(id);
+
+      if (element) {
+        element.style.display = "block";
+      }
+    }
+
+
+    function hideElement(id) {
+      const element = document.getElementById(id);
+
+      if (element) {
+        element.style.display = "none";
+      }
+    }
+
+
+    function setText(id, text) {
+      const element = document.getElementById(id);
+
+      if (element) {
+        element.textContent = text;
+      }
+    }
+
+
+    function showError(id, message) {
+      const element = document.getElementById(id);
+
+      if (!element) {
+        return;
+      }
+
+      element.textContent = message || "Произошла ошибка";
+      element.style.display = "block";
+    }
+
+
+    function hideError(id) {
+      hideElement(id);
+    }
+
+
+    function showPromoResult(id, message, success = false) {
+      const element = document.getElementById(id);
+
+      if (!element) {
+        return;
+      }
+
+      element.textContent = message || "";
+
+      element.className =
+        "promo-result " +
+        (message
+          ? success
+            ? "success"
+            : "error"
+          : "");
+    }
+
+
+    // ==========================================
+    // БАЛАНС
+    // ==========================================
+
+    function updateBalance(newBalance) {
+      balance = Number(newBalance || 0);
+
+      setText(
+        "balanceValue",
+        formatNumber(balance)
+      );
+
+      setText(
+        "profileBalance",
+        `${formatNumber(balance)} PT`
+      );
+    }
+
+
+    // ==========================================
+    // НАВИГАЦИЯ
+    // ==========================================
+
+    function openPage(pageId) {
+      document.querySelectorAll(".page").forEach((page) => {
+        page.classList.remove("active");
+      });
+
+      const page = document.getElementById(pageId);
+
+      if (page) {
+        page.classList.add("active");
+      }
+
+      document.querySelectorAll(".nav-button").forEach((button) => {
+        const target = button.dataset.page;
+
+        button.classList.toggle(
+          "active",
+          target === pageId
         );
+      });
 
-
-      if (
-        page ===
-        "history"
-      ) {
-
+      if (pageId === "historyPage") {
         loadHistory();
       }
 
-
-      if (
-        page ===
-        "profile"
-      ) {
-
+      if (pageId === "profilePage") {
         loadProfile();
       }
     }
 
 
-    /* =====================================================
-       МОДАЛКИ
-       ===================================================== */
+    // ==========================================
+    // КАТЕГОРИИ
+    // ==========================================
 
-    function openModal(
-      id
-    ) {
+    function renderCategories() {
+      const container =
+        document.getElementById("categories");
 
-      document
-        .getElementById(id)
-        .classList.add(
-          "open"
-        );
-
-
-      refreshTelegramBackButton();
-    }
-
-
-    function closeModal(
-      id
-    ) {
-
-      document
-        .getElementById(id)
-        .classList.remove(
-          "open"
-        );
-
-
-      refreshTelegramBackButton();
-    }
-
-
-    function closeModalByOverlay(
-      event,
-      id
-    ) {
-
-      if (
-        event.target.id ===
-        id
-      ) {
-
-        closeModal(id);
-      }
-    }
-
-
-    function openTopupModal() {
-
-      openModal(
-        "topupModal"
-      );
-    }
-
-
-    function closeTopupModal() {
-
-      closeModal(
-        "topupModal"
-      );
-    }
-
-
-    function openPtPromoModal() {
-
-      openModal(
-        "ptPromoModal"
-      );
-
-
-      setTimeout(
-        () => {
-
-          const input =
-            document.getElementById(
-              "ptPromoCode"
-            );
-
-
-          if (input) {
-
-            input.focus();
-
-          }
-
-        },
-        100
-      );
-    }
-
-
-    function closePtPromoModal() {
-
-      closeModal(
-        "ptPromoModal"
-      );
-    }
-
-
-    function closeBuyModal() {
-
-      closeModal(
-        "buyModal"
-      );
-    }
-
-
-    /* =====================================================
-       КАТЕГОРИИ
-       ===================================================== */
-
-    function getProductCategory(
-      product
-    ) {
-
-      const name =
-        String(
-          product.name || ""
-        ).toLowerCase();
-
-
-      if (
-        product.escort ||
-        name.includes(
-          "сопровождение"
-        )
-      ) {
-
-        return "escort";
+      if (!container) {
+        return;
       }
 
-
-      if (
-        name.includes(
-          "оруж"
+      const categories = [
+        "Все",
+        ...new Set(
+          currentProducts.map(
+            (product) => product.category
+          )
         )
-      ) {
+      ];
 
-        return "weapons";
-      }
+      container.innerHTML = "";
 
+      categories.forEach((category) => {
+        const button =
+          document.createElement("button");
 
-      return "sets";
-    }
+        button.type = "button";
+        button.className =
+          "category-button" +
+          (
+            category === activeCategory
+              ? " active"
+              : ""
+          );
 
+        button.textContent = category;
 
-    function filterCategory(
-      category,
-      button
-    ) {
+        button.addEventListener(
+          "click",
+          () => {
+            activeCategory = category;
 
-      currentCategory =
-        category;
-
-
-      document
-        .querySelectorAll(
-          ".category-button"
-        )
-        .forEach(
-          element => {
-
-            element.classList.remove(
-              "active"
-            );
-
+            renderCategories();
+            renderProducts();
           }
         );
 
-
-      button.classList.add(
-        "active"
-      );
-
-
-      renderProducts();
+        container.appendChild(button);
+      });
     }
 
 
-    /* =====================================================
-       ОТРИСОВКА ТОВАРОВ
-       ===================================================== */
+    // ==========================================
+    // ТОВАРЫ
+    // ==========================================
 
     function renderProducts() {
-
       const container =
-        document.getElementById(
-          "productsContainer"
-        );
+        document.getElementById("products");
 
+      if (!container) {
+        return;
+      }
 
-      const filtered =
-        products.filter(
-          product => {
-
-            if (
-              currentCategory ===
-              "all"
-            ) {
-
-              return true;
-            }
-
-
-            return (
-              getProductCategory(
-                product
-              ) ===
-              currentCategory
+      const products =
+        activeCategory === "Все"
+          ? currentProducts
+          : currentProducts.filter(
+              (product) =>
+                product.category ===
+                activeCategory
             );
 
-          }
-        );
+      setText(
+        "productCount",
+        `${products.length} ${
+          products.length === 1
+            ? "товар"
+            : "товаров"
+        }`
+      );
 
-
-      if (
-        !filtered.length
-      ) {
-
+      if (!products.length) {
         container.innerHTML = `
-          <div class="empty-box">
-            В этой категории пока нет товаров.
+          <div class="empty">
+            В этой категории пока ничего нет.
           </div>
         `;
 
         return;
       }
 
+      container.innerHTML = "";
 
-      container.innerHTML =
-        filtered
-          .map(
-            product => {
+      products.forEach((product) => {
 
-              const price =
-                Number(
-                  product.price
-                ) || 0;
+        const card =
+          document.createElement("div");
 
+        card.className = "product-card";
 
-              const description =
-                product.escort
-                  ? "Сопровождение с указанным количеством денег и вещей."
-                  : "Товар для Metro Royale.";
+        const controls =
+          product.available
+            ? `
+              <div class="product-controls">
 
-
-              if (
-                price <= 0
-              ) {
-
-                return `
-                  <div class="product-card">
-
-                    <div class="product-top">
-
-                      <div class="product-name">
-                        ${escapeHtml(
-                          product.name
-                        )}
-                      </div>
-
-                      <div class="product-price">
-                        По договорённости
-                      </div>
-
-                    </div>
-
-
-                    <div class="product-description">
-                      ${escapeHtml(
-                        description
-                      )}
-                    </div>
-
-
-                    <div class="product-actions">
-
-                      <button
-                        class="buy-button"
-                        type="button"
-                        disabled
-                      >
-                        Пока недоступно
-                      </button>
-
-                    </div>
-
-                  </div>
-                `;
-              }
-
-
-              const maxQuantity =
-                product.quantityEnabled
-                  ? Math.min(
-                      Number(
-                        product.maxQuantity ||
-                        10
-                      ),
-                      10
-                    )
-                  : 1;
-
-
-              return `
-                <div class="product-card">
-
-                  <div class="product-top">
-
-                    <div class="product-name">
-                      ${escapeHtml(
-                        product.name
-                      )}
-                    </div>
-
-                    <div class="product-price">
-                      ${formatPT(
-                        price
-                      )}
-                    </div>
-
-                  </div>
-
-
-                  <div class="product-description">
-                    ${escapeHtml(
-                      description
-                    )}
-                  </div>
-
-
-                  <div class="product-actions">
-
-                    ${
-                      product.quantityEnabled
-                        ? `
-                          <select
-                            class="product-quantity"
-                          >
-
-                            ${Array.from(
-                              {
-                                length:
-                                  maxQuantity
-                              },
-
-                              (_, index) => `
-                                <option value="${index + 1}">
-                                  ${index + 1} шт.
-                                </option>
-                              `
-                            ).join("")}
-
-                          </select>
-                        `
-                        : ""
-                    }
-
-
-                    <button
-                      class="buy-button primary buy-product-button"
-                      type="button"
-                    >
-                      Купить
-                    </button>
-
-                  </div>
-
-                </div>
-              `;
-            }
-          )
-          .join("");
-
-
-      /*
-       * Подключаем обработчики после того,
-       * как карточки созданы.
-       *
-       * Название товара НЕ вставляется
-       * в onclick.
-       */
-
-      container
-        .querySelectorAll(
-          ".buy-product-button"
-        )
-        .forEach(
-          button => {
-
-            button.addEventListener(
-              "click",
-              () => {
-
-                const card =
-                  button.closest(
-                    ".product-card"
-                  );
-
-
-                if (!card) {
-                  return;
-                }
-
-
-                const nameElement =
-                  card.querySelector(
-                    ".product-name"
-                  );
-
-
-                if (!nameElement) {
-                  return;
-                }
-
-
-                const productName =
-                  nameElement.textContent
-                    .trim();
-
-
-                const product =
-                  products.find(
-                    item =>
-                      item.name ===
-                      productName
-                  );
-
-
-                if (!product) {
-
-                  showToast(
-                    "Товар не найден."
-                  );
-
-                  return;
-                }
-
-
-                let quantity =
-                  1;
-
-
-                if (
+                ${
                   product.quantityEnabled
-                ) {
+                    ? `
+                      <select
+                        class="quantity-select product-quantity"
+                        data-id="${product.id}"
+                      >
+                        ${Array.from(
+                          {
+                            length:
+                              product.maxQuantity || 1
+                          },
+                          (_, index) => {
+                            const quantity =
+                              index + 1;
 
-                  const select =
-                    card.querySelector(
-                      ".product-quantity"
-                    );
-
-
-                  if (select) {
-
-                    quantity =
-                      Number(
-                        select.value
-                      ) || 1;
-                  }
+                            return `
+                              <option value="${quantity}">
+                                ${quantity} шт.
+                              </option>
+                            `;
+                          }
+                        ).join("")}
+                      </select>
+                    `
+                    : ""
                 }
 
+                <button
+                  type="button"
+                  class="buy-button buy-product-button"
+                  data-id="${product.id}"
+                >
+                  Купить
+                </button>
 
-                openBuyModal(
-                  product,
-                  quantity
+              </div>
+            `
+            : `
+              <div class="product-controls">
+                <button
+                  type="button"
+                  class="buy-button disabled"
+                  disabled
+                >
+                  Скоро
+                </button>
+              </div>
+            `;
+
+        card.innerHTML = `
+          <div class="product-top">
+
+            <div>
+              <div class="product-name">
+                ${product.name}
+              </div>
+
+              <div class="product-category">
+                ${product.category}
+              </div>
+            </div>
+
+          </div>
+
+          <div class="product-price">
+
+            <div
+              class="price ${
+                product.price > 0
+                  ? ""
+                  : "free"
+              }"
+            >
+              ${
+                product.price > 0
+                  ? `${formatNumber(product.price)} PT`
+                  : "Недоступно"
+              }
+            </div>
+
+            ${controls}
+
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      // ВАЖНО:
+      // Кнопки покупок подключаем через addEventListener,
+      // а не через inline onclick.
+      container
+        .querySelectorAll(".buy-product-button")
+        .forEach((button) => {
+
+          button.addEventListener(
+            "click",
+            () => {
+
+              const productId =
+                button.dataset.id;
+
+              const product =
+                currentProducts.find(
+                  (item) =>
+                    item.id === productId
                 );
 
+              if (!product) {
+                return;
               }
-            );
 
-          }
-        );
+              let quantity = 1;
+
+              const select =
+                container.querySelector(
+                  `.product-quantity[data-id="${productId}"]`
+                );
+
+              if (select) {
+                quantity =
+                  Number(select.value) || 1;
+              }
+
+              openBuyModal(
+                product,
+                quantity
+              );
+            }
+          );
+        });
     }
-    /* =====================================================
-       ОКНО ПОКУПКИ
-       ===================================================== */
+  </script>  <script>
 
-    function openBuyModal(
-      product,
-      quantity
-    ) {
+    // ==========================================
+    // МОДАЛЬНЫЕ ОКНА
+    // ==========================================
 
-      selectedProduct =
-        product;
+    function openModal(id) {
+      const modal = document.getElementById(id);
+
+      if (modal) {
+        modal.classList.add("show");
+      }
+    }
+
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+
+      if (modal) {
+        modal.classList.remove("show");
+      }
+    }
+
+
+    // ==========================================
+    // ПОКУПКА
+    // ==========================================
+
+    function openBuyModal(product, quantity = 1) {
+      selectedProduct = product;
 
       selectedQuantity =
-        Math.max(
-          1,
-          Math.min(
-            Number(quantity) || 1,
-            10
-          )
-        );
+        Number(quantity) || 1;
 
-
-      const price =
-        Number(
-          product.price
-        ) || 0;
-
+      hideError("buyError");
 
       const total =
-        price *
+        Number(product.price) *
         selectedQuantity;
 
-
-      const content =
+      const info =
         document.getElementById(
-          "buyModalContent"
+          "buyProductInfo"
         );
 
+      if (info) {
+        info.innerHTML = `
+          <div class="summary-row">
+            <span>Товар</span>
+            <strong>${product.name}</strong>
+          </div>
 
-      if (!content) {
-        return;
+          <div class="summary-row">
+            <span>Цена за 1 шт.</span>
+            <strong>${formatNumber(product.price)} PT</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Количество</span>
+            <strong>${selectedQuantity}</strong>
+          </div>
+
+          <div class="summary-row summary-total">
+            <span>Итого</span>
+            <strong>${formatNumber(total)} PT</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Ваш баланс</span>
+            <strong>${formatNumber(balance)} PT</strong>
+          </div>
+        `;
       }
-
-
-      content.innerHTML = `
-
-        <div class="order-info">
-
-          <div class="order-info-row">
-
-            <div class="order-info-label">
-              Товар
-            </div>
-
-            <div class="order-info-value">
-              ${escapeHtml(
-                product.name
-              )}
-            </div>
-
-          </div>
-
-
-          <div class="order-info-row">
-
-            <div class="order-info-label">
-              Количество
-            </div>
-
-            <div class="order-info-value">
-              ${selectedQuantity} шт.
-            </div>
-
-          </div>
-
-
-          <div class="order-info-row">
-
-            <div class="order-info-label">
-              Цена за 1 шт.
-            </div>
-
-            <div class="order-info-value">
-              ${formatPT(
-                price
-              )}
-            </div>
-
-          </div>
-
-
-          <div class="order-info-row">
-
-            <div class="order-info-label">
-              Сумма
-            </div>
-
-            <div class="order-info-value">
-              ${formatPT(
-                total
-              )}
-            </div>
-
-          </div>
-
-
-          <div class="order-info-row">
-
-            <div class="order-info-label">
-              Баланс
-            </div>
-
-            <div class="order-info-value">
-              ${formatPT(
-                currentUser.balance
-              )}
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div class="form-group">
-
-          <label
-            class="form-label"
-            for="gameIdInput"
-          >
-            Игровой ID
-          </label>
-
-
-          <input
-            id="gameIdInput"
-            class="input"
-            type="text"
-            maxlength="100"
-            placeholder="Введите игровой ID"
-            autocomplete="off"
-            inputmode="numeric"
-          >
-
-        </div>
-
-
-        <button
-          class="submit-button"
-          type="button"
-          id="confirmBuyButton"
-        >
-          ✅ Купить за ${formatPT(
-            total
-          )}
-        </button>
-
-      `;
-
-
-      const confirmButton =
-        document.getElementById(
-          "confirmBuyButton"
-        );
-
-
-      if (
-        confirmButton
-      ) {
-
-        confirmButton.addEventListener(
-          "click",
-          buySelectedProduct
-        );
-      }
-
-
-      openModal(
-        "buyModal"
-      );
-    }
-
-
-    /* =====================================================
-       ПОКУПКА ТОВАРА
-       ===================================================== */
-
-    async function buySelectedProduct() {
-
-      if (
-        !selectedProduct
-      ) {
-
-        showToast(
-          "Товар не выбран."
-        );
-
-        return;
-      }
-
-
-      if (
-        !hasTelegramAuth()
-      ) {
-
-        showToast(
-          "Открой приложение через Telegram."
-        );
-
-        return;
-      }
-
 
       const gameIdInput =
         document.getElementById(
           "gameIdInput"
         );
 
+      if (gameIdInput) {
+        gameIdInput.value = "";
+      }
+
+      openModal("buyModal");
+    }
+
+
+    async function confirmBuy() {
+      hideError("buyError");
+
+      if (!selectedProduct) {
+        showError(
+          "buyError",
+          "Товар не выбран"
+        );
+
+        return;
+      }
+
+      const gameIdInput =
+        document.getElementById(
+          "gameIdInput"
+        );
 
       const gameId =
-        gameIdInput
-          ? gameIdInput.value.trim()
-          : "";
-
+        gameIdInput?.value.trim() || "";
 
       if (!gameId) {
-
-        showToast(
-          "Введите игровой ID."
+        showError(
+          "buyError",
+          "Введите Game ID"
         );
+
+        gameIdInput?.focus();
 
         return;
       }
-
-
-      let quantity =
-        Number(
-          selectedQuantity
-        ) || 1;
-
-
-      quantity =
-        Math.max(
-          1,
-          Math.min(
-            quantity,
-            10
-          )
-        );
-
-
-      const price =
-        Number(
-          selectedProduct.price
-        ) || 0;
-
 
       const total =
-        price *
-        quantity;
+        Number(selectedProduct.price) *
+        Number(selectedQuantity);
 
-
-      if (
-        currentUser.balance <
-        total
-      ) {
-
-        showToast(
-          "Недостаточно PT на балансе."
+      if (balance < total) {
+        showError(
+          "buyError",
+          "Недостаточно PT. Сначала пополните баланс."
         );
 
         return;
       }
-
 
       const button =
         document.getElementById(
           "confirmBuyButton"
         );
 
+      const oldText =
+        button.textContent;
 
-      if (button) {
-
-        button.disabled =
-          true;
-
-        button.textContent =
-          "⏳ Оформление...";
-      }
-
+      button.disabled = true;
+      button.textContent =
+        "⏳ Оформляем...";
 
       try {
 
-        const result =
-          await api(
-            "/api/buy",
-            {
+        const result = await api(
+          "/api/buy",
+          {
+            productId:
+              selectedProduct.id,
 
-              product:
-                selectedProduct.name,
+            quantity:
+              selectedQuantity,
 
-              gameId,
+            gameId
+          }
+        );
 
-              quantity
-
-            }
-          );
-
-
-        if (
-          result &&
-          result.balance !==
-            undefined
-        ) {
-
-          updateBalance(
-            result.balance
-          );
-
-        } else {
-
-          updateBalance(
-            currentUser.balance -
-            total
+        if (!result.ok) {
+          throw new Error(
+            result.message ||
+            "Не удалось оформить заказ"
           );
         }
 
-
-        closeBuyModal();
-
-
-        showToast(
-          result &&
-          result.message
-            ? result.message
-            : "Заказ создан."
+        updateBalance(
+          result.balance
         );
 
+        closeModal("buyModal");
 
-        await loadProfile();
+        if (tg?.HapticFeedback) {
+          tg.HapticFeedback.notificationOccurred(
+            "success"
+          );
+        }
 
-        await loadHistory();
-
+        alert(
+          `✅ Заказ оформлен!\n\n` +
+          `📦 ${selectedProduct.name}\n` +
+          `🔢 Количество: ${selectedQuantity}\n` +
+          `💎 Списано: ${formatNumber(total)} PT\n\n` +
+          `🧾 Заказ: ${result.orderId}`
+        );
 
       } catch (error) {
 
-        console.error(
-          "Buy error:",
-          error
+        showError(
+          "buyError",
+          error.message
         );
-
-
-        showToast(
-          error.message ||
-          "Не удалось оформить заказ."
-        );
-
 
       } finally {
 
-        if (button) {
+        button.disabled = false;
+        button.textContent = oldText;
 
-          button.disabled =
-            false;
-
-          button.textContent =
-            "✅ Купить за " +
-            formatPT(total);
-        }
       }
     }
 
 
-    /* =====================================================
-       ПРОФИЛЬ
-       ===================================================== */
+    // ==========================================
+    // ПРОФИЛЬ
+    // ==========================================
 
     async function loadProfile() {
-
-      const container =
-        document.getElementById(
-          "profileContainer"
-        );
-
-
-      if (
-        !hasTelegramAuth()
-      ) {
-
-        container.innerHTML = `
-          <div class="error-box">
-            Открой приложение через Telegram,
-            чтобы посмотреть профиль.
-          </div>
-        `;
-
-        return;
-      }
-
-
       try {
 
         const result =
           await api(
-            "/api/profile",
-            {}
+            "/api/profile"
           );
 
+        if (!result.ok) {
+          throw new Error(
+            result.message ||
+            "Не удалось загрузить профиль"
+          );
+        }
 
-        currentUser = {
-
-          id:
-            result.id ??
-            null,
-
-          username:
-            result.username ||
-            "",
-
-          firstName:
-            result.firstName ||
-            "",
-
-          balance:
-            Number(
-              result.balance
-            ) || 0
-
-        };
-
+        const profile =
+          result.profile;
 
         updateBalance(
-          currentUser.balance
+          profile.balance
         );
 
+        setText(
+          "profileName",
+          (
+            `${profile.firstName || ""} ` +
+            `${profile.lastName || ""}`
+          ).trim() || "—"
+        );
 
-        renderProfile();
+        setText(
+          "profileUsername",
+          profile.username
+            ? `@${profile.username}`
+            : "—"
+        );
 
+        setText(
+          "profileTelegramId",
+          profile.telegramId || "—"
+        );
 
       } catch (error) {
 
         console.error(
-          "Profile error:",
+          "PROFILE ERROR:",
           error
         );
 
-
-        container.innerHTML = `
-          <div class="error-box">
-            Не удалось загрузить профиль.<br><br>
-            ${escapeHtml(
-              error.message
-            )}
-          </div>
-        `;
       }
     }
 
 
-    /* =====================================================
-       ПРОФИЛЬ — ОТРИСОВКА
-       ===================================================== */
-
-    function renderProfile() {
-
-      const container =
-        document.getElementById(
-          "profileContainer"
-        );
-
-
-      if (!container) {
-        return;
-      }
-
-
-      const firstName =
-        currentUser.firstName ||
-        "Пользователь";
-
-
-      const username =
-        currentUser.username
-          ? "@" +
-            currentUser.username
-          : "Username не указан";
-
-
-      const avatarLetter =
-        String(
-          firstName
-        )
-          .trim()
-          .charAt(0)
-          .toUpperCase() ||
-        "👤";
-
-
-      container.innerHTML = `
-
-        <div class="profile-card">
-
-          <div class="profile-avatar">
-            ${escapeHtml(
-              avatarLetter
-            )}
-          </div>
-
-
-          <div class="profile-name">
-            ${escapeHtml(
-              firstName
-            )}
-          </div>
-
-
-          <div class="profile-username">
-            ${escapeHtml(
-              username
-            )}
-          </div>
-
-
-          <div class="profile-balance">
-
-            <div class="profile-balance-label">
-              Баланс
-            </div>
-
-
-            <div class="profile-balance-value">
-              ${formatPT(
-                currentUser.balance
-              )}
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div style="height:10px;"></div>
-
-
-        <button
-          class="submit-button"
-          type="button"
-          onclick="openTopupModal()"
-        >
-          💎 Пополнить баланс
-        </button>
-
-      `;
-    }
-
-
-    /* =====================================================
-       ИСТОРИЯ
-       ===================================================== */
+    // ==========================================
+    // ИСТОРИЯ
+    // ==========================================
 
     async function loadHistory() {
-
       const container =
         document.getElementById(
-          "historyContainer"
+          "historyList"
         );
-
 
       if (!container) {
         return;
       }
 
-
-      if (
-        !hasTelegramAuth()
-      ) {
-
-        container.innerHTML = `
-          <div class="error-box">
-            Открой приложение через Telegram,
-            чтобы посмотреть историю.
-          </div>
-        `;
-
-        return;
-      }
-
-
-      container.innerHTML =
-        '<div class="loading">Загрузка истории...</div>';
-
+      container.innerHTML = `
+        <div class="loading">
+          Загрузка истории...
+        </div>
+      `;
 
       try {
 
         const result =
           await api(
-            "/api/history",
-            {}
+            "/api/history"
           );
 
+        if (!result.ok) {
+          throw new Error(
+            result.message ||
+            "Не удалось загрузить историю"
+          );
+        }
 
-        const history =
+        const list =
           Array.isArray(
-            result
+            result.transactions
           )
-            ? result
-            : (
-                Array.isArray(
-                  result.transactions
-                )
-                  ? result.transactions
-                  : []
-              );
+            ? result.transactions
+            : [];
 
+        if (!list.length) {
 
-        renderHistory(
-          history
-        );
+          container.innerHTML = `
+            <div class="empty">
+              История пока пустая.
+            </div>
+          `;
 
+          return;
+        }
+
+        container.innerHTML = "";
+
+        list.forEach((transaction) => {
+
+          const row =
+            document.createElement(
+              "div"
+            );
+
+          row.className =
+            "history-row";
+
+          const amount =
+            Number(
+              transaction.amount || 0
+            );
+
+          const isPositive =
+            amount > 0;
+
+          const sign =
+            isPositive
+              ? "+"
+              : "";
+
+          row.innerHTML = `
+            <div class="history-left">
+
+              <div class="history-title">
+                ${
+                  transaction.description ||
+                  transaction.type ||
+                  "Операция"
+                }
+              </div>
+
+              <div class="history-date">
+                ${formatDate(
+                  transaction.createdAt
+                )}
+              </div>
+
+            </div>
+
+            <div
+              class="history-amount ${
+                isPositive
+                  ? "plus"
+                  : "minus"
+              }"
+            >
+              ${sign}${formatNumber(amount)} PT
+            </div>
+          `;
+
+          container.appendChild(row);
+        });
 
       } catch (error) {
 
-        console.error(
-          "History error:",
-          error
-        );
-
-
         container.innerHTML = `
           <div class="error-box">
-            Не удалось загрузить историю.<br><br>
-            ${escapeHtml(
-              error.message
-            )}
+            ${error.message}
           </div>
         `;
+
       }
     }
 
 
-    /* =====================================================
-       ИСТОРИЯ — ОТРИСОВКА
-       ===================================================== */
-
-    function renderHistory(
-      history
-    ) {
-
-      const container =
-        document.getElementById(
-          "historyContainer"
-        );
-
-
-      if (!history.length) {
-
-        container.innerHTML = `
-          <div class="empty-box">
-            История пока пустая.
-          </div>
-        `;
-
-        return;
-      }
-
-
-      const sorted =
-        [...history].sort(
-          (a, b) => {
-
-            const aTime =
-              new Date(
-                a.createdAt ||
-                a.date ||
-                0
-              ).getTime();
-
-
-            const bTime =
-              new Date(
-                b.createdAt ||
-                b.date ||
-                0
-              ).getTime();
-
-
-            return bTime - aTime;
-          }
-        );
-
-
-      container.innerHTML = `
-
-        <div class="history-list">
-
-          ${
-            sorted
-              .map(
-                item => {
-
-                  const type =
-                    String(
-                      item.type ||
-                      "Операция"
-                    );
-
-
-                  const amount =
-                    Number(
-                      item.amount
-                    ) || 0;
-
-
-                  const description =
-                    item.description ||
-                    "Операция с балансом";
-
-
-                  let amountText =
-                    formatPT(
-                      amount
-                    );
-
-
-                  if (
-                    amount > 0
-                  ) {
-
-                    amountText =
-                      "+" +
-                      formatPT(
-                        amount
-                      );
-                  }
-
-
-                  let dateText =
-                    "";
-
-
-                  const rawDate =
-                    item.createdAt ||
-                    item.date;
-
-
-                  if (
-                    rawDate
-                  ) {
-
-                    const date =
-                      new Date(
-                        rawDate
-                      );
-
-
-                    if (
-                      !Number.isNaN(
-                        date.getTime()
-                      )
-                    ) {
-
-                      dateText =
-                        date.toLocaleString(
-                          "ru-RU",
-                          {
-
-                            day:
-                              "2-digit",
-
-                            month:
-                              "2-digit",
-
-                            year:
-                              "numeric",
-
-                            hour:
-                              "2-digit",
-
-                            minute:
-                              "2-digit"
-
-                          }
-                        );
-                    }
-                  }
-
-
-                  return `
-
-                    <div class="history-item">
-
-                      <div class="history-item-top">
-
-                        <div class="history-type">
-                          ${escapeHtml(
-                            type
-                          )}
-                        </div>
-
-
-                        <div class="history-amount">
-                          ${escapeHtml(
-                            amountText
-                          )}
-                        </div>
-
-                      </div>
-
-
-                      <div class="history-description">
-                        ${escapeHtml(
-                          description
-                        )}
-                      </div>
-
-
-                      ${
-                        dateText
-                          ? `
-                            <div class="history-date">
-                              ${escapeHtml(
-                                dateText
-                              )}
-                            </div>
-                          `
-                          : ""
-                      }
-
-                    </div>
-
-                  `;
-
-                }
-              )
-              .join("")
-          }
-
-        </div>
-      `;
-    }
-
-
-    /* =====================================================
-       PT-ПРОМОКОД
-       ===================================================== */
-
-    async function activatePtPromo() {
-
-      if (
-        !hasTelegramAuth()
-      ) {
-
-        showToast(
-          "Открой приложение через Telegram."
-        );
-
-        return;
-      }
-
-
+    // ==========================================
+    // PT ПРОМОКОД
+    // ==========================================
+
+    async function activateBonusPromo() {
       const input =
         document.getElementById(
-          "ptPromoCode"
+          "bonusPromoInput"
         );
 
-
       const code =
-        input
-          ? input.value.trim()
-          : "";
+        input?.value.trim() || "";
 
+      showPromoResult(
+        "bonusPromoResult",
+        ""
+      );
 
       if (!code) {
-
-        showToast(
-          "Введите промокод."
+        showPromoResult(
+          "bonusPromoResult",
+          "Введите промокод",
+          false
         );
 
         return;
       }
-
 
       const button =
         document.getElementById(
           "activatePromoButton"
         );
 
+      const oldText =
+        button.textContent;
 
-      if (button) {
-
-        button.disabled =
-          true;
-
-        button.textContent =
-          "⏳ Проверяем...";
-      }
-
+      button.disabled = true;
+      button.textContent =
+        "⏳ Проверяем...";
 
       try {
 
@@ -3528,80 +2162,82 @@
             }
           );
 
-
-        if (
-          result &&
-          result.balance !==
-            undefined
-        ) {
-
-          updateBalance(
-            result.balance
+        if (!result.ok) {
+          throw new Error(
+            result.message ||
+            "Не удалось активировать промокод"
           );
         }
 
-
-        if (input) {
-          input.value = "";
-        }
-
-
-        closePtPromoModal();
-
-
-        showToast(
-          result &&
-          result.message
-            ? result.message
-            : "Промокод активирован."
+        updateBalance(
+          result.balance
         );
 
+        showPromoResult(
+          "bonusPromoResult",
+          `✅ ${result.message}`,
+          true
+        );
 
-        await loadProfile();
+        input.value = "";
 
-        await loadHistory();
+        if (tg?.HapticFeedback) {
+          tg.HapticFeedback.notificationOccurred(
+            "success"
+          );
+        }
 
+        setTimeout(() => {
+          closeModal(
+            "bonusPromoModal"
+          );
+        }, 1200);
 
       } catch (error) {
 
-        console.error(
-          "Promo error:",
-          error
+        showPromoResult(
+          "bonusPromoResult",
+          error.message,
+          false
         );
 
-
-        showToast(
-          error.message ||
-          "Не удалось активировать промокод."
-        );
-
+        if (tg?.HapticFeedback) {
+          tg.HapticFeedback.notificationOccurred(
+            "error"
+          );
+        }
 
       } finally {
 
-        if (button) {
+        button.disabled = false;
+        button.textContent = oldText;
 
-          button.disabled =
-            false;
-
-          button.textContent =
-            "🎁 Активировать";
-        }
       }
-    }    /* =====================================================
-       ПОПОЛНЕНИЕ — ПРОВЕРКА ПРОМОКОДА
-       ===================================================== */
+    }
 
-    async function checkPercentPromo(
-      amount,
-      promoCode,
-      target
-    ) {
 
-      if (
-        !hasTelegramAuth() ||
-        !promoCode ||
-        amount <= 0
-      ) {
+    // ==========================================
+    // ПРОМОКОД НА ПОПОЛНЕНИЕ
+    // ==========================================
+
+    async function checkPercentPromo() {
+      const input =
+        document.getElementById(
+          "percentPromoInput"
+        );
+
+      const code =
+        input?.value.trim() || "";
+
+      if (!code) {
+
+        showPromoResult(
+          "percentPromoResult",
+          ""
+        );
+
+        updateTopupPreview();
+
         return;
       }
 
@@ -3611,435 +2247,174 @@
           await api(
             "/api/promo/check-percent",
             {
-              amount,
-              promoPercent:
-                promoCode
+              code
             }
           );
 
-
-        const bonus =
-          Number(
-            result.percentBonus ??
-            result.bonus ??
-            0
-          ) || 0;
-
-
-        const total =
-          Number(
-            result.totalPoints ??
-            result.total ??
-            amount + bonus
-          ) ||
-          amount + bonus;
-
-
-        if (
-          target === "page"
-        ) {
-
-          const bonusElement =
-            document.getElementById(
-              "previewBonus"
-            );
-
-          const totalElement =
-            document.getElementById(
-              "previewTotal"
-            );
-
-
-          if (bonusElement) {
-            bonusElement.textContent =
-              formatPT(bonus);
-          }
-
-
-          if (totalElement) {
-            totalElement.textContent =
-              formatPT(total);
-          }
-
-        } else {
-
-          const bonusElement =
-            document.getElementById(
-              "modalPreviewBonus"
-            );
-
-          const totalElement =
-            document.getElementById(
-              "modalPreviewTotal"
-            );
-
-
-          if (bonusElement) {
-            bonusElement.textContent =
-              formatPT(bonus);
-          }
-
-
-          if (totalElement) {
-            totalElement.textContent =
-              formatPT(total);
-          }
+        if (!result.ok) {
+          throw new Error(
+            result.message ||
+            "Промокод недействителен"
+          );
         }
 
+        showPromoResult(
+          "percentPromoResult",
+          `✅ Бонус к пополнению: +${result.percent}%`,
+          true
+        );
+
+        updateTopupPreview();
 
       } catch (error) {
 
-        console.error(
-          "Promo percent error:",
-          error
+        showPromoResult(
+          "percentPromoResult",
+          error.message,
+          false
         );
 
+        updateTopupPreview();
 
-        if (
-          target === "page"
-        ) {
-
-          document.getElementById(
-            "previewBonus"
-          ).textContent =
-            "0 PT";
-
-
-          document.getElementById(
-            "previewTotal"
-          ).textContent =
-            formatPT(amount);
-
-        } else {
-
-          document.getElementById(
-            "modalPreviewBonus"
-          ).textContent =
-            "0 PT";
-
-
-          document.getElementById(
-            "modalPreviewTotal"
-          ).textContent =
-            formatPT(amount);
-        }
       }
     }
 
 
-    /* =====================================================
-       ПРЕВЬЮ ПОПОЛНЕНИЯ
-       ===================================================== */
+    // ==========================================
+    // ПРЕДПРОСМОТР ПОПОЛНЕНИЯ
+    // ==========================================
+
+    function getTopupAmount() {
+      const input =
+        document.getElementById(
+          "topupAmountInput"
+        );
+
+      return Number(
+        input?.value || 0
+      );
+    }
+
+
+    function getPercentPromoCode() {
+      const input =
+        document.getElementById(
+          "percentPromoInput"
+        );
+
+      return (
+        input?.value.trim() || ""
+      );
+    }
+
 
     function updateTopupPreview() {
-
-      const amountInput =
+      const preview =
         document.getElementById(
-          "topupAmount"
+          "topupPreview"
         );
 
-
-      const promoInput =
-        document.getElementById(
-          "promoPercent"
-        );
-
-
-      const amount =
-        Number(
-          amountInput
-            ? amountInput.value
-            : 0
-        ) || 0;
-
-
-      const promoCode =
-        promoInput
-          ? promoInput.value.trim()
-          : "";
-
-
-      const previewAmount =
-        document.getElementById(
-          "previewAmount"
-        );
-
-
-      const previewBonus =
-        document.getElementById(
-          "previewBonus"
-        );
-
-
-      const previewTotal =
-        document.getElementById(
-          "previewTotal"
-        );
-
-
-      if (previewAmount) {
-
-        previewAmount.textContent =
-          formatPT(amount);
+      if (!preview) {
+        return;
       }
 
+      const amount =
+        getTopupAmount();
 
       if (
-        !promoCode ||
+        !Number.isFinite(amount) ||
         amount <= 0
       ) {
-
-        if (previewBonus) {
-
-          previewBonus.textContent =
-            "0 PT";
-        }
-
-
-        if (previewTotal) {
-
-          previewTotal.textContent =
-            formatPT(amount);
-        }
-
+        preview.style.display = "none";
+        preview.innerHTML = "";
 
         return;
       }
 
-
-      clearTimeout(
-        percentPromoCheckTimer
-      );
-
-
-      percentPromoCheckTimer =
-        setTimeout(
-          () => {
-
-            checkPercentPromo(
-              amount,
-              promoCode,
-              "page"
-            );
-
-          },
-          500
-        );
-
-
-      if (previewBonus) {
-
-        previewBonus.textContent =
-          "Проверка...";
-      }
-    }
-
-
-    function updateModalTopupPreview() {
-
-      const amountInput =
-        document.getElementById(
-          "modalTopupAmount"
-        );
-
-
-      const promoInput =
-        document.getElementById(
-          "modalPromoPercent"
-        );
-
-
-      const amount =
-        Number(
-          amountInput
-            ? amountInput.value
-            : 0
-        ) || 0;
-
-
       const promoCode =
-        promoInput
-          ? promoInput.value.trim()
-          : "";
+        getPercentPromoCode()
+          .toUpperCase();
 
+      let percent = 0;
 
-      const previewAmount =
-        document.getElementById(
-          "modalPreviewAmount"
-        );
-
-
-      const previewBonus =
-        document.getElementById(
-          "modalPreviewBonus"
-        );
-
-
-      const previewTotal =
-        document.getElementById(
-          "modalPreviewTotal"
-        );
-
-
-      if (previewAmount) {
-
-        previewAmount.textContent =
-          formatPT(amount);
+      // Предварительный расчёт для интерфейса.
+      // Финально сервер всё равно перепроверяет код.
+      if (promoCode === "WELCOME") {
+        percent = 25;
       }
 
-
-      if (
-        !promoCode ||
-        amount <= 0
-      ) {
-
-        if (previewBonus) {
-
-          previewBonus.textContent =
-            "0 PT";
-        }
-
-
-        if (previewTotal) {
-
-          previewTotal.textContent =
-            formatPT(amount);
-        }
-
-
-        return;
-      }
-
-
-      clearTimeout(
-        percentPromoCheckTimer
-      );
-
-
-      percentPromoCheckTimer =
-        setTimeout(
-          () => {
-
-            checkPercentPromo(
-              amount,
-              promoCode,
-              "modal"
-            );
-
-          },
-          500
+      const bonus =
+        Math.floor(
+          amount * (percent / 100)
         );
 
+      const total =
+        amount + bonus;
 
-      if (previewBonus) {
+      preview.style.display =
+        "block";
 
-        previewBonus.textContent =
-          "Проверка...";
-      }
+      preview.innerHTML = `
+        <div class="summary-row">
+          <span>Пополнение</span>
+          <strong>${formatNumber(amount)} PT</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Бонус</span>
+          <strong>
+            ${
+              bonus > 0
+                ? `+${formatNumber(bonus)} PT`
+                : "0 PT"
+            }
+          </strong>
+        </div>
+
+        <div class="summary-row summary-total">
+          <span>Получите</span>
+          <strong>${formatNumber(total)} PT</strong>
+        </div>
+      `;
     }
 
 
-    /* =====================================================
-       СОЗДАНИЕ ПОПОЛНЕНИЯ
-       ===================================================== */
+    // ==========================================
+    // СОЗДАНИЕ ЗАЯВКИ НА ПОПОЛНЕНИЕ
+    // ==========================================
 
     async function createTopup() {
-
-      await submitTopup(
-        "topupAmount",
-        "promoPercent",
-        false
-      );
-    }
-
-
-    async function createTopupFromModal() {
-
-      await submitTopup(
-        "modalTopupAmount",
-        "modalPromoPercent",
-        true
-      );
-    }
-
-
-    async function submitTopup(
-      amountInputId,
-      promoInputId,
-      fromModal
-    ) {
-
-      if (
-        !hasTelegramAuth()
-      ) {
-
-        showToast(
-          "Открой приложение через Telegram."
-        );
-
-        return;
-      }
-
-
-      const amountInput =
-        document.getElementById(
-          amountInputId
-        );
-
-
-      const promoInput =
-        document.getElementById(
-          promoInputId
-        );
-
+      hideError("topupError");
 
       const amount =
-        Number(
-          amountInput
-            ? amountInput.value
-            : 0
-        );
-
+        getTopupAmount();
 
       const promoPercent =
-        promoInput
-          ? promoInput.value.trim()
-          : "";
-
+        getPercentPromoCode();
 
       if (
         !Number.isInteger(amount) ||
-        amount < 1 ||
-        amount > 1000000
+        amount < 1
       ) {
-
-        showToast(
-          "Количество PT должно быть от 1 до 1 000 000."
+        showError(
+          "topupError",
+          "Введите целое количество PT больше 0"
         );
 
         return;
       }
 
-
       const button =
-        fromModal
-          ? document.querySelector(
-              "#topupModal .submit-button"
-            )
-          : document.querySelector(
-              "#pageTopup .submit-button"
-            );
+        document.getElementById(
+          "createTopupButton"
+        );
 
+      const oldText =
+        button.textContent;
 
-      if (button) {
-
-        button.disabled =
-          true;
-
-        button.textContent =
-          "⏳ Создание заявки...";
-      }
-
+      button.disabled = true;
+      button.textContent =
+        "⏳ Создаём заявку...";
 
       try {
 
@@ -4048,453 +2423,952 @@
             "/api/topup/create",
             {
               amount,
-
-              promoPercent,
-
-              /*
-               * PT-промокоды здесь НЕ передаются.
-               */
-              promoBonus: "",
-
-              promoCode: ""
+              promoPercent
             }
           );
 
-
-        const totalPoints =
-          Number(
-            result.totalPoints ??
-            amount
-          ) || amount;
-
-
-        let message =
-          "Заявка рассчитана: " +
-          formatPT(totalPoints) +
-          ".";
-
-
-        /*
-         * На данный момент paymentUrl
-         * будет null, так как ручная оплата
-         * ещё не подключена.
-         */
-
-        if (
-          result.paymentUrl
-        ) {
-
-          window.open(
-            result.paymentUrl,
-            "_blank"
+        if (!result.ok) {
+          throw new Error(
+            result.message ||
+            "Не удалось создать заявку"
           );
-
-
-          message =
-            "Заявка создана. Открываю оплату.";
-
-        } else {
-
-          message +=
-            " Ручная оплата будет подключена следующим этапом.";
         }
 
+        currentTopup = result;
 
-        if (
-          fromModal
-        ) {
+        closeModal("topupModal");
 
-          closeTopupModal();
-        }
-
-
-        showToast(
-          message
+        showPaymentModal(
+          result
         );
 
+        if (tg?.HapticFeedback) {
+          tg.HapticFeedback.impactOccurred(
+            "medium"
+          );
+        }
 
       } catch (error) {
 
-        console.error(
-          "Topup error:",
-          error
+        showError(
+          "topupError",
+          error.message
         );
-
-
-        showToast(
-          error.message ||
-          "Не удалось создать заявку."
-        );
-
 
       } finally {
 
-        if (button) {
+        button.disabled = false;
+        button.textContent = oldText;
 
-          button.disabled =
-            false;
-
-          button.textContent =
-            "💳 Создать заявку";
-        }
       }
     }
 
 
-    /* =====================================================
-       ESCAPE HTML
-       ===================================================== */
+    // ==========================================
+    // ОКНО ОПЛАТЫ
+    // ==========================================
 
-    function escapeHtml(
-      value
-    ) {
-
-      return String(
-        value ?? ""
-      )
-        .replace(
-          /&/g,
-          "&amp;"
-        )
-        .replace(
-          /</g,
-          "&lt;"
-        )
-        .replace(
-          />/g,
-          "&gt;"
-        )
-        .replace(
-          /"/g,
-          "&quot;"
-        )
-        .replace(
-          /'/g,
-          "&#039;"
+    function showPaymentModal(topup) {
+      const paymentSummary =
+        document.getElementById(
+          "paymentSummary"
         );
+
+      const paymentDetails =
+        document.getElementById(
+          "paymentDetails"
+        );
+
+      const status =
+        document.getElementById(
+          "paymentStatus"
+        );
+
+      const error =
+        document.getElementById(
+          "paymentError"
+        );
+
+      hideError("paymentError");
+
+      if (paymentSummary) {
+
+        paymentSummary.innerHTML = `
+          <div class="summary-row">
+            <span>К оплате</span>
+            <strong>${formatNumber(topup.paymentRub)} ₽</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Пополнение</span>
+            <strong>${formatNumber(topup.amountPT)} PT</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Бонус</span>
+            <strong>
+              ${
+                Number(topup.bonusPoints) > 0
+                  ? `+${formatNumber(topup.bonusPoints)} PT`
+                  : "0 PT"
+              }
+            </strong>
+          </div>
+
+          <div class="summary-row summary-total">
+            <span>Итого получите</span>
+            <strong>${formatNumber(topup.totalPoints)} PT</strong>
+          </div>
+        `;
+      }
+
+      if (paymentDetails) {
+
+        paymentDetails.innerHTML = `
+          <div class="payment-detail-row">
+
+            <div class="payment-detail-label">
+              💳 Номер карты
+            </div>
+
+            <div class="payment-detail-value">
+              ${topup.payment.card}
+            </div>
+
+          </div>
+
+          <div class="payment-detail-row">
+
+            <div class="payment-detail-label">
+              👤 Получатель
+            </div>
+
+            <div class="payment-detail-value">
+              ${topup.payment.recipient}
+            </div>
+
+          </div>
+
+          <div class="payment-detail-row">
+
+            <div class="payment-detail-label">
+              💰 Сумма перевода
+            </div>
+
+            <div class="payment-detail-value">
+              ${formatNumber(topup.paymentRub)} ₽
+            </div>
+
+          </div>
+        `;
+      }
+
+      if (status) {
+        status.textContent =
+          "⏳ Ожидается оплата";
+      }
+
+      const markPaidButton =
+        document.getElementById(
+          "markPaidButton"
+        );
+
+      if (markPaidButton) {
+        markPaidButton.disabled = false;
+        markPaidButton.style.display =
+          "block";
+        markPaidButton.textContent =
+          "✅ Я оплатил";
+      }
+
+      openModal("paymentModal");
     }
 
 
-    function escapeHtmlAttribute(
-      value
-    ) {
+    // ==========================================
+    // ПОЛЬЗОВАТЕЛЬ НАЖАЛ «Я ОПЛАТИЛ»
+    // ==========================================
 
-      return String(
-        value ?? ""
-      )
-        .replace(
-          /[^a-zA-Z0-9_-]/g,
-          "_"
+    async function markTopupPaid() {
+      hideError("paymentError");
+
+      if (!currentTopup?.paymentId) {
+        showError(
+          "paymentError",
+          "Заявка на оплату не найдена"
         );
-    }
-
-
-    /* =====================================================
-       ЗАПУСК TELEGRAM BACK BUTTON
-       ===================================================== */
-
-    function setupTelegramBackButton() {
-
-      if (
-        !tg ||
-        !tg.BackButton
-      ) {
 
         return;
       }
 
-
-      tg.BackButton.onClick(
-        () => {
-
-          const modals = [
-            "buyModal",
-            "topupModal",
-            "ptPromoModal"
-          ];
-
-
-          for (
-            const id of modals
-          ) {
-
-            const modal =
-              document.getElementById(
-                id
-              );
-
-
-            if (
-              modal &&
-              modal.classList.contains(
-                "open"
-              )
-            ) {
-
-              closeModal(id);
-
-              return;
-            }
-          }
-
-
-          showPage(
-            "shop"
-          );
-
-
-          tg.BackButton.hide();
-
-        }
-      );
-    }
-
-
-    function refreshTelegramBackButton() {
-
-      if (
-        !tg ||
-        !tg.BackButton
-      ) {
-
-        return;
-      }
-
-
-      const opened =
-        Array.from(
-          document.querySelectorAll(
-            ".modal-overlay"
-          )
-        )
-        .some(
-          modal =>
-            modal.classList.contains(
-              "open"
-            )
+      const button =
+        document.getElementById(
+          "markPaidButton"
         );
 
+      const status =
+        document.getElementById(
+          "paymentStatus"
+        );
 
-      if (
-        opened
-      ) {
+      const oldText =
+        button.textContent;
 
-        tg.BackButton.show();
-
-      } else {
-
-        tg.BackButton.hide();
-      }
-    }
-
-
-    /* =====================================================
-       ENTER — PT-ПРОМОКОД
-       ===================================================== */
-
-    document.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          event.key !==
-          "Enter"
-        ) {
-
-          return;
-        }
-
-
-        const active =
-          document.activeElement;
-
-
-        if (
-          active &&
-          active.id ===
-            "ptPromoCode"
-        ) {
-
-          activatePtPromo();
-        }
-      }
-    );
-
-
-    /* =====================================================
-       АКТИВНОСТЬ ПРИ ВОЗВРАТЕ
-       ===================================================== */
-
-    document.addEventListener(
-      "visibilitychange",
-      async () => {
-
-        if (
-          document.visibilityState !==
-          "visible"
-        ) {
-
-          return;
-        }
-
-
-        if (
-          !hasTelegramAuth()
-        ) {
-
-          return;
-        }
-
-
-        try {
-
-          await loadProfile();
-
-        } catch (error) {
-
-          console.error(
-            "Refresh error:",
-            error
-          );
-        }
-      }
-    );
-
-
-    /* =====================================================
-       ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
-       ===================================================== */
-
-    async function initApp() {
-
-      initTelegram();
-
-      setupTelegramBackButton();
-
-
-      /*
-       * Главное:
-       * каталог рисуем сразу.
-       */
-
-      renderProducts();
-
-
-      /*
-       * Потом пробуем обновить
-       * его данными сервера.
-       */
+      button.disabled = true;
+      button.textContent =
+        "⏳ Отправляем...";
 
       try {
 
         const result =
           await api(
-            "/api/products",
-            null,
-            "GET"
+            "/api/topup/mark-paid",
+            {
+              paymentId:
+                currentTopup.paymentId
+            }
           );
 
-
-        const serverProducts =
-          Array.isArray(result)
-            ? result
-            : (
-                Array.isArray(
-                  result.products
-                )
-                  ? result.products
-                  : []
-              );
-
-
-        if (
-          serverProducts.length > 0
-        ) {
-
-          products =
-            serverProducts;
-
-          renderProducts();
+        if (!result.ok) {
+          throw new Error(
+            result.message ||
+            "Не удалось отправить заявку"
+          );
         }
 
+        if (status) {
+          status.textContent =
+            "🕐 Оплата отмечена. Ожидайте проверки сотрудником.";
+        }
+
+        button.style.display =
+          "none";
+
+        if (tg?.HapticFeedback) {
+          tg.HapticFeedback.notificationOccurred(
+            "success"
+          );
+        }
 
       } catch (error) {
 
-        console.warn(
-          "Серверный каталог недоступен. Используем локальный.",
-          error
+        showError(
+          "paymentError",
+          error.message
         );
 
-
-        /*
-         * Ничего не ломаем —
-         * локальный каталог уже показан.
-         */
-
-        renderProducts();
+        button.disabled = false;
+        button.textContent =
+          oldText;
       }
-
-
-      /*
-       * Авторизация Telegram.
-       */
-
-      if (
-        hasTelegramAuth()
-      ) {
-
-        await loadProfile();
-
-      } else {
-
-        updateBalance(
-          0
-        );
-
-
-        const profile =
-          document.getElementById(
-            "profileContainer"
-          );
-
-
-        if (profile) {
-
-          profile.innerHTML = `
-            <div class="error-box">
-              Открой приложение через Telegram,
-              чтобы авторизоваться и использовать
-              баланс, покупки и профиль.
-            </div>
-          `;
-        }
-      }
-
-
-      refreshTelegramBackButton();
     }
 
 
-    /* =====================================================
-       ЗАПУСК
-       ===================================================== */
+    // ==========================================
+    // ЗАКРЫТИЕ МОДАЛОК ПО КЛИКУ НА ФОН
+    // ==========================================
 
-    window.addEventListener(
-      "load",
-      () => {
+    document
+      .querySelectorAll(".modal-overlay")
+      .forEach((overlay) => {
 
-        initApp()
-          .catch(
-            error => {
+        overlay.addEventListener(
+          "click",
+          (event) => {
+
+            if (
+              event.target === overlay
+            ) {
+              overlay.classList.remove(
+                "show"
+              );
+            }
+
+          }
+        );
+
+      });
+
+
+    // ==========================================
+    // КНОПКИ ЗАКРЫТИЯ
+    // ==========================================
+
+    document
+      .getElementById("closeBuyModal")
+      ?.addEventListener(
+        "click",
+        () => {
+          closeModal("buyModal");
+        }
+      );
+
+
+    document
+      .getElementById("closeBonusPromoModal")
+      ?.addEventListener(
+        "click",
+        () => {
+          closeModal(
+            "bonusPromoModal"
+          );
+        }
+      );
+
+
+    document
+      .getElementById("closeTopupModal")
+      ?.addEventListener(
+        "click",
+        () => {
+          closeModal(
+            "topupModal"
+          );
+        }
+      );
+
+
+    document
+      .getElementById("closePaymentModal")
+      ?.addEventListener(
+        "click",
+        () => {
+          closeModal(
+            "paymentModal"
+          );
+        }
+      );
+
+
+    // ==========================================
+    // КНОПКИ ДЕЙСТВИЙ
+    // ==========================================
+
+    document
+      .getElementById("confirmBuyButton")
+      ?.addEventListener(
+        "click",
+        confirmBuy
+      );
+
+
+    document
+      .getElementById("activatePromoButton")
+      ?.addEventListener(
+        "click",
+        activateBonusPromo
+      );
+
+
+    document
+      .getElementById("createTopupButton")
+      ?.addEventListener(
+        "click",
+        createTopup
+      );
+
+
+    document
+      .getElementById("markPaidButton")
+      ?.addEventListener(
+        "click",
+        markTopupPaid
+      );
+
+
+    document
+      .getElementById("topupAmountInput")
+      ?.addEventListener(
+        "input",
+        updateTopupPreview
+      );
+
+
+    document
+      .getElementById("percentPromoInput")
+      ?.addEventListener(
+        "input",
+        updateTopupPreview
+      );
+
+
+    document
+      .getElementById("percentPromoInput")
+      ?.addEventListener(
+        "blur",
+        checkPercentPromo
+      );
+
+
+    // ==========================================
+    // ОТКРЫТЬ ПОПОЛНЕНИЕ
+    // ==========================================
+
+    function openTopupModal() {
+      hideError("topupError");
+
+      showPromoResult(
+        "percentPromoResult",
+        ""
+      );
+
+      updateTopupPreview();
+
+      openModal("topupModal");
+    }
+
+
+    document
+      .getElementById("openTopupButton")
+      ?.addEventListener(
+        "click",
+        openTopupModal
+      );
+
+
+    document
+      .querySelector(
+        '[data-open-topup="1"]'
+      )
+      ?.addEventListener(
+        "click",
+        openTopupModal
+      );
+
+
+    // ==========================================
+    // PT ПРОМО
+    // ==========================================
+
+    document
+      .getElementById(
+        "openBonusPromoButton"
+      )
+      ?.addEventListener(
+        "click",
+        () => {
+
+          showPromoResult(
+            "bonusPromoResult",
+            ""
+          );
+
+          openModal(
+            "bonusPromoModal"
+          );
+
+        }
+      );
+
+
+    // ==========================================
+    // НАВИГАЦИЯ
+    // ==========================================
+
+    document
+      .querySelectorAll(
+        ".nav-button[data-page]"
+      )
+      .forEach((button) => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            const pageId =
+              button.dataset.page;
+
+            openPage(pageId);
+
+          }
+        );
+
+      });
+
+
+    // ==========================================
+    // ESC
+    // ==========================================
+
+    document.addEventListener(
+      "keydown",
+      (event) => {
+
+        if (event.key !== "Escape") {
+          return;
+        }
+
+        document
+          .querySelectorAll(
+            ".modal-overlay.show"
+          )
+          .forEach((modal) => {
+            modal.classList.remove(
+              "show"
+            );
+          });
+
+      }
+    );    // ==========================================
+    // ЗАГРУЗКА ТОВАРОВ
+    // ==========================================
+
+    async function loadProducts() {
+      try {
+        const response = await fetch(
+          API_BASE + "/api/products"
+        );
+
+        const text =
+          await response.text();
+
+        let data;
+
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error(
+            "Сервер товаров вернул некорректный ответ"
+          );
+        }
+
+        if (
+          data.ok &&
+          Array.isArray(data.products) &&
+          data.products.length
+        ) {
+          currentProducts = data.products;
+
+          renderCategories();
+          renderProducts();
+        }
+
+      } catch (error) {
+        console.error(
+          "PRODUCTS ERROR:",
+          error
+        );
+
+        // Если сервер временно не отвечает,
+        // остаются локальные товары.
+        currentProducts = [
+          ...localProducts
+        ];
+
+        renderCategories();
+        renderProducts();
+      }
+    }
+
+
+    // ==========================================
+    // ЗАГРУЗКА ПРОФИЛЯ ПРИ СТАРТЕ
+    // ==========================================
+
+    async function initializeProfile() {
+      try {
+
+        const result =
+          await api(
+            "/api/profile"
+          );
+
+        if (!result.ok) {
+          throw new Error(
+            result.message ||
+            "Не удалось загрузить профиль"
+          );
+        }
+
+        const profile =
+          result.profile;
+
+        updateBalance(
+          profile.balance
+        );
+
+        setText(
+          "profileName",
+          (
+            `${profile.firstName || ""} ` +
+            `${profile.lastName || ""}`
+          ).trim() || "—"
+        );
+
+        setText(
+          "profileUsername",
+          profile.username
+            ? `@${profile.username}`
+            : "—"
+        );
+
+        setText(
+          "profileTelegramId",
+          profile.telegramId || "—"
+        );
+
+      } catch (error) {
+
+        console.error(
+          "INIT PROFILE ERROR:",
+          error
+        );
+
+        /*
+         * Когда приложение открыто не в Telegram,
+         * initData отсутствует.
+         * Сам каталог при этом всё равно работает.
+         */
+
+        if (!tg?.initData) {
+          console.warn(
+            "Приложение открыто вне Telegram WebApp."
+          );
+        }
+
+      }
+    }
+
+
+    // ==========================================
+    // КЛАВИАТУРА TELEGRAM BACK BUTTON
+    // ==========================================
+
+    function updateTelegramBackButton() {
+      if (!tg?.BackButton) {
+        return;
+      }
+
+      const anyModalOpen =
+        document.querySelector(
+          ".modal-overlay.show"
+        );
+
+      if (anyModalOpen) {
+
+        tg.BackButton.show();
+
+        return;
+      }
+
+      tg.BackButton.hide();
+    }
+
+
+    if (tg?.BackButton) {
+
+      tg.BackButton.onClick(
+        () => {
+
+          const modal =
+            document.querySelector(
+              ".modal-overlay.show"
+            );
+
+          if (modal) {
+            modal.classList.remove(
+              "show"
+            );
+
+            updateTelegramBackButton();
+
+            return;
+          }
+
+          openPage("shopPage");
+        }
+      );
+
+    }
+
+
+    // ==========================================
+    // СЛЕДИМ ЗА СОСТОЯНИЕМ МОДАЛОК
+    // ==========================================
+
+    const originalOpenModal =
+      openModal;
+
+    const originalCloseModal =
+      closeModal;
+
+    openModal = function(id) {
+
+      originalOpenModal(id);
+
+      updateTelegramBackButton();
+    };
+
+
+    closeModal = function(id) {
+
+      originalCloseModal(id);
+
+      updateTelegramBackButton();
+    };
+
+
+    // ==========================================
+    // ПЕРИОДИЧЕСКАЯ ПРОВЕРКА ЗАЯВКИ
+    // ==========================================
+
+    let topupStatusTimer = null;
+
+
+    function startTopupStatusCheck() {
+      stopTopupStatusCheck();
+
+      if (!currentTopup?.paymentId) {
+        return;
+      }
+
+      topupStatusTimer =
+        setInterval(
+          async () => {
+
+            try {
+
+              const result =
+                await api(
+                  "/api/topup/status",
+                  {
+                    paymentId:
+                      currentTopup.paymentId
+                  }
+                );
+
+              if (!result.ok) {
+                return;
+              }
+
+              currentTopup.status =
+                result.status;
+
+              if (
+                result.status ===
+                "completed"
+              ) {
+
+                stopTopupStatusCheck();
+
+                updateBalanceFromProfile();
+
+                const status =
+                  document.getElementById(
+                    "paymentStatus"
+                  );
+
+                if (status) {
+                  status.textContent =
+                    "✅ Оплата подтверждена! PT зачислены.";
+                }
+
+                const button =
+                  document.getElementById(
+                    "markPaidButton"
+                  );
+
+                if (button) {
+                  button.style.display =
+                    "none";
+                }
+
+                setTimeout(() => {
+                  closeModal(
+                    "paymentModal"
+                  );
+                }, 1800);
+
+              }
+
+              if (
+                result.status ===
+                "rejected"
+              ) {
+
+                stopTopupStatusCheck();
+
+                const status =
+                  document.getElementById(
+                    "paymentStatus"
+                  );
+
+                if (status) {
+                  status.textContent =
+                    "❌ Заявка отклонена.";
+                }
+
+                const button =
+                  document.getElementById(
+                    "markPaidButton"
+                  );
+
+                if (button) {
+                  button.style.display =
+                    "none";
+                }
+
+              }
+
+            } catch (error) {
 
               console.error(
-                "App init error:",
+                "TOPUP STATUS ERROR:",
                 error
               );
 
             }
+
+          },
+          5000
+        );
+    }
+
+
+    function stopTopupStatusCheck() {
+
+      if (topupStatusTimer) {
+
+        clearInterval(
+          topupStatusTimer
+        );
+
+        topupStatusTimer = null;
+
+      }
+    }
+
+
+    async function updateBalanceFromProfile() {
+
+      try {
+
+        const result =
+          await api(
+            "/api/profile"
           );
 
+        if (
+          result.ok &&
+          result.profile
+        ) {
+
+          updateBalance(
+            result.profile.balance
+          );
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          "BALANCE UPDATE ERROR:",
+          error
+        );
+
+      }
+    }
+
+
+    // После создания окна оплаты
+    // начинаем отслеживать её статус.
+    const originalShowPaymentModal =
+      showPaymentModal;
+
+    showPaymentModal =
+      function(topup) {
+
+        originalShowPaymentModal(
+          topup
+        );
+
+        startTopupStatusCheck();
+      };
+
+
+    // ==========================================
+    // ПОВТОРНОЕ ОТКРЫТИЕ ПОПОЛНЕНИЯ
+    // ==========================================
+
+    document
+      .getElementById(
+        "topupModal"
+      )
+      ?.addEventListener(
+        "click",
+        (event) => {
+
+          const amount =
+            getTopupAmount();
+
+          if (
+            event.target?.id ===
+            "topupAmountInput"
+          ) {
+            updateTopupPreview();
+          }
+
+        }
+      );
+
+
+    // ==========================================
+    // ПРИ ЗАКРЫТИИ ОПЛАТЫ
+    // ==========================================
+
+    document
+      .getElementById(
+        "closePaymentModal"
+      )
+      ?.addEventListener(
+        "click",
+        () => {
+
+          // Не удаляем currentTopup,
+          // чтобы пользователь мог вернуться
+          // к заявке до её завершения.
+
+          updateTelegramBackButton();
+        }
+      );
+
+
+    // ==========================================
+    // ЗАПУСК ПРИЛОЖЕНИЯ
+    // ==========================================
+
+    async function initApp() {
+
+      renderCategories();
+
+      renderProducts();
+
+      await loadProducts();
+
+      await initializeProfile();
+
+      updateTopupPreview();
+
+      updateTelegramBackButton();
+
+    }
+
+
+    // ==========================================
+    // ЗАПУСК
+    // ==========================================
+
+    initApp();
+
+
+    // ==========================================
+    // ЗАЩИТА ОТ СЛУЧАЙНОГО ЗАКРЫТИЯ
+    // ==========================================
+
+    window.addEventListener(
+      "beforeunload",
+      () => {
+        stopTopupStatusCheck();
       }
     );
 
