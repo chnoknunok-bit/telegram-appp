@@ -1,17 +1,27 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+
   <title>СК МЕТРОШОП</title>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+
   <style>
+
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
     }
+
 
     html,
     body {
@@ -23,10 +33,12 @@
       color: #fff;
     }
 
+
     body {
       min-height: 100vh;
       overflow-x: hidden;
     }
+
 
     button,
     input,
@@ -34,10 +46,12 @@
       font: inherit;
     }
 
+
     button {
       border: 0;
       cursor: pointer;
     }
+
 
     .app {
       width: 100%;
@@ -46,6 +60,7 @@
       min-height: 100vh;
       padding-bottom: 95px;
     }
+
 
     .header {
       position: sticky;
@@ -57,6 +72,7 @@
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
 
+
     .header-top {
       display: flex;
       align-items: center;
@@ -64,12 +80,14 @@
       gap: 12px;
     }
 
+
     .brand {
       display: flex;
       align-items: center;
       gap: 10px;
       min-width: 0;
     }
+
 
     .brand-logo {
       width: 42px;
@@ -85,17 +103,20 @@
       flex: 0 0 auto;
     }
 
+
     .brand-title {
       font-size: 17px;
       font-weight: 900;
       line-height: 1.1;
     }
 
+
     .brand-subtitle {
       margin-top: 3px;
       color: #8e8e9d;
       font-size: 12px;
     }
+
 
     .header-balance {
       padding: 9px 12px;
@@ -106,31 +127,38 @@
       flex: 0 0 auto;
     }
 
+
     .header-balance-label {
       color: #858592;
       font-size: 10px;
       margin-bottom: 2px;
     }
 
+
     .header-balance-value {
       font-size: 14px;
       font-weight: 900;
     }
 
+
     .content {
       padding: 16px;
     }
+
 
     .page {
       display: none;
       animation: fadeIn .18s ease;
     }
 
+
     .page.active {
       display: block;
     }
 
+
     @keyframes fadeIn {
+
       from {
         opacity: 0;
         transform: translateY(4px);
@@ -140,17 +168,30 @@
         opacity: 1;
         transform: translateY(0);
       }
+
     }
+
 
     .hero {
       padding: 20px;
       border-radius: 22px;
+
       background:
-        radial-gradient(circle at top right, rgba(141,66,255,.22), transparent 36%),
-        linear-gradient(145deg, #191922, #101017);
+        radial-gradient(
+          circle at top right,
+          rgba(141,66,255,.22),
+          transparent 36%
+        ),
+        linear-gradient(
+          145deg,
+          #191922,
+          #101017
+        );
+
       border: 1px solid rgba(255,255,255,.06);
       margin-bottom: 14px;
     }
+
 
     .hero-title {
       margin: 0;
@@ -159,12 +200,14 @@
       font-weight: 950;
     }
 
+
     .hero-text {
       margin: 9px 0 0;
       color: #a2a2b1;
       font-size: 13px;
       line-height: 1.45;
     }
+
 
     .balance-card {
       margin-top: 18px;
@@ -174,22 +217,26 @@
       border: 1px solid rgba(255,255,255,.05);
     }
 
+
     .balance-card-label {
       color: #888896;
       font-size: 12px;
       margin-bottom: 6px;
     }
 
+
     .balance-card-value {
       font-size: 28px;
       font-weight: 950;
     }
+
 
     .balance-card-value span {
       color: #bcbcc9;
       font-size: 15px;
       font-weight: 700;
     }
+
 
     .topup-button {
       width: 100%;
@@ -199,7 +246,9 @@
       color: #fff;
       font-weight: 900;
       background: linear-gradient(135deg, #8d42ff, #6524c5);
+      box-shadow: 0 10px 24px rgba(141,66,255,.23);
     }
+
 
     .promo-small-button {
       width: 100%;
@@ -212,11 +261,13 @@
       font-weight: 800;
     }
 
+
     .section-title {
       margin: 20px 0 11px;
       font-size: 18px;
       font-weight: 900;
     }
+
 
     .category-row {
       display: flex;
@@ -227,9 +278,11 @@
       scrollbar-width: none;
     }
 
+
     .category-row::-webkit-scrollbar {
       display: none;
     }
+
 
     .category-button {
       flex: 0 0 auto;
@@ -243,17 +296,20 @@
       font-weight: 800;
     }
 
+
     .category-button.active {
       background: #8d42ff;
       color: #fff;
       border-color: #8d42ff;
     }
 
+
     .products {
       display: grid;
       grid-template-columns: 1fr;
       gap: 11px;
     }
+
 
     .product-card {
       padding: 15px;
@@ -262,6 +318,7 @@
       border: 1px solid rgba(255,255,255,.06);
     }
 
+
     .product-top {
       display: flex;
       align-items: flex-start;
@@ -269,11 +326,13 @@
       gap: 12px;
     }
 
+
     .product-name {
       font-size: 15px;
       line-height: 1.3;
       font-weight: 900;
     }
+
 
     .product-price {
       white-space: nowrap;
@@ -282,6 +341,7 @@
       font-weight: 900;
     }
 
+
     .product-description {
       margin-top: 7px;
       color: #8e8e9b;
@@ -289,12 +349,14 @@
       line-height: 1.4;
     }
 
+
     .product-actions {
       margin-top: 13px;
       display: flex;
       gap: 8px;
       align-items: center;
     }
+
 
     .product-quantity {
       width: 95px;
@@ -308,6 +370,7 @@
       cursor: pointer;
     }
 
+
     .buy-button {
       flex: 1;
       min-height: 43px;
@@ -317,14 +380,17 @@
       font-weight: 900;
     }
 
+
     .buy-button.primary {
       background: linear-gradient(135deg, #8d42ff, #6524c5);
     }
+
 
     .buy-button:disabled {
       opacity: .45;
       cursor: not-allowed;
     }
+
 
     .empty-box {
       padding: 24px 16px;
@@ -337,6 +403,7 @@
       font-size: 13px;
     }
 
+
     .profile-card,
     .topup-card {
       padding: 17px;
@@ -344,6 +411,7 @@
       background: #16161d;
       border: 1px solid rgba(255,255,255,.06);
     }
+
 
     .profile-avatar {
       width: 58px;
@@ -358,10 +426,12 @@
       margin-bottom: 12px;
     }
 
+
     .profile-name {
       font-size: 20px;
       font-weight: 900;
     }
+
 
     .profile-username {
       margin-top: 4px;
@@ -369,16 +439,19 @@
       font-size: 13px;
     }
 
+
     .profile-balance {
       margin-top: 18px;
       padding-top: 14px;
       border-top: 1px solid rgba(255,255,255,.06);
     }
 
+
     .profile-balance-label {
       font-size: 11px;
       color: #858591;
     }
+
 
     .profile-balance-value {
       margin-top: 4px;
@@ -386,9 +459,11 @@
       font-weight: 950;
     }
 
+
     .form-group {
       margin-bottom: 13px;
     }
+
 
     .form-label {
       display: block;
@@ -397,6 +472,7 @@
       color: #a1a1ad;
       font-weight: 700;
     }
+
 
     .input {
       width: 100%;
@@ -409,9 +485,11 @@
       outline: none;
     }
 
+
     .input:focus {
       border-color: rgba(141,66,255,.55);
     }
+
 
     .amount-preview {
       margin-top: 12px;
@@ -420,6 +498,7 @@
       background: rgba(141,66,255,.07);
       border: 1px solid rgba(141,66,255,.14);
     }
+
 
     .amount-preview-row {
       display: flex;
@@ -431,12 +510,14 @@
       font-size: 12px;
     }
 
+
     .amount-preview-row:last-child {
       margin-bottom: 0;
       color: #fff;
       font-weight: 900;
       font-size: 14px;
     }
+
 
     .submit-button {
       width: 100%;
@@ -448,14 +529,17 @@
       font-weight: 900;
     }
 
+
     .submit-button:disabled {
       opacity: .55;
     }
+
 
     .history-list {
       display: grid;
       gap: 9px;
     }
+
 
     .history-item {
       padding: 14px;
@@ -464,6 +548,7 @@
       border: 1px solid rgba(255,255,255,.05);
     }
 
+
     .history-item-top {
       display: flex;
       align-items: flex-start;
@@ -471,15 +556,18 @@
       gap: 10px;
     }
 
+
     .history-type {
       font-size: 13px;
       font-weight: 900;
     }
 
+
     .history-amount {
       font-size: 13px;
       font-weight: 900;
     }
+
 
     .history-description {
       margin-top: 6px;
@@ -488,11 +576,13 @@
       line-height: 1.4;
     }
 
+
     .history-date {
       margin-top: 7px;
       color: #6f6f7a;
       font-size: 10px;
     }
+
 
     .bottom-nav {
       position: fixed;
@@ -512,6 +602,7 @@
       box-shadow: 0 12px 40px rgba(0,0,0,.35);
     }
 
+
     .nav-button {
       min-height: 54px;
       border-radius: 13px;
@@ -526,15 +617,18 @@
       font-weight: 800;
     }
 
+
     .nav-button-icon {
       font-size: 18px;
       line-height: 1;
     }
 
+
     .nav-button.active {
       background: rgba(141,66,255,.14);
       color: #fff;
     }
+
 
     .modal-overlay {
       position: fixed;
@@ -548,9 +642,11 @@
       backdrop-filter: blur(5px);
     }
 
+
     .modal-overlay.open {
       display: flex;
     }
+
 
     .modal {
       width: min(760px, 100%);
@@ -564,7 +660,9 @@
       animation: modalUp .2s ease;
     }
 
+
     @keyframes modalUp {
+
       from {
         opacity: 0;
         transform: translateY(20px);
@@ -574,7 +672,9 @@
         opacity: 1;
         transform: translateY(0);
       }
+
     }
+
 
     .modal-header {
       display: flex;
@@ -584,10 +684,12 @@
       margin-bottom: 15px;
     }
 
+
     .modal-title {
       font-size: 18px;
       font-weight: 950;
     }
+
 
     .modal-close {
       width: 36px;
@@ -598,6 +700,7 @@
       font-size: 18px;
     }
 
+
     .order-info {
       margin-bottom: 14px;
       padding: 13px;
@@ -605,6 +708,7 @@
       background: #101016;
       border: 1px solid rgba(255,255,255,.05);
     }
+
 
     .order-info-row {
       display: flex;
@@ -614,19 +718,23 @@
       font-size: 12px;
     }
 
+
     .order-info-row:last-child {
       margin-bottom: 0;
     }
 
+
     .order-info-label {
       color: #858591;
     }
+
 
     .order-info-value {
       color: #fff;
       font-weight: 800;
       text-align: right;
     }
+
 
     .notice {
       margin-bottom: 12px;
@@ -638,12 +746,14 @@
       line-height: 1.45;
     }
 
+
     .loading {
       padding: 24px 12px;
       text-align: center;
       color: #7f7f8b;
       font-size: 13px;
     }
+
 
     .toast-container {
       position: fixed;
@@ -658,6 +768,7 @@
       pointer-events: none;
     }
 
+
     .toast {
       padding: 12px 14px;
       border-radius: 13px;
@@ -670,7 +781,9 @@
       animation: toastIn .2s ease;
     }
 
+
     @keyframes toastIn {
+
       from {
         opacity: 0;
         transform: translateY(-7px);
@@ -680,7 +793,9 @@
         opacity: 1;
         transform: translateY(0);
       }
+
     }
+
 
     .error-box {
       padding: 15px;
@@ -692,7 +807,9 @@
       line-height: 1.45;
     }
 
+
     @media (min-width: 600px) {
+
       .content {
         padding: 20px;
       }
@@ -704,1372 +821,1635 @@
       .hero-title {
         font-size: 28px;
       }
+
     }
+
   </style>
+
 </head>
+
 
 <body>
 
-<div class="app">
+  <div class="app">
 
-  <header class="header">
-    <div class="header-top">
 
-      <div class="brand">
+    <header class="header">
 
-        <div class="brand-logo">
-          СК
-        </div>
+      <div class="header-top">
 
-        <div>
-          <div class="brand-title">
-            СК МЕТРОШОП
+
+        <div class="brand">
+
+          <div class="brand-logo">
+            СК
           </div>
 
-          <div class="brand-subtitle">
-            Metro Royale • магазин
+
+          <div>
+
+            <div class="brand-title">
+              СК МЕТРОШОП
+            </div>
+
+
+            <div class="brand-subtitle">
+              Metro Royale • магазин
+            </div>
+
           </div>
+
         </div>
+
+
+        <div class="header-balance">
+
+          <div class="header-balance-label">
+            Баланс
+          </div>
+
+
+          <div
+            class="header-balance-value"
+            id="headerBalance"
+          >
+            0 PT
+          </div>
+
+        </div>
+
 
       </div>
 
-      <div class="header-balance">
+    </header>
 
-        <div class="header-balance-label">
-          Баланс
+
+    <main class="content">
+
+
+      <!-- =================================================
+           МАГАЗИН
+           ================================================= -->
+
+      <section
+        class="page active"
+        id="pageShop"
+      >
+
+
+        <div class="hero">
+
+
+          <h1 class="hero-title">
+            Добро пожаловать 👋
+          </h1>
+
+
+          <p class="hero-text">
+            Здесь можно купить наборы, оружие
+            и сопровождения для Metro Royale.
+          </p>
+
+
+          <div class="balance-card">
+
+
+            <div class="balance-card-label">
+              Ваш баланс
+            </div>
+
+
+            <div class="balance-card-value">
+
+              <span id="shopBalance">
+                0
+              </span>
+
+              <span>
+                PT
+              </span>
+
+            </div>
+
+
+            <button
+              class="topup-button"
+              type="button"
+              onclick="openTopupModal()"
+            >
+              💎 Пополнить PT
+            </button>
+
+
+            <button
+              class="promo-small-button"
+              type="button"
+              onclick="openPtPromoModal()"
+            >
+              🎟️ Промокод PT
+            </button>
+
+
+          </div>
+
+
         </div>
+
+
+        <div class="section-title">
+          Каталог
+        </div>
+
 
         <div
-          class="header-balance-value"
-          id="headerBalance"
+          class="category-row"
+          id="categoryRow"
         >
-          0 PT
-        </div>
 
-      </div>
-
-    </div>
-  </header>
-
-
-  <main class="content">
-
-    <!-- МАГАЗИН -->
-
-    <section
-      class="page active"
-      id="pageShop"
-    >
-
-      <div class="hero">
-
-        <h1 class="hero-title">
-          Добро пожаловать 👋
-        </h1>
-
-        <p class="hero-text">
-          Здесь можно купить наборы, оружие
-          и сопровождения для Metro Royale.
-        </p>
-
-        <div class="balance-card">
-
-          <div class="balance-card-label">
-            Ваш баланс
-          </div>
-
-          <div class="balance-card-value">
-            <span id="shopBalance">0</span>
-            <span>PT</span>
-          </div>
 
           <button
-            class="topup-button"
+            class="category-button active"
             type="button"
-            onclick="openTopupModal()"
+            onclick="filterCategory('all', this)"
           >
-            💎 Пополнить PT
+            Все
           </button>
 
+
           <button
-            class="promo-small-button"
+            class="category-button"
             type="button"
-            onclick="openPtPromoModal()"
+            onclick="filterCategory('sets', this)"
           >
-            🎟️ Промокод PT
+            Наборы
           </button>
+
+
+          <button
+            class="category-button"
+            type="button"
+            onclick="filterCategory('weapons', this)"
+          >
+            Оружие
+          </button>
+
+
+          <button
+            class="category-button"
+            type="button"
+            onclick="filterCategory('escort', this)"
+          >
+            Сопровождение
+          </button>
+
 
         </div>
 
-      </div>
+
+        <div
+          id="productsContainer"
+          class="products"
+        ></div>
 
 
-      <div class="section-title">
-        Каталог
-      </div>
+      </section>
 
 
-      <div
-        class="category-row"
-        id="categoryRow"
+      <!-- =================================================
+           ПОПОЛНЕНИЕ
+           ================================================= -->
+
+      <section
+        class="page"
+        id="pageTopup"
       >
 
-        <button
-          class="category-button active"
-          type="button"
-          onclick="filterCategory('all', this)"
-        >
-          Все
-        </button>
 
-        <button
-          class="category-button"
-          type="button"
-          onclick="filterCategory('sets', this)"
-        >
-          Наборы
-        </button>
-
-        <button
-          class="category-button"
-          type="button"
-          onclick="filterCategory('weapons', this)"
-        >
-          Оружие
-        </button>
-
-        <button
-          class="category-button"
-          type="button"
-          onclick="filterCategory('escort', this)"
-        >
-          Сопровождение
-        </button>
-
-      </div>
-
-
-      <div
-        id="productsContainer"
-        class="products"
-      ></div>
-
-    </section>
-
-
-    <!-- ПОПОЛНЕНИЕ -->
-
-    <section
-      class="page"
-      id="pageTopup"
-    >
-
-      <div class="section-title">
-        💎 Пополнение PT
-      </div>
-
-      <div class="topup-card">
-
-        <div class="notice">
-          Укажи количество PT, которое хочешь пополнить.
-          Промокод на процент вводится отдельно.
+        <div class="section-title">
+          💎 Пополнение PT
         </div>
 
-        <div class="form-group">
 
-          <label
-            class="form-label"
-            for="topupAmount"
-          >
-            Количество PT
-          </label>
+        <div class="topup-card">
 
-          <input
-            id="topupAmount"
-            class="input"
-            type="number"
-            min="1"
-            max="1000000"
-            step="1"
-            placeholder="Например: 1000"
-            inputmode="numeric"
-            oninput="updateTopupPreview()"
-          >
 
-        </div>
-
-        <div class="form-group">
-
-          <label
-            class="form-label"
-            for="promoPercent"
-          >
-            Промокод на процент
-          </label>
-
-          <input
-            id="promoPercent"
-            class="input"
-            type="text"
-            maxlength="50"
-            placeholder="Введите промокод"
-            autocomplete="off"
-            oninput="updateTopupPreview()"
-          >
-
-        </div>
-
-        <div class="amount-preview">
-
-          <div class="amount-preview-row">
-            <span>Пополнение</span>
-            <span id="previewAmount">
-              0 PT
-            </span>
+          <div class="notice">
+            Укажи количество PT, которое хочешь
+            пополнить. Промокод на процент
+            вводится отдельно.
           </div>
 
-          <div class="amount-preview-row">
-            <span>Бонус</span>
-            <span id="previewBonus">
-              0 PT
-            </span>
+
+          <div class="form-group">
+
+            <label
+              class="form-label"
+              for="topupAmount"
+            >
+              Количество PT
+            </label>
+
+
+            <input
+              id="topupAmount"
+              class="input"
+              type="number"
+              min="1"
+              max="1000000"
+              step="1"
+              placeholder="Например: 1000"
+              inputmode="numeric"
+              oninput="updateTopupPreview()"
+            >
+
           </div>
 
-          <div class="amount-preview-row">
-            <span>Итого</span>
-            <span id="previewTotal">
-              0 PT
-            </span>
+
+          <div class="form-group">
+
+            <label
+              class="form-label"
+              for="promoPercent"
+            >
+              Промокод на процент
+            </label>
+
+
+            <input
+              id="promoPercent"
+              class="input"
+              type="text"
+              maxlength="50"
+              placeholder="Введите промокод"
+              autocomplete="off"
+              oninput="updateTopupPreview()"
+            >
+
           </div>
+
+
+          <div class="amount-preview">
+
+
+            <div class="amount-preview-row">
+
+              <span>
+                Пополнение
+              </span>
+
+              <span id="previewAmount">
+                0 PT
+              </span>
+
+            </div>
+
+
+            <div class="amount-preview-row">
+
+              <span>
+                Бонус
+              </span>
+
+              <span id="previewBonus">
+                0 PT
+              </span>
+
+            </div>
+
+
+            <div class="amount-preview-row">
+
+              <span>
+                Итого
+              </span>
+
+              <span id="previewTotal">
+                0 PT
+              </span>
+
+            </div>
+
+
+          </div>
+
+
+          <button
+            class="submit-button"
+            type="button"
+            onclick="createTopup()"
+          >
+            💳 Создать заявку
+          </button>
+
 
         </div>
 
-        <button
-          class="submit-button"
-          type="button"
-          onclick="createTopup()"
-        >
-          💳 Создать заявку
-        </button>
 
-      </div>
-
-    </section>
+      </section>
 
 
-    <!-- ИСТОРИЯ -->
+      <!-- =================================================
+           ИСТОРИЯ
+           ================================================= -->
 
-    <section
-      class="page"
-      id="pageHistory"
-    >
+      <section
+        class="page"
+        id="pageHistory"
+      >
 
-      <div class="section-title">
-        📜 История
-      </div>
 
-      <div id="historyContainer">
-        <div class="loading">
-          Загрузка истории...
+        <div class="section-title">
+          📜 История
         </div>
-      </div>
-
-    </section>
 
 
-    <!-- ПРОФИЛЬ -->
-
-    <section
-      class="page"
-      id="pageProfile"
-    >
-
-      <div class="section-title">
-        👤 Профиль
-      </div>
-
-      <div id="profileContainer">
-
-        <div class="profile-card">
+        <div id="historyContainer">
 
           <div class="loading">
-            Загрузка профиля...
+            Загрузка истории...
           </div>
 
         </div>
 
-      </div>
 
-    </section>
-
-  </main>
-
-</div>
+      </section>
 
 
-<!-- НИЖНЯЯ НАВИГАЦИЯ -->
+      <!-- =================================================
+           ПРОФИЛЬ
+           ================================================= -->
 
-<nav class="bottom-nav">
-
-  <button
-    class="nav-button active"
-    id="navShop"
-    type="button"
-    onclick="showPage('shop')"
-  >
-    <div class="nav-button-icon">
-      🛒
-    </div>
-    <div>Магазин</div>
-  </button>
-
-  <button
-    class="nav-button"
-    id="navTopup"
-    type="button"
-    onclick="showPage('topup')"
-  >
-    <div class="nav-button-icon">
-      💎
-    </div>
-    <div>Пополнить</div>
-  </button>
-
-  <button
-    class="nav-button"
-    id="navHistory"
-    type="button"
-    onclick="showPage('history')"
-  >
-    <div class="nav-button-icon">
-      📜
-    </div>
-    <div>История</div>
-  </button>
-
-  <button
-    class="nav-button"
-    id="navProfile"
-    type="button"
-    onclick="showPage('profile')"
-  >
-    <div class="nav-button-icon">
-      👤
-    </div>
-    <div>Профиль</div>
-  </button>
-
-</nav>
-
-
-<!-- МОДАЛКА ПОКУПКИ -->
-
-<div
-  class="modal-overlay"
-  id="buyModal"
-  onclick="closeModalByOverlay(event, 'buyModal')"
->
-
-  <div class="modal">
-
-    <div class="modal-header">
-
-      <div class="modal-title">
-        🛒 Покупка
-      </div>
-
-      <button
-        class="modal-close"
-        type="button"
-        onclick="closeBuyModal()"
+      <section
+        class="page"
+        id="pageProfile"
       >
-        ✕
-      </button>
 
-    </div>
 
-    <div id="buyModalContent"></div>
+        <div class="section-title">
+          👤 Профиль
+        </div>
+
+
+        <div id="profileContainer">
+
+
+          <div class="profile-card">
+
+            <div class="loading">
+              Загрузка профиля...
+            </div>
+
+          </div>
+
+
+        </div>
+
+
+      </section>
+
+
+    </main>
+
 
   </div>
 
-</div>
 
+  <!-- =====================================================
+       НИЖНЯЯ НАВИГАЦИЯ
+       ===================================================== -->
 
-<!-- МОДАЛКА ПОПОЛНЕНИЯ -->
+  <nav class="bottom-nav">
 
-<div
-  class="modal-overlay"
-  id="topupModal"
-  onclick="closeModalByOverlay(event, 'topupModal')"
->
-
-  <div class="modal">
-
-    <div class="modal-header">
-
-      <div class="modal-title">
-        💎 Пополнение PT
-      </div>
-
-      <button
-        class="modal-close"
-        type="button"
-        onclick="closeTopupModal()"
-      >
-        ✕
-      </button>
-
-    </div>
-
-    <div class="notice">
-      Введи нужное количество PT и, при наличии,
-      промокод на процент.
-    </div>
-
-    <div class="form-group">
-
-      <label
-        class="form-label"
-        for="modalTopupAmount"
-      >
-        Количество PT
-      </label>
-
-      <input
-        id="modalTopupAmount"
-        class="input"
-        type="number"
-        min="1"
-        max="1000000"
-        step="1"
-        placeholder="Например: 1000"
-        inputmode="numeric"
-        oninput="updateModalTopupPreview()"
-      >
-
-    </div>
-
-    <div class="form-group">
-
-      <label
-        class="form-label"
-        for="modalPromoPercent"
-      >
-        Промокод на процент
-      </label>
-
-      <input
-        id="modalPromoPercent"
-        class="input"
-        type="text"
-        maxlength="50"
-        placeholder="Введите промокод"
-        autocomplete="off"
-        oninput="updateModalTopupPreview()"
-      >
-
-    </div>
-
-    <div class="amount-preview">
-
-      <div class="amount-preview-row">
-        <span>Пополнение</span>
-        <span id="modalPreviewAmount">
-          0 PT
-        </span>
-      </div>
-
-      <div class="amount-preview-row">
-        <span>Бонус</span>
-        <span id="modalPreviewBonus">
-          0 PT
-        </span>
-      </div>
-
-      <div class="amount-preview-row">
-        <span>Итого</span>
-        <span id="modalPreviewTotal">
-          0 PT
-        </span>
-      </div>
-
-    </div>
 
     <button
-      class="submit-button"
+      class="nav-button active"
+      id="navShop"
       type="button"
-      onclick="createTopupFromModal()"
+      onclick="showPage('shop')"
     >
-      💳 Создать заявку
-    </button>
 
-  </div>
-
-</div>
-
-
-<!-- МОДАЛКА PT-ПРОМОКОДА -->
-
-<div
-  class="modal-overlay"
-  id="ptPromoModal"
-  onclick="closeModalByOverlay(event, 'ptPromoModal')"
->
-
-  <div class="modal">
-
-    <div class="modal-header">
-
-      <div class="modal-title">
-        🎟️ Промокод PT
+      <div class="nav-button-icon">
+        🛒
       </div>
 
-      <button
-        class="modal-close"
-        type="button"
-        onclick="closePtPromoModal()"
-      >
-        ✕
-      </button>
+      <div>
+        Магазин
+      </div>
 
-    </div>
+    </button>
 
-    <div class="notice">
-      Введи промокод, который получил
-      в Telegram-канале.
-    </div>
-
-    <div class="form-group">
-
-      <label
-        class="form-label"
-        for="ptPromoCode"
-      >
-        Промокод
-      </label>
-
-      <input
-        id="ptPromoCode"
-        class="input"
-        type="text"
-        maxlength="50"
-        placeholder="Введите промокод"
-        autocomplete="off"
-      >
-
-    </div>
 
     <button
-      class="submit-button"
+      class="nav-button"
+      id="navTopup"
       type="button"
-      onclick="activatePtPromo()"
+      onclick="showPage('topup')"
     >
-      🎁 Активировать
+
+      <div class="nav-button-icon">
+        💎
+      </div>
+
+      <div>
+        Пополнить
+      </div>
+
     </button>
+
+
+    <button
+      class="nav-button"
+      id="navHistory"
+      type="button"
+      onclick="showPage('history')"
+    >
+
+      <div class="nav-button-icon">
+        📜
+      </div>
+
+      <div>
+        История
+      </div>
+
+    </button>
+
+
+    <button
+      class="nav-button"
+      id="navProfile"
+      type="button"
+      onclick="showPage('profile')"
+    >
+
+      <div class="nav-button-icon">
+        👤
+      </div>
+
+      <div>
+        Профиль
+      </div>
+
+    </button>
+
+
+  </nav>
+
+
+  <!-- =====================================================
+       МОДАЛКА ПОКУПКИ
+       ===================================================== -->
+
+  <div
+    class="modal-overlay"
+    id="buyModal"
+    onclick="closeModalByOverlay(event, 'buyModal')"
+  >
+
+
+    <div class="modal">
+
+
+      <div class="modal-header">
+
+        <div class="modal-title">
+          🛒 Покупка
+        </div>
+
+
+        <button
+          class="modal-close"
+          type="button"
+          onclick="closeBuyModal()"
+        >
+          ✕
+        </button>
+
+      </div>
+
+
+      <div id="buyModalContent"></div>
+
+
+    </div>
+
 
   </div>
 
-</div>
 
+  <!-- =====================================================
+       МОДАЛКА ПОПОЛНЕНИЯ
+       ===================================================== -->
 
-<div
-  class="toast-container"
-  id="toastContainer"
-></div>
+  <div
+    class="modal-overlay"
+    id="topupModal"
+    onclick="closeModalByOverlay(event, 'topupModal')"
+  >
 
 
-<script>
+    <div class="modal">
 
-  const API_BASE =
-    "https://telegram-appp.onrender.com";
 
+      <div class="modal-header">
 
-  const tg =
-    window.Telegram &&
-    window.Telegram.WebApp
-      ? window.Telegram.WebApp
-      : null;
+        <div class="modal-title">
+          💎 Пополнение PT
+        </div>
 
 
-  /* =====================================================
-     ЛОКАЛЬНЫЕ ТОВАРЫ
-     ===================================================== */
+        <button
+          class="modal-close"
+          type="button"
+          onclick="closeTopupModal()"
+        >
+          ✕
+        </button>
 
-  let products = [
+      </div>
 
-    {
-      name:
-        "Набор Фулл 6 + МК вк на обвесах",
 
-      price:
-        25,
+      <div class="notice">
+        Введи нужное количество PT и, при наличии,
+        промокод на процент.
+      </div>
 
-      quantityEnabled:
-        true,
 
-      maxQuantity:
-        10,
+      <div class="form-group">
 
-      escort:
-        false
-    },
 
-    {
-      name:
-        "Набор фулл 6",
+        <label
+          class="form-label"
+          for="modalTopupAmount"
+        >
+          Количество PT
+        </label>
 
-      price:
-        18,
 
-      quantityEnabled:
-        true,
+        <input
+          id="modalTopupAmount"
+          class="input"
+          type="number"
+          min="1"
+          max="1000000"
+          step="1"
+          placeholder="Например: 1000"
+          inputmode="numeric"
+          oninput="updateModalTopupPreview()"
+        >
 
-      maxQuantity:
-        10,
 
-      escort:
-        false
-    },
+      </div>
 
-    {
-      name:
-        "Оружие МК вк",
 
-      price:
-        0,
+      <div class="form-group">
 
-      quantityEnabled:
-        false,
 
-      maxQuantity:
-        1,
+        <label
+          class="form-label"
+          for="modalPromoPercent"
+        >
+          Промокод на процент
+        </label>
 
-      escort:
-        false
-    },
 
-    {
-      name:
-        "Сопровождение 7кк + вещи",
+        <input
+          id="modalPromoPercent"
+          class="input"
+          type="text"
+          maxlength="50"
+          placeholder="Введите промокод"
+          autocomplete="off"
+          oninput="updateModalTopupPreview()"
+        >
 
-      price:
-        0,
 
-      quantityEnabled:
-        false,
+      </div>
 
-      maxQuantity:
-        1,
 
-      escort:
-        true
-    },
+      <div class="amount-preview">
 
-    {
-      name:
-        "Сопровождение 15кк + вещи",
 
-      price:
-        0,
+        <div class="amount-preview-row">
 
-      quantityEnabled:
-        false,
+          <span>
+            Пополнение
+          </span>
 
-      maxQuantity:
-        1,
+          <span id="modalPreviewAmount">
+            0 PT
+          </span>
 
-      escort:
-        true
-    },
+        </div>
 
-    {
-      name:
-        "Сопровождение 20кк + вещи",
 
-      price:
-        0,
+        <div class="amount-preview-row">
 
-      quantityEnabled:
-        false,
+          <span>
+            Бонус
+          </span>
 
-      maxQuantity:
-        1,
+          <span id="modalPreviewBonus">
+            0 PT
+          </span>
 
-      escort:
-        true
-    },
+        </div>
 
-    {
-      name:
-        "Сопровождение 25кк + вещи",
 
-      price:
-        0,
+        <div class="amount-preview-row">
 
-      quantityEnabled:
-        false,
+          <span>
+            Итого
+          </span>
 
-      maxQuantity:
-        1,
+          <span id="modalPreviewTotal">
+            0 PT
+          </span>
 
-      escort:
-        true
-    }
+        </div>
 
-  ];
 
+      </div>
 
-  let currentCategory =
-    "all";
 
+      <button
+        class="submit-button"
+        type="button"
+        onclick="createTopupFromModal()"
+      >
+        💳 Создать заявку
+      </button>
 
-  let selectedProduct =
-    null;
 
+    </div>
 
-  let selectedQuantity =
-    1;
 
+  </div>
 
-  let currentUser = {
-    id: null,
-    username: "",
-    firstName: "",
-    balance: 0
-  };
 
+  <!-- =====================================================
+       МОДАЛКА PT-ПРОМОКОДА
+       ===================================================== -->
 
-  let percentPromoCheckTimer =
-    null;
+  <div
+    class="modal-overlay"
+    id="ptPromoModal"
+    onclick="closeModalByOverlay(event, 'ptPromoModal')"
+  >
 
 
-  /* =====================================================
-     TELEGRAM
-     ===================================================== */
+    <div class="modal">
 
-  function initTelegram() {
 
-    if (!tg) {
-      return;
-    }
+      <div class="modal-header">
 
-    try {
+        <div class="modal-title">
+          🎟️ Промокод PT
+        </div>
 
-      tg.ready();
-      tg.expand();
 
-    } catch (error) {
+        <button
+          class="modal-close"
+          type="button"
+          onclick="closePtPromoModal()"
+        >
+          ✕
+        </button>
 
-      console.error(
-        "Telegram init error:",
-        error
-      );
-    }
-  }
+      </div>
 
 
-  function getInitData() {
+      <div class="notice">
+        Введи промокод, который получил
+        в Telegram-канале.
+      </div>
 
-    return tg
-      ? tg.initData || ""
-      : "";
-  }
 
+      <div class="form-group">
 
-  function hasTelegramAuth() {
 
-    return Boolean(
-      getInitData()
-    );
-  }
+        <label
+          class="form-label"
+          for="ptPromoCode"
+        >
+          Промокод
+        </label>
 
 
-  /* =====================================================
-     API
-     ===================================================== */
+        <input
+          id="ptPromoCode"
+          class="input"
+          type="text"
+          maxlength="50"
+          placeholder="Введите промокод"
+          autocomplete="off"
+        >
 
-  async function api(
-    path,
-    data = null,
-    method = null
-  ) {
 
-    const requestMethod =
-      method ||
-      (
-        data === null
-          ? "GET"
-          : "POST"
-      );
+      </div>
 
 
-    const options = {
+      <button
+        class="submit-button"
+        type="button"
+        id="activatePromoButton"
+      >
+        🎁 Активировать
+      </button>
 
-      method:
-        requestMethod,
 
-      headers: {}
+    </div>
+
+
+  </div>
+
+
+  <div
+    class="toast-container"
+    id="toastContainer"
+  ></div>
+
+
+  <script>
+
+    /* =====================================================
+       API
+       ===================================================== */
+
+    const API_BASE =
+      "https://telegram-appp.onrender.com";
+
+
+    /* =====================================================
+       TELEGRAM
+       ===================================================== */
+
+    const tg =
+      window.Telegram &&
+      window.Telegram.WebApp
+        ? window.Telegram.WebApp
+        : null;
+
+
+    /* =====================================================
+       ЛОКАЛЬНЫЕ ТОВАРЫ
+       ===================================================== */
+
+    let products = [
+
+      {
+        name:
+          "Набор Фулл 6 + МК вк на обвесах",
+
+        price:
+          25,
+
+        quantityEnabled:
+          true,
+
+        maxQuantity:
+          10,
+
+        escort:
+          false
+      },
+
+
+      {
+        name:
+          "Набор фулл 6",
+
+        price:
+          18,
+
+        quantityEnabled:
+          true,
+
+        maxQuantity:
+          10,
+
+        escort:
+          false
+      },
+
+
+      {
+        name:
+          "Оружие МК вк",
+
+        price:
+          0,
+
+        quantityEnabled:
+          false,
+
+        maxQuantity:
+          1,
+
+        escort:
+          false
+      },
+
+
+      {
+        name:
+          "Сопровождение 7кк + вещи",
+
+        price:
+          0,
+
+        quantityEnabled:
+          false,
+
+        maxQuantity:
+          1,
+
+        escort:
+          true
+      },
+
+
+      {
+        name:
+          "Сопровождение 15кк + вещи",
+
+        price:
+          0,
+
+        quantityEnabled:
+          false,
+
+        maxQuantity:
+          1,
+
+        escort:
+          true
+      },
+
+
+      {
+        name:
+          "Сопровождение 20кк + вещи",
+
+        price:
+          0,
+
+        quantityEnabled:
+          false,
+
+        maxQuantity:
+          1,
+
+        escort:
+          true
+      },
+
+
+      {
+        name:
+          "Сопровождение 25кк + вещи",
+
+        price:
+          0,
+
+        quantityEnabled:
+          false,
+
+        maxQuantity:
+          1,
+
+        escort:
+          true
+      }
+
+    ];
+
+
+    let currentCategory =
+      "all";
+
+
+    let selectedProduct =
+      null;
+
+
+    let selectedQuantity =
+      1;
+
+
+    let currentUser = {
+
+      id:
+        null,
+
+      username:
+        "",
+
+      firstName:
+        "",
+
+      balance:
+        0
 
     };
 
 
-    if (
-      requestMethod !==
-      "GET"
-    ) {
-
-      options.headers[
-        "Content-Type"
-      ] =
-        "application/json";
+    let percentPromoCheckTimer =
+      null;
 
 
-      options.body =
-        JSON.stringify({
+    /* =====================================================
+       TELEGRAM INIT
+       ===================================================== */
 
-          ...(data || {}),
+    function initTelegram() {
 
-          initData:
-            getInitData()
-
-        });
-    }
-
-
-    const response =
-      await fetch(
-        API_BASE +
-        path,
-        options
-      );
+      if (!tg) {
+        return;
+      }
 
 
-    const text =
-      await response.text();
+      try {
 
+        tg.ready();
 
-    let result;
+        tg.expand();
 
+      } catch (error) {
 
-    try {
-
-      result =
-        text
-          ? JSON.parse(text)
-          : {};
-
-    } catch (error) {
-
-      console.error(
-        "Raw server response:",
-        text
-      );
-
-
-      throw new Error(
-        `Сервер вернул некорректный ответ (${response.status}).`
-      );
-    }
-
-
-    if (
-      !response.ok
-    ) {
-
-      throw new Error(
-        result &&
-        result.error
-          ? result.error
-          : `Ошибка сервера (${response.status}).`
-      );
-    }
-
-
-    return result;
-  }
-
-
-  /* =====================================================
-     TOAST
-     ===================================================== */
-
-  function showToast(
-    message
-  ) {
-
-    const container =
-      document.getElementById(
-        "toastContainer"
-      );
-
-
-    const toast =
-      document.createElement(
-        "div"
-      );
-
-
-    toast.className =
-      "toast";
-
-
-    toast.textContent =
-      message;
-
-
-    container.appendChild(
-      toast
-    );
-
-
-    setTimeout(
-      () => {
-
-        toast.style.opacity =
-          "0";
-
-
-        setTimeout(
-          () => {
-
-            toast.remove();
-
-          },
-          180
+        console.error(
+          "Telegram init error:",
+          error
         );
 
-      },
-      2800
-    );
-  }
-
-
-  /* =====================================================
-     ФОРМАТ PT
-     ===================================================== */
-
-  function formatPT(
-    value
-  ) {
-
-    const number =
-      Number(value) || 0;
-
-
-    return (
-      new Intl.NumberFormat(
-        "ru-RU"
-      ).format(number)
-      + " PT"
-    );
-  }
-
-
-  /* =====================================================
-     БАЛАНС
-     ===================================================== */
-
-  function updateBalance(
-    balance
-  ) {
-
-    currentUser.balance =
-      Number(balance) || 0;
-
-
-    const header =
-      document.getElementById(
-        "headerBalance"
-      );
-
-
-    const shop =
-      document.getElementById(
-        "shopBalance"
-      );
-
-
-    if (header) {
-
-      header.textContent =
-        formatPT(
-          currentUser.balance
-        );
+      }
     }
 
 
-    if (shop) {
+    function getInitData() {
 
-      shop.textContent =
+      return tg
+        ? tg.initData || ""
+        : "";
+    }
+
+
+    function hasTelegramAuth() {
+
+      return Boolean(
+        getInitData()
+      );
+    }
+
+
+    /* =====================================================
+       API ЗАПРОС
+       ===================================================== */
+
+    async function api(
+      path,
+      data = null,
+      method = null
+    ) {
+
+      const requestMethod =
+        method ||
+        (
+          data === null
+            ? "GET"
+            : "POST"
+        );
+
+
+      const options = {
+
+        method:
+          requestMethod,
+
+        headers: {}
+
+      };
+
+
+      if (
+        requestMethod !==
+        "GET"
+      ) {
+
+        options.headers[
+          "Content-Type"
+        ] =
+          "application/json";
+
+
+        options.body =
+          JSON.stringify({
+
+            ...(data || {}),
+
+            initData:
+              getInitData()
+
+          });
+      }
+
+
+      const response =
+        await fetch(
+          API_BASE +
+          path,
+          options
+        );
+
+
+      const text =
+        await response.text();
+
+
+      let result =
+        {};
+
+
+      try {
+
+        result =
+          text
+            ? JSON.parse(text)
+            : {};
+
+      } catch (error) {
+
+        console.error(
+          "Raw server response:",
+          text
+        );
+
+
+        throw new Error(
+          `Сервер вернул некорректный ответ (${response.status}).`
+        );
+      }
+
+
+      if (
+        !response.ok
+      ) {
+
+        throw new Error(
+
+          result &&
+          result.error
+
+            ? result.error
+
+            : `Ошибка сервера (${response.status}).`
+
+        );
+      }
+
+
+      return result;
+    }
+
+
+    /* =====================================================
+       TOAST
+       ===================================================== */
+
+    function showToast(
+      message
+    ) {
+
+      const container =
+        document.getElementById(
+          "toastContainer"
+        );
+
+
+      const toast =
+        document.createElement(
+          "div"
+        );
+
+
+      toast.className =
+        "toast";
+
+
+      toast.textContent =
+        message;
+
+
+      container.appendChild(
+        toast
+      );
+
+
+      setTimeout(
+        () => {
+
+          toast.style.opacity =
+            "0";
+
+
+          setTimeout(
+            () => {
+
+              toast.remove();
+
+            },
+            180
+          );
+
+        },
+        2800
+      );
+    }
+
+
+    /* =====================================================
+       ФОРМАТ PT
+       ===================================================== */
+
+    function formatPT(
+      value
+    ) {
+
+      const number =
+        Number(value) || 0;
+
+
+      return (
         new Intl.NumberFormat(
           "ru-RU"
         ).format(
-          currentUser.balance
-        );
-    }
-  }
-
-
-  /* =====================================================
-     НАВИГАЦИЯ
-     ===================================================== */
-
-  function showPage(
-    page
-  ) {
-
-    const pages = {
-
-      shop:
-        "pageShop",
-
-      topup:
-        "pageTopup",
-
-      history:
-        "pageHistory",
-
-      profile:
-        "pageProfile"
-
-    };
-
-
-    Object.values(
-      pages
-    ).forEach(
-      id => {
-
-        document
-          .getElementById(id)
-          .classList.remove(
-            "active"
-          );
-
-      }
-    );
-
-
-    document
-      .getElementById(
-        pages[page]
-      )
-      .classList.add(
-        "active"
+          number
+        )
+        + " PT"
       );
+    }
 
 
-    document
-      .querySelectorAll(
-        ".nav-button"
-      )
-      .forEach(
-        button => {
+    /* =====================================================
+       БАЛАНС
+       ===================================================== */
 
-          button.classList.remove(
-            "active"
+    function updateBalance(
+      balance
+    ) {
+
+      currentUser.balance =
+        Number(balance) || 0;
+
+
+      const header =
+        document.getElementById(
+          "headerBalance"
+        );
+
+
+      const shop =
+        document.getElementById(
+          "shopBalance"
+        );
+
+
+      if (header) {
+
+        header.textContent =
+          formatPT(
+            currentUser.balance
           );
+      }
+
+
+      if (shop) {
+
+        shop.textContent =
+          new Intl.NumberFormat(
+            "ru-RU"
+          ).format(
+            currentUser.balance
+          );
+      }
+    }
+
+
+    /* =====================================================
+       НАВИГАЦИЯ
+       ===================================================== */
+
+    function showPage(
+      page
+    ) {
+
+      const pages = {
+
+        shop:
+          "pageShop",
+
+        topup:
+          "pageTopup",
+
+        history:
+          "pageHistory",
+
+        profile:
+          "pageProfile"
+
+      };
+
+
+      Object.values(
+        pages
+      ).forEach(
+        id => {
+
+          document
+            .getElementById(id)
+            .classList.remove(
+              "active"
+            );
 
         }
       );
 
 
-    const activeId = {
-
-      shop:
-        "navShop",
-
-      topup:
-        "navTopup",
-
-      history:
-        "navHistory",
-
-      profile:
-        "navProfile"
-
-    }[page];
+      document
+        .getElementById(
+          pages[page]
+        )
+        .classList.add(
+          "active"
+        );
 
 
-    document
-      .getElementById(
-        activeId
-      )
-      .classList.add(
-        "active"
-      );
+      document
+        .querySelectorAll(
+          ".nav-button"
+        )
+        .forEach(
+          button => {
+
+            button.classList.remove(
+              "active"
+            );
+
+          }
+        );
 
 
-    if (
-      page ===
-      "history"
-    ) {
+      const activeId =
+        {
 
-      loadHistory();
+          shop:
+            "navShop",
+
+          topup:
+            "navTopup",
+
+          history:
+            "navHistory",
+
+          profile:
+            "navProfile"
+
+        }[page];
+
+
+      document
+        .getElementById(
+          activeId
+        )
+        .classList.add(
+          "active"
+        );
+
+
+      if (
+        page ===
+        "history"
+      ) {
+
+        loadHistory();
+      }
+
+
+      if (
+        page ===
+        "profile"
+      ) {
+
+        loadProfile();
+      }
     }
 
 
-    if (
-      page ===
-      "profile"
-    ) {
+    /* =====================================================
+       МОДАЛКИ
+       ===================================================== */
 
-      loadProfile();
-    }
-  }
-
-
-  /* =====================================================
-     МОДАЛКИ
-     ===================================================== */
-
-  function openModal(
-    id
-  ) {
-
-    document
-      .getElementById(id)
-      .classList.add(
-        "open"
-      );
-
-
-    refreshTelegramBackButton();
-  }
-
-
-  function closeModal(
-    id
-  ) {
-
-    document
-      .getElementById(id)
-      .classList.remove(
-        "open"
-      );
-
-
-    refreshTelegramBackButton();
-  }
-
-
-  function closeModalByOverlay(
-    event,
-    id
-  ) {
-
-    if (
-      event.target.id ===
+    function openModal(
       id
     ) {
 
-      closeModal(id);
+      document
+        .getElementById(id)
+        .classList.add(
+          "open"
+        );
+
+
+      refreshTelegramBackButton();
     }
-  }
 
 
-  function openTopupModal() {
-
-    openModal(
-      "topupModal"
-    );
-  }
-
-
-  function closeTopupModal() {
-
-    closeModal(
-      "topupModal"
-    );
-  }
-
-
-  function openPtPromoModal() {
-
-    openModal(
-      "ptPromoModal"
-    );
-
-
-    setTimeout(
-      () => {
-
-        const input =
-          document.getElementById(
-            "ptPromoCode"
-          );
-
-
-        if (input) {
-
-          input.focus();
-
-        }
-
-      },
-      100
-    );
-  }
-
-
-  function closePtPromoModal() {
-
-    closeModal(
-      "ptPromoModal"
-    );
-  }
-
-
-  function closeBuyModal() {
-
-    closeModal(
-      "buyModal"
-    );
-  }
-
-
-  /* =====================================================
-     КАТЕГОРИИ
-     ===================================================== */
-
-  function getProductCategory(
-    product
-  ) {
-
-    const name =
-      String(
-        product.name || ""
-      ).toLowerCase();
-
-
-    if (
-      product.escort ||
-      name.includes(
-        "сопровождение"
-      )
+    function closeModal(
+      id
     ) {
 
-      return "escort";
+      document
+        .getElementById(id)
+        .classList.remove(
+          "open"
+        );
+
+
+      refreshTelegramBackButton();
     }
 
 
-    if (
-      name.includes(
-        "оруж"
-      )
+    function closeModalByOverlay(
+      event,
+      id
     ) {
 
-      return "weapons";
+      if (
+        event.target.id ===
+        id
+      ) {
+
+        closeModal(id);
+      }
     }
 
 
-    return "sets";
-  }
+    function openTopupModal() {
+
+      openModal(
+        "topupModal"
+      );
+    }
 
 
-  function filterCategory(
-    category,
-    button
-  ) {
+    function closeTopupModal() {
 
-    currentCategory =
-      category;
+      closeModal(
+        "topupModal"
+      );
+    }
 
 
-    document
-      .querySelectorAll(
-        ".category-button"
-      )
-      .forEach(
-        element => {
+    function openPtPromoModal() {
 
-          element.classList.remove(
-            "active"
-          );
-
-        }
+      openModal(
+        "ptPromoModal"
       );
 
 
-    button.classList.add(
-      "active"
-    );
+      setTimeout(
+        () => {
+
+          const input =
+            document.getElementById(
+              "ptPromoCode"
+            );
 
 
-    renderProducts();
-  }
+          if (input) {
 
+            input.focus();
 
-  /* =====================================================
-     ТОВАРЫ
-     ===================================================== */
-
-  function renderProducts() {
-
-    const container =
-      document.getElementById(
-        "productsContainer"
-      );
-
-
-    const filtered =
-      products.filter(
-        product => {
-
-          if (
-            currentCategory ===
-            "all"
-          ) {
-
-            return true;
           }
 
-
-          return (
-            getProductCategory(
-              product
-            ) ===
-            currentCategory
-          );
-
-        }
+        },
+        100
       );
-
-
-    if (
-      !filtered.length
-    ) {
-
-      container.innerHTML = `
-        <div class="empty-box">
-          В этой категории пока нет товаров.
-        </div>
-      `;
-
-      return;
     }
 
 
-    container.innerHTML =
-      filtered
-        .map(
+    function closePtPromoModal() {
+
+      closeModal(
+        "ptPromoModal"
+      );
+    }
+
+
+    function closeBuyModal() {
+
+      closeModal(
+        "buyModal"
+      );
+    }
+
+
+    /* =====================================================
+       КАТЕГОРИИ
+       ===================================================== */
+
+    function getProductCategory(
+      product
+    ) {
+
+      const name =
+        String(
+          product.name || ""
+        ).toLowerCase();
+
+
+      if (
+        product.escort ||
+        name.includes(
+          "сопровождение"
+        )
+      ) {
+
+        return "escort";
+      }
+
+
+      if (
+        name.includes(
+          "оруж"
+        )
+      ) {
+
+        return "weapons";
+      }
+
+
+      return "sets";
+    }
+
+
+    function filterCategory(
+      category,
+      button
+    ) {
+
+      currentCategory =
+        category;
+
+
+      document
+        .querySelectorAll(
+          ".category-button"
+        )
+        .forEach(
+          element => {
+
+            element.classList.remove(
+              "active"
+            );
+
+          }
+        );
+
+
+      button.classList.add(
+        "active"
+      );
+
+
+      renderProducts();
+    }
+
+
+    /* =====================================================
+       ОТРИСОВКА ТОВАРОВ
+       ===================================================== */
+
+    function renderProducts() {
+
+      const container =
+        document.getElementById(
+          "productsContainer"
+        );
+
+
+      const filtered =
+        products.filter(
           product => {
 
-            const price =
-              Number(
-                product.price
-              ) || 0;
-
-
-            const description =
-              product.escort
-                ? "Сопровождение с указанным количеством денег и вещей."
-                : "Товар для Metro Royale.";
-
-
             if (
-              price <= 0
+              currentCategory ===
+              "all"
             ) {
+
+              return true;
+            }
+
+
+            return (
+              getProductCategory(
+                product
+              ) ===
+              currentCategory
+            );
+
+          }
+        );
+
+
+      if (
+        !filtered.length
+      ) {
+
+        container.innerHTML = `
+          <div class="empty-box">
+            В этой категории пока нет товаров.
+          </div>
+        `;
+
+        return;
+      }
+
+
+      container.innerHTML =
+        filtered
+          .map(
+            product => {
+
+              const price =
+                Number(
+                  product.price
+                ) || 0;
+
+
+              const description =
+                product.escort
+                  ? "Сопровождение с указанным количеством денег и вещей."
+                  : "Товар для Metro Royale.";
+
+
+              if (
+                price <= 0
+              ) {
+
+                return `
+                  <div class="product-card">
+
+                    <div class="product-top">
+
+                      <div class="product-name">
+                        ${escapeHtml(
+                          product.name
+                        )}
+                      </div>
+
+                      <div class="product-price">
+                        По договорённости
+                      </div>
+
+                    </div>
+
+
+                    <div class="product-description">
+                      ${escapeHtml(
+                        description
+                      )}
+                    </div>
+
+
+                    <div class="product-actions">
+
+                      <button
+                        class="buy-button"
+                        type="button"
+                        disabled
+                      >
+                        Пока недоступно
+                      </button>
+
+                    </div>
+
+                  </div>
+                `;
+              }
+
+
+              const maxQuantity =
+                product.quantityEnabled
+                  ? Math.min(
+                      Number(
+                        product.maxQuantity ||
+                        10
+                      ),
+                      10
+                    )
+                  : 1;
+
 
               return `
                 <div class="product-card">
@@ -2083,10 +2463,13 @@
                     </div>
 
                     <div class="product-price">
-                      По договорённости
+                      ${formatPT(
+                        price
+                      )}
                     </div>
 
                   </div>
+
 
                   <div class="product-description">
                     ${escapeHtml(
@@ -2094,14 +2477,40 @@
                     )}
                   </div>
 
+
                   <div class="product-actions">
 
+                    ${
+                      product.quantityEnabled
+                        ? `
+                          <select
+                            class="product-quantity"
+                          >
+
+                            ${Array.from(
+                              {
+                                length:
+                                  maxQuantity
+                              },
+
+                              (_, index) => `
+                                <option value="${index + 1}">
+                                  ${index + 1} шт.
+                                </option>
+                              `
+                            ).join("")}
+
+                          </select>
+                        `
+                        : ""
+                    }
+
+
                     <button
-                      class="buy-button"
+                      class="buy-button primary buy-product-button"
                       type="button"
-                      disabled
                     >
-                      Пока недоступно
+                      Купить
                     </button>
 
                   </div>
@@ -2109,1814 +2518,304 @@
                 </div>
               `;
             }
+          )
+          .join("");
 
 
-            const maxQuantity =
-              product.quantityEnabled
-                ? Math.min(
-                    Number(
-                      product.maxQuantity ||
-                      10
-                    ),
-                    10
-                  )
-                : 1;
+      /*
+       * Подключаем обработчики после того,
+       * как карточки созданы.
+       *
+       * Название товара НЕ вставляется
+       * в onclick.
+       */
 
-
-            return `
-              <div class="product-card">
-
-                <div class="product-top">
-
-                  <div class="product-name">
-                    ${escapeHtml(
-                      product.name
-                    )}
-                  </div>
-
-                  <div class="product-price">
-                    ${formatPT(
-                      price
-                    )}
-                  </div>
-
-                </div>
-
-                <div class="product-description">
-                  ${escapeHtml(
-                    description
-                  )}
-                </div>
-
-                <div class="product-actions">
-
-                  ${
-                    product.quantityEnabled
-                      ? `
-                        <select
-                          class="product-quantity"
-                        >
-
-                          ${Array.from(
-                            {
-                              length:
-                                maxQuantity
-                            },
-                            (_, index) => `
-                              <option value="${index + 1}">
-                                ${index + 1} шт.
-                              </option>
-                            `
-                          ).join("")}
-
-                        </select>
-                      `
-                      : ""
-                  }
-
-                  <button
-                    class="buy-button primary buy-product-button"
-                    type="button"
-                  >
-                    Купить
-                  </button>
-
-                </div>
-
-              </div>
-            `;
-          }
+      container
+        .querySelectorAll(
+          ".buy-product-button"
         )
-        .join("");
-
-
-    /*
-     * ВАЖНО:
-     * Кнопки подключаются через addEventListener,
-     * поэтому название товара вообще не попадает
-     * внутрь onclick.
-     */
-
-    const buttons =
-      container.querySelectorAll(
-        ".buy-product-button"
-      );
-
-
-    buttons.forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            const card =
-              button.closest(
-                ".product-card"
-              );
-
-
-            if (!card) {
-              return;
-            }
-
-
-            const nameElement =
-              card.querySelector(
-                ".product-name"
-              );
-
-
-            if (!nameElement) {
-              return;
-            }
-
-
-            const productName =
-              nameElement.textContent
-                .trim();
-
-
-            const product =
-              products.find(
-                item =>
-                  item.name ===
-                  productName
-              );
-
-
-            if (!product) {
-
-              showToast(
-                "Товар не найден."
-              );
-
-              return;
-            }
-
-
-            let quantity =
-              1;
-
-
-            if (
-              product.quantityEnabled
-            ) {
-
-              const select =
-                card.querySelector(
-                  ".product-quantity"
-                );
-
-
-              if (select) {
-
-                quantity =
-                  Number(
-                    select.value
-                  ) || 1;
-              }
-            }
-
-
-            openBuyModal(
-              product,
-              quantity
-            );
-
-          }
-        );
-
-      }
-    );
-  }
-
-
-  /* =====================================================
-     ОКНО ПОКУПКИ
-     ===================================================== */
-
-  function openBuyModal(
-    product,
-    quantity
-  ) {
-
-    selectedProduct =
-      product;
-
-
-    selectedQuantity =
-      Math.max(
-        1,
-        Math.min(
-          Number(quantity) || 1,
-          10
-        )
-      );
-
-
-    const price =
-      Number(
-        product.price
-      ) || 0;
-
-
-    const total =
-      price *
-      selectedQuantity;
-
-
-    document.getElementById(
-      "buyModalContent"
-    ).innerHTML = `
-
-      <div class="order-info">
-
-        <div class="order-info-row">
-
-          <div class="order-info-label">
-            Товар
-          </div>
-
-          <div class="order-info-value">
-            ${escapeHtml(
-              product.name
-            )}
-          </div>
-
-        </div>
-
-
-        <div class="order-info-row">
-
-          <div class="order-info-label">
-            Количество
-          </div>
-
-          <div class="order-info-value">
-            ${selectedQuantity} шт.
-          </div>
-
-        </div>
-
-
-        <div class="order-info-row">
-
-          <div class="order-info-label">
-            Цена за 1 шт.
-          </div>
-
-          <div class="order-info-value">
-            ${formatPT(
-              price
-            )}
-          </div>
-
-        </div>
-
-
-        <div class="order-info-row">
-
-          <div class="order-info-label">
-            Сумма
-          </div>
-
-          <div class="order-info-value">
-            ${formatPT(
-              total
-            )}
-          </div>
-
-        </div>
-
-
-        <div class="order-info-row">
-
-          <div class="order-info-label">
-            Баланс
-          </div>
-
-          <div class="order-info-value">
-            ${formatPT(
-              currentUser.balance
-            )}
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label
-          class="form-label"
-          for="gameIdInput"
-        >
-          Игровой ID
-        </label>
-
-
-        <input
-          id="gameIdInput"
-          class="input"
-          type="text"
-          maxlength="100"
-          placeholder="Введите игровой ID"
-          autocomplete="off"
-          inputmode="numeric"
-        >
-
-      </div>
-
-
-      <button
-        class="submit-button"
-        type="button"
-        id="confirmBuyButton"
-      >
-        ✅ Купить за ${formatPT(
-          total
-        )}
-      </button>
-
-    `;
-
-
-    const confirmButton =
-      document.getElementById(
-        "confirmBuyButton"
-      );
-
-
-    if (
-      confirmButton
-    ) {
-
-      confirmButton.addEventListener(
-        "click",
-        buySelectedProduct
-      );
-    }
-
-
-    openModal(
-      "buyModal"
-    );
-  }
-
-
-  /* =====================================================
-     ПОКУПКА
-     ===================================================== */
-
-  async function buySelectedProduct() {
-
-    if (
-      !selectedProduct
-    ) {
-
-      showToast(
-        "Товар не выбран."
-      );
-
-      return;
-    }
-
-
-    if (
-      !hasTelegramAuth()
-    ) {
-
-      showToast(
-        "Открой приложение через Telegram."
-      );
-
-      return;
-    }
-
-
-    const gameIdInput =
-      document.getElementById(
-        "gameIdInput"
-      );
-
-
-    const gameId =
-      gameIdInput
-        ? gameIdInput.value.trim()
-        : "";
-
-
-    if (!gameId) {
-
-      showToast(
-        "Введите игровой ID."
-      );
-
-      return;
-    }
-
-
-    let quantity =
-      Number(
-        selectedQuantity
-      ) || 1;
-
-
-    quantity =
-      Math.max(
-        1,
-        Math.min(
-          quantity,
-          10
-        )
-      );
-
-
-    const price =
-      Number(
-        selectedProduct.price
-      ) || 0;
-
-
-    const total =
-      price *
-      quantity;
-
-
-    if (
-      currentUser.balance <
-      total
-    ) {
-
-      showToast(
-        "Недостаточно PT на балансе."
-      );
-
-      return;
-    }
-
-
-    const button =
-      document.getElementById(
-        "confirmBuyButton"
-      );
-
-
-    if (button) {
-
-      button.disabled =
-        true;
-
-      button.textContent =
-        "⏳ Оформление...";
-    }
-
-
-    try {
-
-      const result =
-        await api(
-          "/api/buy",
-          {
-            product:
-              selectedProduct.name,
-
-            gameId,
-
-            quantity
-          }
-        );
-
-
-      if (
-        result &&
-        result.balance !==
-          undefined
-      ) {
-
-        updateBalance(
-          result.balance
-        );
-
-      } else {
-
-        updateBalance(
-          currentUser.balance -
-          total
-        );
-      }
-
-
-      closeBuyModal();
-
-
-      showToast(
-        result &&
-        result.message
-          ? result.message
-          : "Заказ создан."
-      );
-
-
-      await loadProfile();
-
-      await loadHistory();
-
-
-    } catch (error) {
-
-      console.error(
-        "Buy error:",
-        error
-      );
-
-
-      showToast(
-        error.message ||
-        "Не удалось оформить заказ."
-      );
-
-
-    } finally {
-
-      if (button) {
-
-        button.disabled =
-          false;
-
-        button.textContent =
-          "✅ Купить за " +
-          formatPT(total);
-      }
-    }
-  }
-
-
-  /* =====================================================
-     ПРОФИЛЬ
-     ===================================================== */
-
-  async function loadProfile() {
-
-    const container =
-      document.getElementById(
-        "profileContainer"
-      );
-
-
-    if (
-      !hasTelegramAuth()
-    ) {
-
-      container.innerHTML = `
-        <div class="error-box">
-          Открой приложение через Telegram,
-          чтобы посмотреть профиль.
-        </div>
-      `;
-
-      return;
-    }
-
-
-    try {
-
-      const result =
-        await api(
-          "/api/profile",
-          {}
-        );
-
-
-      currentUser = {
-
-        id:
-          result.id ??
-          null,
-
-        username:
-          result.username ||
-          "",
-
-        firstName:
-          result.firstName ||
-          "",
-
-        balance:
-          Number(
-            result.balance
-          ) || 0
-
-      };
-
-
-      updateBalance(
-        currentUser.balance
-      );
-
-
-      renderProfile();
-
-
-    } catch (error) {
-
-      console.error(
-        "Profile error:",
-        error
-      );
-
-
-      container.innerHTML = `
-        <div class="error-box">
-          Не удалось загрузить профиль.<br><br>
-          ${escapeHtml(
-            error.message
-          )}
-        </div>
-      `;
-    }
-  }
-
-
-  function renderProfile() {
-
-    const container =
-      document.getElementById(
-        "profileContainer"
-      );
-
-
-    const firstName =
-      currentUser.firstName ||
-      "Пользователь";
-
-
-    const username =
-      currentUser.username
-        ? "@" +
-          currentUser.username
-        : "Username не указан";
-
-
-    const avatarLetter =
-      String(
-        firstName
-      )
-        .trim()
-        .charAt(0)
-        .toUpperCase() ||
-      "👤";
-
-
-    container.innerHTML = `
-
-      <div class="profile-card">
-
-        <div class="profile-avatar">
-          ${escapeHtml(
-            avatarLetter
-          )}
-        </div>
-
-        <div class="profile-name">
-          ${escapeHtml(
-            firstName
-          )}
-        </div>
-
-        <div class="profile-username">
-          ${escapeHtml(
-            username
-          )}
-        </div>
-
-        <div class="profile-balance">
-
-          <div class="profile-balance-label">
-            Баланс
-          </div>
-
-          <div class="profile-balance-value">
-            ${formatPT(
-              currentUser.balance
-            )}
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div style="height:10px;"></div>
-
-
-      <button
-        class="submit-button"
-        type="button"
-        onclick="openTopupModal()"
-      >
-        💎 Пополнить баланс
-      </button>
-    `;
-  }
-
-
-  /* =====================================================
-     ИСТОРИЯ
-     ===================================================== */
-
-  async function loadHistory() {
-
-    const container =
-      document.getElementById(
-        "historyContainer"
-      );
-
-
-    if (
-      !hasTelegramAuth()
-    ) {
-
-      container.innerHTML = `
-        <div class="error-box">
-          Открой приложение через Telegram,
-          чтобы посмотреть историю.
-        </div>
-      `;
-
-      return;
-    }
-
-
-    container.innerHTML =
-      '<div class="loading">Загрузка истории...</div>';
-
-
-    try {
-
-      const result =
-        await api(
-          "/api/history",
-          {}
-        );
-
-
-      const history =
-        Array.isArray(result)
-          ? result
-          : (
-              Array.isArray(
-                result.transactions
-              )
-                ? result.transactions
-                : []
-            );
-
-
-      renderHistory(
-        history
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        "History error:",
-        error
-      );
-
-
-      container.innerHTML = `
-        <div class="error-box">
-          Не удалось загрузить историю.<br><br>
-          ${escapeHtml(
-            error.message
-          )}
-        </div>
-      `;
-    }
-  }
-
-
-  function renderHistory(
-    history
-  ) {
-
-    const container =
-      document.getElementById(
-        "historyContainer"
-      );
-
-
-    if (
-      !history.length
-    ) {
-
-      container.innerHTML = `
-        <div class="empty-box">
-          История пока пустая.
-        </div>
-      `;
-
-      return;
-    }
-
-
-    const sorted =
-      [...history].sort(
-        (a, b) => {
-
-          const aTime =
-            new Date(
-              a.createdAt ||
-              a.date ||
-              0
-            ).getTime();
-
-
-          const bTime =
-            new Date(
-              b.createdAt ||
-              b.date ||
-              0
-            ).getTime();
-
-
-          return bTime - aTime;
-        }
-      );
-
-
-    container.innerHTML = `
-
-      <div class="history-list">
-
-        ${
-          sorted.map(
-            item => {
-
-              const type =
-                String(
-                  item.type ||
-                  "Операция"
-                );
-
-
-              const amount =
-                Number(
-                  item.amount
-                ) || 0;
-
-
-              let amountText =
-                formatPT(
-                  amount
-                );
-
-
-              if (
-                amount > 0
-              ) {
-
-                amountText =
-                  "+" +
-                  formatPT(
-                    amount
+        .forEach(
+          button => {
+
+            button.addEventListener(
+              "click",
+              () => {
+
+                const card =
+                  button.closest(
+                    ".product-card"
                   );
-              }
 
 
-              const description =
-                item.description ||
-                "Операция с балансом";
+                if (!card) {
+                  return;
+                }
 
 
-              let dateText =
-                "";
-
-
-              const rawDate =
-                item.createdAt ||
-                item.date;
-
-
-              if (
-                rawDate
-              ) {
-
-                const date =
-                  new Date(
-                    rawDate
+                const nameElement =
+                  card.querySelector(
+                    ".product-name"
                   );
+
+
+                if (!nameElement) {
+                  return;
+                }
+
+
+                const productName =
+                  nameElement.textContent
+                    .trim();
+
+
+                const product =
+                  products.find(
+                    item =>
+                      item.name ===
+                      productName
+                  );
+
+
+                if (!product) {
+
+                  showToast(
+                    "Товар не найден."
+                  );
+
+                  return;
+                }
+
+
+                let quantity =
+                  1;
 
 
                 if (
-                  !Number.isNaN(
-                    date.getTime()
-                  )
+                  product.quantityEnabled
                 ) {
 
-                  dateText =
-                    date.toLocaleString(
-                      "ru-RU",
-                      {
-                        day:
-                          "2-digit",
-
-                        month:
-                          "2-digit",
-
-                        year:
-                          "numeric",
-
-                        hour:
-                          "2-digit",
-
-                        minute:
-                          "2-digit"
-                      }
+                  const select =
+                    card.querySelector(
+                      ".product-quantity"
                     );
-                }
-              }
 
 
-              return `
+                  if (select) {
 
-                <div class="history-item">
-
-                  <div class="history-item-top">
-
-                    <div class="history-type">
-                      ${escapeHtml(
-                        type
-                      )}
-                    </div>
-
-                    <div class="history-amount">
-                      ${escapeHtml(
-                        amountText
-                      )}
-                    </div>
-
-                  </div>
-
-                  <div class="history-description">
-                    ${escapeHtml(
-                      description
-                    )}
-                  </div>
-
-                  ${
-                    dateText
-                      ? `
-                        <div class="history-date">
-                          ${escapeHtml(
-                            dateText
-                          )}
-                        </div>
-                      `
-                      : ""
+                    quantity =
+                      Number(
+                        select.value
+                      ) || 1;
                   }
-
-                </div>
-
-              `;
-            }
-          ).join("")
-        }
-
-      </div>
-    `;
-  }
+                }
 
 
-  /* =====================================================
-     PT-ПРОМОКОД
-     ===================================================== */
+                openBuyModal(
+                  product,
+                  quantity
+                );
 
-  async function activatePtPromo() {
+              }
+            );
 
-    if (
-      !hasTelegramAuth()
-    ) {
-
-      showToast(
-        "Открой приложение через Telegram."
-      );
-
-      return;
-    }
-
-
-    const input =
-      document.getElementById(
-        "ptPromoCode"
-      );
-
-
-    const code =
-      input
-        ? input.value.trim()
-        : "";
-
-
-    if (!code) {
-
-      showToast(
-        "Введите промокод."
-      );
-
-      return;
-    }
-
-
-    const button =
-      document.querySelector(
-        "#ptPromoModal .submit-button"
-      );
-
-
-    if (button) {
-
-      button.disabled =
-        true;
-
-      button.textContent =
-        "⏳ Проверяем...";
-    }
-
-
-    try {
-
-      const result =
-        await api(
-          "/api/promo/activate",
-          {
-            code
           }
         );
-
-
-      if (
-        result &&
-        result.balance !==
-          undefined
-      ) {
-
-        updateBalance(
-          result.balance
-        );
-      }
-
-
-      if (input) {
-        input.value = "";
-      }
-
-
-      closePtPromoModal();
-
-
-      showToast(
-        result &&
-        result.message
-          ? result.message
-          : "Промокод активирован."
-      );
-
-
-      await loadProfile();
-
-      await loadHistory();
-
-
-    } catch (error) {
-
-      console.error(
-        "Promo error:",
-        error
-      );
-
-
-      showToast(
-        error.message ||
-        "Не удалось активировать промокод."
-      );
-
-
-    } finally {
-
-      if (button) {
-
-        button.disabled =
-          false;
-
-        button.textContent =
-          "🎁 Активировать";
-      }
     }
-  }
+    /* =====================================================
+       ОКНО ПОКУПКИ
+       ===================================================== */
 
-
-  /* =====================================================
-     ПОПОЛНЕНИЕ
-     ===================================================== */
-
-  function updateTopupPreview() {
-
-    const amountInput =
-      document.getElementById(
-        "topupAmount"
-      );
-
-
-    const promoInput =
-      document.getElementById(
-        "promoPercent"
-      );
-
-
-    const amount =
-      Number(
-        amountInput
-          ? amountInput.value
-          : 0
-      ) || 0;
-
-
-    const promo =
-      promoInput
-        ? promoInput.value.trim()
-        : "";
-
-
-    document.getElementById(
-      "previewAmount"
-    ).textContent =
-      formatPT(
-        amount
-      );
-
-
-    if (
-      !promo ||
-      amount <= 0
+    function openBuyModal(
+      product,
+      quantity
     ) {
 
-      document.getElementById(
-        "previewBonus"
-      ).textContent =
-        "0 PT";
+      selectedProduct =
+        product;
 
-
-      document.getElementById(
-        "previewTotal"
-      ).textContent =
-        formatPT(
-          amount
+      selectedQuantity =
+        Math.max(
+          1,
+          Math.min(
+            Number(quantity) || 1,
+            10
+          )
         );
 
 
-      return;
-    }
-
-
-    clearTimeout(
-      percentPromoCheckTimer
-    );
-
-
-    percentPromoCheckTimer =
-      setTimeout(
-        () => {
-
-          checkPercentPromo(
-            amount,
-            promo,
-            "page"
-          );
-
-        },
-        500
-      );
-
-
-    document.getElementById(
-      "previewBonus"
-    ).textContent =
-      "Проверка...";
-  }
-
-
-  function updateModalTopupPreview() {
-
-    const amountInput =
-      document.getElementById(
-        "modalTopupAmount"
-      );
-
-
-    const promoInput =
-      document.getElementById(
-        "modalPromoPercent"
-      );
-
-
-    const amount =
-      Number(
-        amountInput
-          ? amountInput.value
-          : 0
-      ) || 0;
-
-
-    const promo =
-      promoInput
-        ? promoInput.value.trim()
-        : "";
-
-
-    document.getElementById(
-      "modalPreviewAmount"
-    ).textContent =
-      formatPT(
-        amount
-      );
-
-
-    if (
-      !promo ||
-      amount <= 0
-    ) {
-
-      document.getElementById(
-        "modalPreviewBonus"
-      ).textContent =
-        "0 PT";
-
-
-      document.getElementById(
-        "modalPreviewTotal"
-      ).textContent =
-        formatPT(
-          amount
-        );
-
-
-      return;
-    }
-
-
-    clearTimeout(
-      percentPromoCheckTimer
-    );
-
-
-    percentPromoCheckTimer =
-      setTimeout(
-        () => {
-
-          checkPercentPromo(
-            amount,
-            promo,
-            "modal"
-          );
-
-        },
-        500
-      );
-
-
-    document.getElementById(
-      "modalPreviewBonus"
-    ).textContent =
-      "Проверка...";
-  }
-
-
-  /* =====================================================
-     ПРОВЕРКА WELCOME
-     ===================================================== */
-
-  async function checkPercentPromo(
-    amount,
-    promoCode,
-    target
-  ) {
-
-    if (
-      !hasTelegramAuth()
-    ) {
-
-      return;
-    }
-
-
-    try {
-
-      const result =
-        await api(
-          "/api/promo/check-percent",
-          {
-            amount,
-
-            promoPercent:
-              promoCode
-          }
-        );
-
-
-      const bonus =
+      const price =
         Number(
-          result.percentBonus ??
-          result.bonus ??
-          0
+          product.price
         ) || 0;
 
 
       const total =
-        Number(
-          result.totalPoints ??
-          result.total ??
-          amount + bonus
-        ) ||
-        amount + bonus;
+        price *
+        selectedQuantity;
 
 
-      if (
-        target === "page"
-      ) {
-
+      const content =
         document.getElementById(
-          "previewBonus"
-        ).textContent =
-          formatPT(
-            bonus
-          );
-
-
-        document.getElementById(
-          "previewTotal"
-        ).textContent =
-          formatPT(
-            total
-          );
-
-      } else {
-
-        document.getElementById(
-          "modalPreviewBonus"
-        ).textContent =
-          formatPT(
-            bonus
-          );
-
-
-        document.getElementById(
-          "modalPreviewTotal"
-        ).textContent =
-          formatPT(
-            total
-          );
-      }
-
-
-    } catch (error) {
-
-      console.error(
-        "Percent promo error:",
-        error
-      );
-
-
-      if (
-        target === "page"
-      ) {
-
-        document.getElementById(
-          "previewBonus"
-        ).textContent =
-          "0 PT";
-
-
-        document.getElementById(
-          "previewTotal"
-        ).textContent =
-          formatPT(
-            amount
-          );
-
-      } else {
-
-        document.getElementById(
-          "modalPreviewBonus"
-        ).textContent =
-          "0 PT";
-
-
-        document.getElementById(
-          "modalPreviewTotal"
-        ).textContent =
-          formatPT(
-            amount
-          );
-      }
-    }
-  }
-
-
-  /* =====================================================
-     СОЗДАНИЕ ПОПОЛНЕНИЯ
-     ===================================================== */
-
-  async function createTopup() {
-
-    await submitTopup(
-      "topupAmount",
-      "promoPercent",
-      false
-    );
-  }
-
-
-  async function createTopupFromModal() {
-
-    await submitTopup(
-      "modalTopupAmount",
-      "modalPromoPercent",
-      true
-    );
-  }
-
-
-  async function submitTopup(
-    amountInputId,
-    promoInputId,
-    fromModal
-  ) {
-
-    if (
-      !hasTelegramAuth()
-    ) {
-
-      showToast(
-        "Открой приложение через Telegram."
-      );
-
-      return;
-    }
-
-
-    const amountInput =
-      document.getElementById(
-        amountInputId
-      );
-
-
-    const promoInput =
-      document.getElementById(
-        promoInputId
-      );
-
-
-    const amount =
-      Number(
-        amountInput
-          ? amountInput.value
-          : 0
-      );
-
-
-    const promoPercent =
-      promoInput
-        ? promoInput.value.trim()
-        : "";
-
-
-    if (
-      !Number.isInteger(
-        amount
-      ) ||
-      amount < 1 ||
-      amount > 1000000
-    ) {
-
-      showToast(
-        "Количество PT должно быть от 1 до 1 000 000."
-      );
-
-      return;
-    }
-
-
-    const button =
-      fromModal
-        ? document.querySelector(
-            "#topupModal .submit-button"
-          )
-        : document.querySelector(
-            "#pageTopup .submit-button"
-          );
-
-
-    if (button) {
-
-      button.disabled =
-        true;
-
-      button.textContent =
-        "⏳ Создание заявки...";
-    }
-
-
-    try {
-
-      const result =
-        await api(
-          "/api/topup/create",
-          {
-
-            amount,
-
-            promoPercent,
-
-            promoBonus:
-              "",
-
-            promoCode:
-              ""
-
-          }
+          "buyModalContent"
         );
 
 
-      const totalPoints =
-        Number(
-          result.totalPoints ??
-          amount
-        ) || amount;
-
-
-      let message =
-        "Заявка рассчитана: " +
-        formatPT(
-          totalPoints
-        ) +
-        ".";
-
-
-      if (
-        result.paymentUrl
-      ) {
-
-        window.open(
-          result.paymentUrl,
-          "_blank"
-        );
-
-
-        message =
-          "Заявка создана. Открываю оплату.";
-
-      } else {
-
-        message +=
-          " Ручная оплата будет подключена следующим этапом.";
-      }
-
-
-      if (
-        fromModal
-      ) {
-
-        closeTopupModal();
-      }
-
-
-      showToast(
-        message
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        "Topup error:",
-        error
-      );
-
-
-      showToast(
-        error.message ||
-        "Не удалось создать заявку."
-      );
-
-
-    } finally {
-
-      if (button) {
-
-        button.disabled =
-          false;
-
-        button.textContent =
-          "💳 Создать заявку";
-      }
-    }
-  }
-
-
-  /* =====================================================
-     ESCAPE
-     ===================================================== */
-
-  function escapeHtml(
-    value
-  ) {
-
-    return String(
-      value ?? ""
-    )
-      .replace(
-        /&/g,
-        "&amp;"
-      )
-      .replace(
-        /</g,
-        "&lt;"
-      )
-      .replace(
-        />/g,
-        "&gt;"
-      )
-      .replace(
-        /"/g,
-        "&quot;"
-      )
-      .replace(
-        /'/g,
-        "&#039;"
-      );
-  }
-
-
-  function escapeHtmlAttribute(
-    value
-  ) {
-
-    return String(
-      value ?? ""
-    )
-      .replace(
-        /[^a-zA-Z0-9_-]/g,
-        "_"
-      );
-  }
-
-
-  /* =====================================================
-     TELEGRAM BACK BUTTON
-     ===================================================== */
-
-  function setupTelegramBackButton() {
-
-    if (
-      !tg ||
-      !tg.BackButton
-    ) {
-
-      return;
-    }
-
-
-    tg.BackButton.onClick(
-      () => {
-
-        const modalIds = [
-          "buyModal",
-          "topupModal",
-          "ptPromoModal"
-        ];
-
-
-        for (
-          const id of modalIds
-        ) {
-
-          const modal =
-            document.getElementById(
-              id
-            );
-
-
-          if (
-            modal &&
-            modal.classList.contains(
-              "open"
-            )
-          ) {
-
-            closeModal(id);
-
-            return;
-          }
-        }
-
-
-        showPage(
-          "shop"
-        );
-
-
-        tg.BackButton.hide();
-      }
-    );
-  }
-
-
-  function refreshTelegramBackButton() {
-
-    if (
-      !tg ||
-      !tg.BackButton
-    ) {
-
-      return;
-    }
-
-
-    const opened =
-      Array.from(
-        document.querySelectorAll(
-          ".modal-overlay"
-        )
-      )
-      .some(
-        modal =>
-          modal.classList.contains(
-            "open"
-          )
-      );
-
-
-    if (opened) {
-
-      tg.BackButton.show();
-
-    } else {
-
-      tg.BackButton.hide();
-    }
-  }
-
-
-  /* =====================================================
-     ENTER — ПРОМОКОД PT
-     ===================================================== */
-
-  document.addEventListener(
-    "keydown",
-    event => {
-
-      if (
-        event.key !==
-        "Enter"
-      ) {
-
+      if (!content) {
         return;
       }
 
 
-      const active =
-        document.activeElement;
+      content.innerHTML = `
+
+        <div class="order-info">
+
+          <div class="order-info-row">
+
+            <div class="order-info-label">
+              Товар
+            </div>
+
+            <div class="order-info-value">
+              ${escapeHtml(
+                product.name
+              )}
+            </div>
+
+          </div>
+
+
+          <div class="order-info-row">
+
+            <div class="order-info-label">
+              Количество
+            </div>
+
+            <div class="order-info-value">
+              ${selectedQuantity} шт.
+            </div>
+
+          </div>
+
+
+          <div class="order-info-row">
+
+            <div class="order-info-label">
+              Цена за 1 шт.
+            </div>
+
+            <div class="order-info-value">
+              ${formatPT(
+                price
+              )}
+            </div>
+
+          </div>
+
+
+          <div class="order-info-row">
+
+            <div class="order-info-label">
+              Сумма
+            </div>
+
+            <div class="order-info-value">
+              ${formatPT(
+                total
+              )}
+            </div>
+
+          </div>
+
+
+          <div class="order-info-row">
+
+            <div class="order-info-label">
+              Баланс
+            </div>
+
+            <div class="order-info-value">
+              ${formatPT(
+                currentUser.balance
+              )}
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label
+            class="form-label"
+            for="gameIdInput"
+          >
+            Игровой ID
+          </label>
+
+
+          <input
+            id="gameIdInput"
+            class="input"
+            type="text"
+            maxlength="100"
+            placeholder="Введите игровой ID"
+            autocomplete="off"
+            inputmode="numeric"
+          >
+
+        </div>
+
+
+        <button
+          class="submit-button"
+          type="button"
+          id="confirmBuyButton"
+        >
+          ✅ Купить за ${formatPT(
+            total
+          )}
+        </button>
+
+      `;
+
+
+      const confirmButton =
+        document.getElementById(
+          "confirmBuyButton"
+        );
 
 
       if (
-        active &&
-        active.id ===
-          "ptPromoCode"
+        confirmButton
       ) {
 
-        activatePtPromo();
+        confirmButton.addEventListener(
+          "click",
+          buySelectedProduct
+        );
       }
+
+
+      openModal(
+        "buyModal"
+      );
     }
-  );
 
 
-  /* =====================================================
-     АКТИВНОСТЬ
-     ===================================================== */
+    /* =====================================================
+       ПОКУПКА ТОВАРА
+       ===================================================== */
 
-  document.addEventListener(
-    "visibilitychange",
-    async () => {
+    async function buySelectedProduct() {
 
       if (
-        document.visibilityState !==
-        "visible"
+        !selectedProduct
       ) {
+
+        showToast(
+          "Товар не выбран."
+        );
 
         return;
       }
@@ -3926,143 +2825,1680 @@
         !hasTelegramAuth()
       ) {
 
+        showToast(
+          "Открой приложение через Telegram."
+        );
+
+        return;
+      }
+
+
+      const gameIdInput =
+        document.getElementById(
+          "gameIdInput"
+        );
+
+
+      const gameId =
+        gameIdInput
+          ? gameIdInput.value.trim()
+          : "";
+
+
+      if (!gameId) {
+
+        showToast(
+          "Введите игровой ID."
+        );
+
+        return;
+      }
+
+
+      let quantity =
+        Number(
+          selectedQuantity
+        ) || 1;
+
+
+      quantity =
+        Math.max(
+          1,
+          Math.min(
+            quantity,
+            10
+          )
+        );
+
+
+      const price =
+        Number(
+          selectedProduct.price
+        ) || 0;
+
+
+      const total =
+        price *
+        quantity;
+
+
+      if (
+        currentUser.balance <
+        total
+      ) {
+
+        showToast(
+          "Недостаточно PT на балансе."
+        );
+
+        return;
+      }
+
+
+      const button =
+        document.getElementById(
+          "confirmBuyButton"
+        );
+
+
+      if (button) {
+
+        button.disabled =
+          true;
+
+        button.textContent =
+          "⏳ Оформление...";
+      }
+
+
+      try {
+
+        const result =
+          await api(
+            "/api/buy",
+            {
+
+              product:
+                selectedProduct.name,
+
+              gameId,
+
+              quantity
+
+            }
+          );
+
+
+        if (
+          result &&
+          result.balance !==
+            undefined
+        ) {
+
+          updateBalance(
+            result.balance
+          );
+
+        } else {
+
+          updateBalance(
+            currentUser.balance -
+            total
+          );
+        }
+
+
+        closeBuyModal();
+
+
+        showToast(
+          result &&
+          result.message
+            ? result.message
+            : "Заказ создан."
+        );
+
+
+        await loadProfile();
+
+        await loadHistory();
+
+
+      } catch (error) {
+
+        console.error(
+          "Buy error:",
+          error
+        );
+
+
+        showToast(
+          error.message ||
+          "Не удалось оформить заказ."
+        );
+
+
+      } finally {
+
+        if (button) {
+
+          button.disabled =
+            false;
+
+          button.textContent =
+            "✅ Купить за " +
+            formatPT(total);
+        }
+      }
+    }
+
+
+    /* =====================================================
+       ПРОФИЛЬ
+       ===================================================== */
+
+    async function loadProfile() {
+
+      const container =
+        document.getElementById(
+          "profileContainer"
+        );
+
+
+      if (
+        !hasTelegramAuth()
+      ) {
+
+        container.innerHTML = `
+          <div class="error-box">
+            Открой приложение через Telegram,
+            чтобы посмотреть профиль.
+          </div>
+        `;
+
         return;
       }
 
 
       try {
 
-        await loadProfile();
+        const result =
+          await api(
+            "/api/profile",
+            {}
+          );
+
+
+        currentUser = {
+
+          id:
+            result.id ??
+            null,
+
+          username:
+            result.username ||
+            "",
+
+          firstName:
+            result.firstName ||
+            "",
+
+          balance:
+            Number(
+              result.balance
+            ) || 0
+
+        };
+
+
+        updateBalance(
+          currentUser.balance
+        );
+
+
+        renderProfile();
+
 
       } catch (error) {
 
         console.error(
+          "Profile error:",
           error
         );
+
+
+        container.innerHTML = `
+          <div class="error-box">
+            Не удалось загрузить профиль.<br><br>
+            ${escapeHtml(
+              error.message
+            )}
+          </div>
+        `;
       }
     }
-  );
 
 
-  /* =====================================================
-     ИНИЦИАЛИЗАЦИЯ
-     ===================================================== */
+    /* =====================================================
+       ПРОФИЛЬ — ОТРИСОВКА
+       ===================================================== */
 
-  async function initApp() {
+    function renderProfile() {
 
-    initTelegram();
-
-    setupTelegramBackButton();
-
-
-    /*
-     * Очень важно:
-     * сначала рисуем локальные товары.
-     */
-
-    renderProducts();
-
-
-    /*
-     * Потом пытаемся взять актуальные
-     * товары с сервера.
-     */
-
-    try {
-
-      const result =
-        await api(
-          "/api/products",
-          null,
-          "GET"
+      const container =
+        document.getElementById(
+          "profileContainer"
         );
 
 
-      const serverProducts =
-        Array.isArray(
-          result
+      if (!container) {
+        return;
+      }
+
+
+      const firstName =
+        currentUser.firstName ||
+        "Пользователь";
+
+
+      const username =
+        currentUser.username
+          ? "@" +
+            currentUser.username
+          : "Username не указан";
+
+
+      const avatarLetter =
+        String(
+          firstName
         )
-          ? result
-          : (
-              Array.isArray(
-                result.products
-              )
-                ? result.products
-                : []
-            );
+          .trim()
+          .charAt(0)
+          .toUpperCase() ||
+        "👤";
+
+
+      container.innerHTML = `
+
+        <div class="profile-card">
+
+          <div class="profile-avatar">
+            ${escapeHtml(
+              avatarLetter
+            )}
+          </div>
+
+
+          <div class="profile-name">
+            ${escapeHtml(
+              firstName
+            )}
+          </div>
+
+
+          <div class="profile-username">
+            ${escapeHtml(
+              username
+            )}
+          </div>
+
+
+          <div class="profile-balance">
+
+            <div class="profile-balance-label">
+              Баланс
+            </div>
+
+
+            <div class="profile-balance-value">
+              ${formatPT(
+                currentUser.balance
+              )}
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div style="height:10px;"></div>
+
+
+        <button
+          class="submit-button"
+          type="button"
+          onclick="openTopupModal()"
+        >
+          💎 Пополнить баланс
+        </button>
+
+      `;
+    }
+
+
+    /* =====================================================
+       ИСТОРИЯ
+       ===================================================== */
+
+    async function loadHistory() {
+
+      const container =
+        document.getElementById(
+          "historyContainer"
+        );
+
+
+      if (!container) {
+        return;
+      }
 
 
       if (
-        serverProducts.length
+        !hasTelegramAuth()
       ) {
 
-        products =
-          serverProducts;
+        container.innerHTML = `
+          <div class="error-box">
+            Открой приложение через Telegram,
+            чтобы посмотреть историю.
+          </div>
+        `;
 
-        renderProducts();
+        return;
       }
 
-    } catch (error) {
 
-      console.warn(
-        "Серверный каталог недоступен, оставляем локальный каталог.",
-        error
-      );
+      container.innerHTML =
+        '<div class="loading">Загрузка истории...</div>';
+
+
+      try {
+
+        const result =
+          await api(
+            "/api/history",
+            {}
+          );
+
+
+        const history =
+          Array.isArray(
+            result
+          )
+            ? result
+            : (
+                Array.isArray(
+                  result.transactions
+                )
+                  ? result.transactions
+                  : []
+              );
+
+
+        renderHistory(
+          history
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "History error:",
+          error
+        );
+
+
+        container.innerHTML = `
+          <div class="error-box">
+            Не удалось загрузить историю.<br><br>
+            ${escapeHtml(
+              error.message
+            )}
+          </div>
+        `;
+      }
     }
 
 
-    /*
-     * Профиль.
-     */
+    /* =====================================================
+       ИСТОРИЯ — ОТРИСОВКА
+       ===================================================== */
 
-    if (
-      hasTelegramAuth()
+    function renderHistory(
+      history
     ) {
 
-      await loadProfile();
-
-    } else {
-
-      updateBalance(
-        0
-      );
+      const container =
+        document.getElementById(
+          "historyContainer"
+        );
 
 
-      document.getElementById(
-        "profileContainer"
-      ).innerHTML = `
-        <div class="error-box">
-          Открой приложение через Telegram,
-          чтобы авторизоваться и использовать
-          баланс, покупки и профиль.
+      if (!history.length) {
+
+        container.innerHTML = `
+          <div class="empty-box">
+            История пока пустая.
+          </div>
+        `;
+
+        return;
+      }
+
+
+      const sorted =
+        [...history].sort(
+          (a, b) => {
+
+            const aTime =
+              new Date(
+                a.createdAt ||
+                a.date ||
+                0
+              ).getTime();
+
+
+            const bTime =
+              new Date(
+                b.createdAt ||
+                b.date ||
+                0
+              ).getTime();
+
+
+            return bTime - aTime;
+          }
+        );
+
+
+      container.innerHTML = `
+
+        <div class="history-list">
+
+          ${
+            sorted
+              .map(
+                item => {
+
+                  const type =
+                    String(
+                      item.type ||
+                      "Операция"
+                    );
+
+
+                  const amount =
+                    Number(
+                      item.amount
+                    ) || 0;
+
+
+                  const description =
+                    item.description ||
+                    "Операция с балансом";
+
+
+                  let amountText =
+                    formatPT(
+                      amount
+                    );
+
+
+                  if (
+                    amount > 0
+                  ) {
+
+                    amountText =
+                      "+" +
+                      formatPT(
+                        amount
+                      );
+                  }
+
+
+                  let dateText =
+                    "";
+
+
+                  const rawDate =
+                    item.createdAt ||
+                    item.date;
+
+
+                  if (
+                    rawDate
+                  ) {
+
+                    const date =
+                      new Date(
+                        rawDate
+                      );
+
+
+                    if (
+                      !Number.isNaN(
+                        date.getTime()
+                      )
+                    ) {
+
+                      dateText =
+                        date.toLocaleString(
+                          "ru-RU",
+                          {
+
+                            day:
+                              "2-digit",
+
+                            month:
+                              "2-digit",
+
+                            year:
+                              "numeric",
+
+                            hour:
+                              "2-digit",
+
+                            minute:
+                              "2-digit"
+
+                          }
+                        );
+                    }
+                  }
+
+
+                  return `
+
+                    <div class="history-item">
+
+                      <div class="history-item-top">
+
+                        <div class="history-type">
+                          ${escapeHtml(
+                            type
+                          )}
+                        </div>
+
+
+                        <div class="history-amount">
+                          ${escapeHtml(
+                            amountText
+                          )}
+                        </div>
+
+                      </div>
+
+
+                      <div class="history-description">
+                        ${escapeHtml(
+                          description
+                        )}
+                      </div>
+
+
+                      ${
+                        dateText
+                          ? `
+                            <div class="history-date">
+                              ${escapeHtml(
+                                dateText
+                              )}
+                            </div>
+                          `
+                          : ""
+                      }
+
+                    </div>
+
+                  `;
+
+                }
+              )
+              .join("")
+          }
+
         </div>
       `;
     }
 
 
-    refreshTelegramBackButton();
-  }
+    /* =====================================================
+       PT-ПРОМОКОД
+       ===================================================== */
+
+    async function activatePtPromo() {
+
+      if (
+        !hasTelegramAuth()
+      ) {
+
+        showToast(
+          "Открой приложение через Telegram."
+        );
+
+        return;
+      }
 
 
-  window.addEventListener(
-    "load",
-    () => {
+      const input =
+        document.getElementById(
+          "ptPromoCode"
+        );
 
-      initApp()
-        .catch(
-          error => {
 
-            console.error(
-              "App init error:",
-              error
+      const code =
+        input
+          ? input.value.trim()
+          : "";
+
+
+      if (!code) {
+
+        showToast(
+          "Введите промокод."
+        );
+
+        return;
+      }
+
+
+      const button =
+        document.getElementById(
+          "activatePromoButton"
+        );
+
+
+      if (button) {
+
+        button.disabled =
+          true;
+
+        button.textContent =
+          "⏳ Проверяем...";
+      }
+
+
+      try {
+
+        const result =
+          await api(
+            "/api/promo/activate",
+            {
+              code
+            }
+          );
+
+
+        if (
+          result &&
+          result.balance !==
+            undefined
+        ) {
+
+          updateBalance(
+            result.balance
+          );
+        }
+
+
+        if (input) {
+          input.value = "";
+        }
+
+
+        closePtPromoModal();
+
+
+        showToast(
+          result &&
+          result.message
+            ? result.message
+            : "Промокод активирован."
+        );
+
+
+        await loadProfile();
+
+        await loadHistory();
+
+
+      } catch (error) {
+
+        console.error(
+          "Promo error:",
+          error
+        );
+
+
+        showToast(
+          error.message ||
+          "Не удалось активировать промокод."
+        );
+
+
+      } finally {
+
+        if (button) {
+
+          button.disabled =
+            false;
+
+          button.textContent =
+            "🎁 Активировать";
+        }
+      }
+    }    /* =====================================================
+       ПОПОЛНЕНИЕ — ПРОВЕРКА ПРОМОКОДА
+       ===================================================== */
+
+    async function checkPercentPromo(
+      amount,
+      promoCode,
+      target
+    ) {
+
+      if (
+        !hasTelegramAuth() ||
+        !promoCode ||
+        amount <= 0
+      ) {
+        return;
+      }
+
+      try {
+
+        const result =
+          await api(
+            "/api/promo/check-percent",
+            {
+              amount,
+              promoPercent:
+                promoCode
+            }
+          );
+
+
+        const bonus =
+          Number(
+            result.percentBonus ??
+            result.bonus ??
+            0
+          ) || 0;
+
+
+        const total =
+          Number(
+            result.totalPoints ??
+            result.total ??
+            amount + bonus
+          ) ||
+          amount + bonus;
+
+
+        if (
+          target === "page"
+        ) {
+
+          const bonusElement =
+            document.getElementById(
+              "previewBonus"
             );
 
+          const totalElement =
+            document.getElementById(
+              "previewTotal"
+            );
+
+
+          if (bonusElement) {
+            bonusElement.textContent =
+              formatPT(bonus);
           }
+
+
+          if (totalElement) {
+            totalElement.textContent =
+              formatPT(total);
+          }
+
+        } else {
+
+          const bonusElement =
+            document.getElementById(
+              "modalPreviewBonus"
+            );
+
+          const totalElement =
+            document.getElementById(
+              "modalPreviewTotal"
+            );
+
+
+          if (bonusElement) {
+            bonusElement.textContent =
+              formatPT(bonus);
+          }
+
+
+          if (totalElement) {
+            totalElement.textContent =
+              formatPT(total);
+          }
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          "Promo percent error:",
+          error
+        );
+
+
+        if (
+          target === "page"
+        ) {
+
+          document.getElementById(
+            "previewBonus"
+          ).textContent =
+            "0 PT";
+
+
+          document.getElementById(
+            "previewTotal"
+          ).textContent =
+            formatPT(amount);
+
+        } else {
+
+          document.getElementById(
+            "modalPreviewBonus"
+          ).textContent =
+            "0 PT";
+
+
+          document.getElementById(
+            "modalPreviewTotal"
+          ).textContent =
+            formatPT(amount);
+        }
+      }
+    }
+
+
+    /* =====================================================
+       ПРЕВЬЮ ПОПОЛНЕНИЯ
+       ===================================================== */
+
+    function updateTopupPreview() {
+
+      const amountInput =
+        document.getElementById(
+          "topupAmount"
+        );
+
+
+      const promoInput =
+        document.getElementById(
+          "promoPercent"
+        );
+
+
+      const amount =
+        Number(
+          amountInput
+            ? amountInput.value
+            : 0
+        ) || 0;
+
+
+      const promoCode =
+        promoInput
+          ? promoInput.value.trim()
+          : "";
+
+
+      const previewAmount =
+        document.getElementById(
+          "previewAmount"
+        );
+
+
+      const previewBonus =
+        document.getElementById(
+          "previewBonus"
+        );
+
+
+      const previewTotal =
+        document.getElementById(
+          "previewTotal"
+        );
+
+
+      if (previewAmount) {
+
+        previewAmount.textContent =
+          formatPT(amount);
+      }
+
+
+      if (
+        !promoCode ||
+        amount <= 0
+      ) {
+
+        if (previewBonus) {
+
+          previewBonus.textContent =
+            "0 PT";
+        }
+
+
+        if (previewTotal) {
+
+          previewTotal.textContent =
+            formatPT(amount);
+        }
+
+
+        return;
+      }
+
+
+      clearTimeout(
+        percentPromoCheckTimer
+      );
+
+
+      percentPromoCheckTimer =
+        setTimeout(
+          () => {
+
+            checkPercentPromo(
+              amount,
+              promoCode,
+              "page"
+            );
+
+          },
+          500
+        );
+
+
+      if (previewBonus) {
+
+        previewBonus.textContent =
+          "Проверка...";
+      }
+    }
+
+
+    function updateModalTopupPreview() {
+
+      const amountInput =
+        document.getElementById(
+          "modalTopupAmount"
+        );
+
+
+      const promoInput =
+        document.getElementById(
+          "modalPromoPercent"
+        );
+
+
+      const amount =
+        Number(
+          amountInput
+            ? amountInput.value
+            : 0
+        ) || 0;
+
+
+      const promoCode =
+        promoInput
+          ? promoInput.value.trim()
+          : "";
+
+
+      const previewAmount =
+        document.getElementById(
+          "modalPreviewAmount"
+        );
+
+
+      const previewBonus =
+        document.getElementById(
+          "modalPreviewBonus"
+        );
+
+
+      const previewTotal =
+        document.getElementById(
+          "modalPreviewTotal"
+        );
+
+
+      if (previewAmount) {
+
+        previewAmount.textContent =
+          formatPT(amount);
+      }
+
+
+      if (
+        !promoCode ||
+        amount <= 0
+      ) {
+
+        if (previewBonus) {
+
+          previewBonus.textContent =
+            "0 PT";
+        }
+
+
+        if (previewTotal) {
+
+          previewTotal.textContent =
+            formatPT(amount);
+        }
+
+
+        return;
+      }
+
+
+      clearTimeout(
+        percentPromoCheckTimer
+      );
+
+
+      percentPromoCheckTimer =
+        setTimeout(
+          () => {
+
+            checkPercentPromo(
+              amount,
+              promoCode,
+              "modal"
+            );
+
+          },
+          500
+        );
+
+
+      if (previewBonus) {
+
+        previewBonus.textContent =
+          "Проверка...";
+      }
+    }
+
+
+    /* =====================================================
+       СОЗДАНИЕ ПОПОЛНЕНИЯ
+       ===================================================== */
+
+    async function createTopup() {
+
+      await submitTopup(
+        "topupAmount",
+        "promoPercent",
+        false
+      );
+    }
+
+
+    async function createTopupFromModal() {
+
+      await submitTopup(
+        "modalTopupAmount",
+        "modalPromoPercent",
+        true
+      );
+    }
+
+
+    async function submitTopup(
+      amountInputId,
+      promoInputId,
+      fromModal
+    ) {
+
+      if (
+        !hasTelegramAuth()
+      ) {
+
+        showToast(
+          "Открой приложение через Telegram."
+        );
+
+        return;
+      }
+
+
+      const amountInput =
+        document.getElementById(
+          amountInputId
+        );
+
+
+      const promoInput =
+        document.getElementById(
+          promoInputId
+        );
+
+
+      const amount =
+        Number(
+          amountInput
+            ? amountInput.value
+            : 0
+        );
+
+
+      const promoPercent =
+        promoInput
+          ? promoInput.value.trim()
+          : "";
+
+
+      if (
+        !Number.isInteger(amount) ||
+        amount < 1 ||
+        amount > 1000000
+      ) {
+
+        showToast(
+          "Количество PT должно быть от 1 до 1 000 000."
+        );
+
+        return;
+      }
+
+
+      const button =
+        fromModal
+          ? document.querySelector(
+              "#topupModal .submit-button"
+            )
+          : document.querySelector(
+              "#pageTopup .submit-button"
+            );
+
+
+      if (button) {
+
+        button.disabled =
+          true;
+
+        button.textContent =
+          "⏳ Создание заявки...";
+      }
+
+
+      try {
+
+        const result =
+          await api(
+            "/api/topup/create",
+            {
+              amount,
+
+              promoPercent,
+
+              /*
+               * PT-промокоды здесь НЕ передаются.
+               */
+              promoBonus: "",
+
+              promoCode: ""
+            }
+          );
+
+
+        const totalPoints =
+          Number(
+            result.totalPoints ??
+            amount
+          ) || amount;
+
+
+        let message =
+          "Заявка рассчитана: " +
+          formatPT(totalPoints) +
+          ".";
+
+
+        /*
+         * На данный момент paymentUrl
+         * будет null, так как ручная оплата
+         * ещё не подключена.
+         */
+
+        if (
+          result.paymentUrl
+        ) {
+
+          window.open(
+            result.paymentUrl,
+            "_blank"
+          );
+
+
+          message =
+            "Заявка создана. Открываю оплату.";
+
+        } else {
+
+          message +=
+            " Ручная оплата будет подключена следующим этапом.";
+        }
+
+
+        if (
+          fromModal
+        ) {
+
+          closeTopupModal();
+        }
+
+
+        showToast(
+          message
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Topup error:",
+          error
+        );
+
+
+        showToast(
+          error.message ||
+          "Не удалось создать заявку."
+        );
+
+
+      } finally {
+
+        if (button) {
+
+          button.disabled =
+            false;
+
+          button.textContent =
+            "💳 Создать заявку";
+        }
+      }
+    }
+
+
+    /* =====================================================
+       ESCAPE HTML
+       ===================================================== */
+
+    function escapeHtml(
+      value
+    ) {
+
+      return String(
+        value ?? ""
+      )
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+        .replace(
+          /</g,
+          "&lt;"
+        )
+        .replace(
+          />/g,
+          "&gt;"
+        )
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+        .replace(
+          /'/g,
+          "&#039;"
         );
     }
-  );
 
-</script>
+
+    function escapeHtmlAttribute(
+      value
+    ) {
+
+      return String(
+        value ?? ""
+      )
+        .replace(
+          /[^a-zA-Z0-9_-]/g,
+          "_"
+        );
+    }
+
+
+    /* =====================================================
+       ЗАПУСК TELEGRAM BACK BUTTON
+       ===================================================== */
+
+    function setupTelegramBackButton() {
+
+      if (
+        !tg ||
+        !tg.BackButton
+      ) {
+
+        return;
+      }
+
+
+      tg.BackButton.onClick(
+        () => {
+
+          const modals = [
+            "buyModal",
+            "topupModal",
+            "ptPromoModal"
+          ];
+
+
+          for (
+            const id of modals
+          ) {
+
+            const modal =
+              document.getElementById(
+                id
+              );
+
+
+            if (
+              modal &&
+              modal.classList.contains(
+                "open"
+              )
+            ) {
+
+              closeModal(id);
+
+              return;
+            }
+          }
+
+
+          showPage(
+            "shop"
+          );
+
+
+          tg.BackButton.hide();
+
+        }
+      );
+    }
+
+
+    function refreshTelegramBackButton() {
+
+      if (
+        !tg ||
+        !tg.BackButton
+      ) {
+
+        return;
+      }
+
+
+      const opened =
+        Array.from(
+          document.querySelectorAll(
+            ".modal-overlay"
+          )
+        )
+        .some(
+          modal =>
+            modal.classList.contains(
+              "open"
+            )
+        );
+
+
+      if (
+        opened
+      ) {
+
+        tg.BackButton.show();
+
+      } else {
+
+        tg.BackButton.hide();
+      }
+    }
+
+
+    /* =====================================================
+       ENTER — PT-ПРОМОКОД
+       ===================================================== */
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key !==
+          "Enter"
+        ) {
+
+          return;
+        }
+
+
+        const active =
+          document.activeElement;
+
+
+        if (
+          active &&
+          active.id ===
+            "ptPromoCode"
+        ) {
+
+          activatePtPromo();
+        }
+      }
+    );
+
+
+    /* =====================================================
+       АКТИВНОСТЬ ПРИ ВОЗВРАТЕ
+       ===================================================== */
+
+    document.addEventListener(
+      "visibilitychange",
+      async () => {
+
+        if (
+          document.visibilityState !==
+          "visible"
+        ) {
+
+          return;
+        }
+
+
+        if (
+          !hasTelegramAuth()
+        ) {
+
+          return;
+        }
+
+
+        try {
+
+          await loadProfile();
+
+        } catch (error) {
+
+          console.error(
+            "Refresh error:",
+            error
+          );
+        }
+      }
+    );
+
+
+    /* =====================================================
+       ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
+       ===================================================== */
+
+    async function initApp() {
+
+      initTelegram();
+
+      setupTelegramBackButton();
+
+
+      /*
+       * Главное:
+       * каталог рисуем сразу.
+       */
+
+      renderProducts();
+
+
+      /*
+       * Потом пробуем обновить
+       * его данными сервера.
+       */
+
+      try {
+
+        const result =
+          await api(
+            "/api/products",
+            null,
+            "GET"
+          );
+
+
+        const serverProducts =
+          Array.isArray(result)
+            ? result
+            : (
+                Array.isArray(
+                  result.products
+                )
+                  ? result.products
+                  : []
+              );
+
+
+        if (
+          serverProducts.length > 0
+        ) {
+
+          products =
+            serverProducts;
+
+          renderProducts();
+        }
+
+
+      } catch (error) {
+
+        console.warn(
+          "Серверный каталог недоступен. Используем локальный.",
+          error
+        );
+
+
+        /*
+         * Ничего не ломаем —
+         * локальный каталог уже показан.
+         */
+
+        renderProducts();
+      }
+
+
+      /*
+       * Авторизация Telegram.
+       */
+
+      if (
+        hasTelegramAuth()
+      ) {
+
+        await loadProfile();
+
+      } else {
+
+        updateBalance(
+          0
+        );
+
+
+        const profile =
+          document.getElementById(
+            "profileContainer"
+          );
+
+
+        if (profile) {
+
+          profile.innerHTML = `
+            <div class="error-box">
+              Открой приложение через Telegram,
+              чтобы авторизоваться и использовать
+              баланс, покупки и профиль.
+            </div>
+          `;
+        }
+      }
+
+
+      refreshTelegramBackButton();
+    }
+
+
+    /* =====================================================
+       ЗАПУСК
+       ===================================================== */
+
+    window.addEventListener(
+      "load",
+      () => {
+
+        initApp()
+          .catch(
+            error => {
+
+              console.error(
+                "App init error:",
+                error
+              );
+
+            }
+          );
+
+      }
+    );
+
+  </script>
 
 </body>
 </html>
