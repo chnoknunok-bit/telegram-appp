@@ -535,8 +535,8 @@ async function addTransaction({
   type,
   amount,
   description,
-  orderId,
-  topupId,
+  orderId = null,
+  topupId = null,
   client = null
 }) {
   const id =
@@ -572,8 +572,8 @@ async function addTransaction({
       type,
       Number(amount) || 0,
       description || "",
-      orderId || null,
-      topupId || null
+      orderId,
+      topupId
     ]
   );
 
@@ -833,26 +833,22 @@ async function activatePromoCode(
     );
   }
 
-  const executor =
-    client || pool;
-
-  // При вызове внутри транзакции блокируем строки промокода,
-  // чтобы два параллельных запроса не смогли превысить лимит.
-  const globalPromoResult =
-    await executor.query(
-      `
-        SELECT uses
-        FROM promo_global
-        WHERE promo_code = $1
-        FOR UPDATE
-      `,
-      [promoCode]
+  const userUses =
+    await getPromoUserUses(
+      user.telegram_id,
+      promoCode
     );
 
+  if (userUses >= 1) {
+    throw new Error(
+      "Пользователь уже использовал этот промокод"
+    );
+  }
+
   const globalUses =
-    globalPromoResult.rows.length
-      ? Number(globalPromoResult.rows[0].uses || 0)
-      : 0;
+    await getPromoGlobalUses(
+      promoCode
+    );
 
   if (
     globalUses >=
@@ -863,31 +859,8 @@ async function activatePromoCode(
     );
   }
 
-  const userPromoResult =
-    await executor.query(
-      `
-        SELECT uses
-        FROM promo_uses
-        WHERE telegram_id = $1
-          AND promo_code = $2
-        FOR UPDATE
-      `,
-      [
-        String(user.telegram_id),
-        promoCode
-      ]
-    );
-
-  const userUses =
-    userPromoResult.rows.length
-      ? Number(userPromoResult.rows[0].uses || 0)
-      : 0;
-
-  if (userUses >= 1) {
-    throw new Error(
-      "Пользователь уже использовал этот промокод"
-    );
-  }
+  const executor =
+    client || pool;
 
   await executor.query(
     `
@@ -1099,52 +1072,7 @@ app.post(
               id: row.id,
               type: row.type,
               amount:
-                Number(
-                  row.amount
-                ),
-              description:
-                row.description,
-              orderId:
-                row.order_id,
-              topupId:
-                row.topup_id,
-              createdAt:
-                row.created_at
-            })
-          )
-      });
-
-    } catch (error) {
-
-      console.error(
-        "HISTORY ERROR:",
-        error.message
-      );
-
-      res.status(401).json({
-        ok: false,
-        message:
-          error.message ||
-          "Ошибка загрузки истории"
-      });
-    }
-  }
-);            )
-          ]
-        );
-
-      res.json({
-        ok: true,
-
-        transactions:
-          result.rows.map(
-            (row) => ({
-              id: row.id,
-              type: row.type,
-              amount:
-                Number(
-                  row.amount
-                ),
+                Number(row.amount),
               description:
                 row.description,
               orderId:
@@ -1176,11 +1104,54 @@ app.post(
 
 
 // ==========================================
-// ПРОМО: ПРОВЕРКА ПРОЦЕНТА
+// API: БАЛАНС
 // ==========================================
 
 app.post(
-  "/api/promo/check-percent",
+  "/api/balance",
+  async (req, res) => {
+
+    try {
+
+      const {
+        user
+      } =
+        await requireTelegramUser(
+          req
+        );
+
+      res.json({
+        ok: true,
+        balance:
+          Number(
+            user.balance || 0
+          )
+      });
+
+    } catch (error) {
+
+      console.error(
+        "BALANCE ERROR:",
+        error.message
+      );
+
+      res.status(401).json({
+        ok: false,
+        message:
+          error.message ||
+          "Ошибка получения баланса"
+      });
+    }
+  }
+);
+
+
+// ==========================================
+// API: ПРОВЕРКА ПРОМО НА ПОПОЛНЕНИЕ
+// ==========================================
+
+app.post(
+  "/api/check-topup-promo",
   async (req, res) => {
 
     try {
@@ -1194,7 +1165,7 @@ app.post(
 
       const code =
         normalizePromoCode(
-          req.body?.code
+          req.body?.promoCode
         );
 
       const result =
@@ -1209,74 +1180,11 @@ app.post(
         );
       }
 
-      return res.json({
+      res.json({
         ok: true,
-        code:
-          result.code,
-        type:
-          "percent",
+        code: result.code,
         percent:
-          result.percent
-      });
-
-    } catch (error) {
-
-      console.error(
-        "PROMO CHECK ERROR:",
-        error.message
-      );
-
-      return res.status(401).json({
-        ok: false,
-        message:
-          error.message ||
-          "Ошибка проверки промокода"
-      });
-    }
-  }
-);
-
-
-// ==========================================
-// ПРОМО: ПРОВЕРКА PT
-// ==========================================
-
-app.post(
-  "/api/promo/check-bonus",
-  async (req, res) => {
-
-    try {
-
-      const {
-        user
-      } =
-        await requireTelegramUser(
-          req
-        );
-
-      const code =
-        normalizePromoCode(
-          req.body?.code
-        );
-
-      const result =
-        await calculateBonusPromo(
-          user,
-          code
-        );
-
-      if (!result.ok) {
-        return res.status(400).json(
-          result
-        );
-      }
-
-      return res.json({
-        ok: true,
-        code:
-          result.code,
-        type:
-          "bonus",
+          result.percent,
         bonus:
           result.bonus
       });
@@ -1284,11 +1192,11 @@ app.post(
     } catch (error) {
 
       console.error(
-        "BONUS PROMO CHECK ERROR:",
+        "CHECK TOPUP PROMO ERROR:",
         error.message
       );
 
-      return res.status(401).json({
+      res.status(400).json({
         ok: false,
         message:
           error.message ||
@@ -1300,11 +1208,11 @@ app.post(
 
 
 // ==========================================
-// СОВМЕСТИМОСТЬ: PROMO CHECK
+// API: ПРОВЕРКА PT ПРОМО
 // ==========================================
 
 app.post(
-  "/api/promo/check",
+  "/api/check-pt-promo",
   async (req, res) => {
 
     try {
@@ -1318,91 +1226,7 @@ app.post(
 
       const code =
         normalizePromoCode(
-          req.body?.code
-        );
-
-      const percentResult =
-        await calculatePercentPromo(
-          user,
-          code
-        );
-
-      if (percentResult.ok) {
-
-        return res.json({
-          ok: true,
-          code:
-            percentResult.code,
-          type:
-            "percent",
-          percent:
-            percentResult.percent,
-          bonus: 0
-        });
-      }
-
-      const bonusResult =
-        await calculateBonusPromo(
-          user,
-          code
-        );
-
-      if (bonusResult.ok) {
-
-        return res.json({
-          ok: true,
-          code:
-            bonusResult.code,
-          type:
-            "bonus",
-          percent: 0,
-          bonus:
-            bonusResult.bonus
-        });
-      }
-
-      return res.status(400).json({
-        ok: false,
-        message:
-          "Промокод не найден или недействителен"
-      });
-
-    } catch (error) {
-
-      return res.status(401).json({
-        ok: false,
-        message:
-          error.message ||
-          "Ошибка проверки промокода"
-      });
-    }
-  }
-);
-
-
-// ==========================================
-// АКТИВАЦИЯ PT-ПРОМОКОДА
-// ==========================================
-
-app.post(
-  "/api/promo/activate",
-  async (req, res) => {
-
-    const client =
-      await pool.connect();
-
-    try {
-
-      const {
-        user
-      } =
-        await requireTelegramUser(
-          req
-        );
-
-      const code =
-        normalizePromoCode(
-          req.body?.code
+          req.body?.promoCode
         );
 
       const result =
@@ -1417,147 +1241,256 @@ app.post(
         );
       }
 
-      if (
-        Number(result.bonus) <= 0
-      ) {
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Этот промокод не даёт PT"
-        });
-      }
-
-      await client.query(
-        "BEGIN"
-      );
-
-      // Блокируем строку пользователя,
-      // чтобы два одновременных запроса
-      // не смогли изменить баланс неправильно.
-      const userResult =
-        await client.query(
-          `
-            SELECT *
-            FROM users
-            WHERE telegram_id = $1
-            FOR UPDATE
-          `,
-          [
-            String(
-              user.telegram_id
-            )
-          ]
-        );
-
-      if (
-        !userResult.rows.length
-      ) {
-        throw new Error(
-          "Пользователь не найден"
-        );
-      }
-
-      const lockedUser =
-        userResult.rows[0];
-
-      const bonus =
-        Number(result.bonus);
-
-      await activatePromoCode(
-        lockedUser,
-        code,
-        client
-      );
-
-      const balanceBefore =
-        Number(
-          lockedUser.balance || 0
-        );
-
-      const balanceAfter =
-        balanceBefore + bonus;
-
-      await client.query(
-        `
-          UPDATE users
-          SET
-            balance = $1,
-            updated_at = NOW()
-          WHERE telegram_id = $2
-        `,
-        [
-          balanceAfter,
-          String(
-            lockedUser.telegram_id
-          )
-        ]
-      );
-
-      await addTransaction({
-        telegramId:
-          lockedUser.telegram_id,
-
-        type:
-          "promo_bonus",
-
-        amount:
-          bonus,
-
-        description:
-          `Активация PT-промокода ${code}`,
-
-        client
-      });
-
-      await client.query(
-        "COMMIT"
-      );
-
-      return res.json({
+      res.json({
         ok: true,
-        code,
-        bonus,
-        balance:
-          balanceAfter,
-
-        message:
-          `Начислено +${bonus} PT`
+        code: result.code,
+        bonus:
+          result.bonus
       });
 
     } catch (error) {
 
-      try {
-        await client.query(
-          "ROLLBACK"
-        );
-      } catch {}
-
       console.error(
-        "PROMO ACTIVATE ERROR:",
+        "CHECK PT PROMO ERROR:",
         error.message
       );
 
-      return res.status(400).json({
+      res.status(400).json({
         ok: false,
         message:
           error.message ||
-          "Не удалось активировать промокод"
+          "Ошибка проверки промокода"
       });
-
-    } finally {
-
-      client.release();
     }
   }
 );
 
 
 // ==========================================
-// ПОКУПКА ТОВАРА
+// API: РЕКВИЗИТЫ
+// ==========================================
+
+app.get(
+  "/api/payment-details",
+  (req, res) => {
+
+    const details =
+      getPaymentDetails();
+
+    res.json({
+      ok: true,
+      ...details
+    });
+
+  }
+);
+
+
+// ==========================================
+// УВЕДОМЛЕНИЯ О ПОПОЛНЕНИИ
+// ==========================================
+
+async function notifyTopupCreated(
+  topup
+) {
+  if (!topup) {
+    return;
+  }
+
+  const username =
+    topup.user_username
+      ? `@${topup.user_username}`
+      : "без username";
+
+  const text =
+    `💳 НОВОЕ ПОПОЛНЕНИЕ\n\n` +
+    `🆔 ID: ${topup.id}\n` +
+    `👤 Пользователь: ${topup.user_first_name || ""} ${topup.user_last_name || ""}\n` +
+    `🔗 Username: ${username}\n` +
+    `🆔 Telegram ID: ${topup.telegram_id}\n\n` +
+    `💰 Пополнение: ${topup.amount_pt} PT\n` +
+    `🎁 Бонус: ${topup.bonus_points || 0} PT\n` +
+    `💎 Итого: ${topup.total_points} PT\n` +
+    `💵 К оплате: ${topup.payment_rub} ₽\n\n` +
+    `💳 Карта: ${PAYMENT_CARD || "не указана"}\n` +
+    `👤 Получатель: ${PAYMENT_RECIPIENT || "не указан"}\n\n` +
+    `⏳ Статус: ОЖИДАЕТ ОПЛАТУ`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: "💰 ОПЛАЧЕНО",
+          callback_data:
+            `topup_paid:${topup.id}`
+        }
+      ]
+    ]
+  };
+
+  return telegramRequest(
+    "sendMessage",
+    {
+      chat_id:
+        PAYMENT_CHAT_ID,
+      text,
+      reply_markup:
+        keyboard
+    }
+  );
+}
+
+
+// ==========================================
+// УВЕДОМЛЕНИЕ ПОЛЬЗОВАТЕЛЯ О ПОПОЛНЕНИИ
+// ==========================================
+
+async function notifyUserTopupWaiting(
+  topup
+) {
+  const text =
+    `💳 Пополнение создано!\n\n` +
+    `💰 Сумма: ${topup.amount_pt} PT\n` +
+    `🎁 Бонус: ${topup.bonus_points || 0} PT\n` +
+    `💎 Вы получите: ${topup.total_points} PT\n` +
+    `💵 К оплате: ${topup.payment_rub} ₽\n\n` +
+    `💳 Карта: ${PAYMENT_CARD || "не указана"}\n` +
+    `👤 Получатель: ${PAYMENT_RECIPIENT || "не указан"}\n\n` +
+    `⏳ Статус: ОЖИДАЕТ ОПЛАТУ\n\n` +
+    `После оплаты нажмите кнопку «Я ОПЛАТИЛ».`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: "✅ Я ОПЛАТИЛ",
+          callback_data:
+            `topup_paid:${topup.id}`
+        }
+      ]
+    ]
+  };
+
+  return telegramRequest(
+    "sendMessage",
+    {
+      chat_id:
+        topup.telegram_id,
+      text,
+      reply_markup:
+        keyboard
+    }
+  );
+}
+
+
+// ==========================================
+// УВЕДОМЛЕНИЕ ОБ ОПЛАТЕ
+// ==========================================
+
+async function notifyTopupPaid(
+  topup
+) {
+  const username =
+    topup.user_username
+      ? `@${topup.user_username}`
+      : "без username";
+
+  const text =
+    `💰 ОПЛАТА ПОПОЛНЕНИЯ\n\n` +
+    `🆔 ID: ${topup.id}\n` +
+    `👤 Пользователь: ${topup.user_first_name || ""} ${topup.user_last_name || ""}\n` +
+    `🔗 Username: ${username}\n` +
+    `🆔 Telegram ID: ${topup.telegram_id}\n\n` +
+    `💎 PT: ${topup.total_points}\n` +
+    `💵 Сумма: ${topup.payment_rub} ₽\n\n` +
+    `🟡 Статус: ОПЛАТА ПОДТВЕРЖДЕНА ПОЛЬЗОВАТЕЛЕМ`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: "✅ ПОДТВЕРДИТЬ",
+          callback_data:
+            `topup_confirm:${topup.id}`
+        },
+        {
+          text: "❌ ОТКЛОНИТЬ",
+          callback_data:
+            `topup_reject:${topup.id}`
+        }
+      ]
+    ]
+  };
+
+  return telegramRequest(
+    "sendMessage",
+    {
+      chat_id:
+        PAYMENT_CHAT_ID,
+      text,
+      reply_markup:
+        keyboard
+    }
+  );
+}
+
+
+// ==========================================
+// УВЕДОМЛЕНИЕ ПОЛЬЗОВАТЕЛЯ О ПОДТВЕРЖДЕНИИ
+// ==========================================
+
+async function notifyTopupConfirmed(
+  topup
+) {
+  const text =
+    `✅ ПОПОЛНЕНИЕ ПОДТВЕРЖДЕНО!\n\n` +
+    `💰 Основная сумма: ${topup.amount_pt} PT\n` +
+    `🎁 Бонус: ${topup.bonus_points || 0} PT\n` +
+    `💎 Начислено: ${topup.total_points} PT\n\n` +
+    `Баланс успешно пополнен.`;
+
+  return telegramRequest(
+    "sendMessage",
+    {
+      chat_id:
+        topup.telegram_id,
+      text
+    }
+  );
+}
+
+
+// ==========================================
+// УВЕДОМЛЕНИЕ ОБ ОТКЛОНЕНИИ
+// ==========================================
+
+async function notifyTopupRejected(
+  topup
+) {
+  const text =
+    `❌ ПОПОЛНЕНИЕ ОТКЛОНЕНО\n\n` +
+    `🆔 ID: ${topup.id}\n` +
+    `💰 Сумма: ${topup.amount_pt} PT\n\n` +
+    `Если вы считаете, что это ошибка, обратитесь к администрации.`;
+
+  return telegramRequest(
+    "sendMessage",
+    {
+      chat_id:
+        topup.telegram_id,
+      text
+    }
+  );
+}
+
+
+// ==========================================
+// API: СОЗДАНИЕ ПОПОЛНЕНИЯ
 // ==========================================
 
 app.post(
-  "/api/buy",
+  "/api/topup",
   async (req, res) => {
 
     const client =
@@ -1566,1004 +1499,100 @@ app.post(
     try {
 
       const {
-        tgUser,
         user
       } =
         await requireTelegramUser(
           req
         );
 
-      const productId =
-        String(
-          req.body?.productId ||
-          ""
-        );
-
-      const gameId =
-        String(
-          req.body?.gameId ||
-          ""
-        ).trim();
-
-      let quantity =
+      const amountPt =
         Number(
-          req.body?.quantity || 1
+          req.body?.amountPt
         );
 
-      const product =
-        PRODUCTS.find(
-          (item) =>
-            item.id === productId
+      const promoCode =
+        normalizePromoCode(
+          req.body?.promoCode
         );
-
-      if (!product) {
-        return res.status(404).json({
-          ok: false,
-          message:
-            "Товар не найден"
-        });
-      }
-
-      if (!product.available) {
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Этот товар пока недоступен"
-        });
-      }
-
-      if (!gameId) {
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Введите Game ID"
-        });
-      }
 
       if (
-        !Number.isInteger(quantity)
+        !Number.isInteger(
+          amountPt
+        ) ||
+        amountPt <= 0
       ) {
         return res.status(400).json({
           ok: false,
           message:
-            "Количество должно быть целым числом"
+            "Некорректная сумма пополнения"
         });
       }
 
-      if (product.quantityEnabled) {
+      let promoResult = {
+        ok: true,
+        code: null,
+        percent: 0,
+        bonus: 0
+      };
 
-        if (
-          quantity < 1 ||
-          quantity >
-            product.maxQuantity
-        ) {
-          return res.status(400).json({
-            ok: false,
-            message:
-              `Можно купить от 1 до ${product.maxQuantity} шт.`
-          });
+      if (promoCode) {
+        promoResult =
+          await calculatePercentPromo(
+            user,
+            promoCode
+          );
+
+        if (!promoResult.ok) {
+          return res.status(400).json(
+            promoResult
+          );
         }
-
-      } else {
-
-        quantity = 1;
       }
 
-      const total =
-        Number(product.price) *
-        quantity;
+      const percent =
+        Number(
+          promoResult.percent || 0
+        );
 
-      if (total <= 0) {
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Цена товара некорректна"
-        });
-      }
+      const bonusPoints =
+        Math.floor(
+          amountPt *
+          percent /
+          100
+        );
+
+      const totalPoints =
+        amountPt +
+        bonusPoints;
+
+      const paymentRub =
+        Math.ceil(
+          amountPt *
+          PT_RUB_RATE
+        );
+
+      const topupId =
+        randomId("topup_");
 
       await client.query(
         "BEGIN"
       );
 
-      const lockedResult =
-        await client.query(
-          `
-            SELECT *
-            FROM users
-            WHERE telegram_id = $1
-            FOR UPDATE
-          `,
-          [
-            String(
-              user.telegram_id
-            )
-          ]
-        );
-
-      if (
-        !lockedResult.rows.length
-      ) {
-        throw new Error(
-          "Пользователь не найден"
-        );
-      }
-
-      const lockedUser =
-        lockedResult.rows[0];
-
-      const currentBalance =
-        Number(
-          lockedUser.balance || 0
-        );
-
-      if (
-        currentBalance < total
-      ) {
-
-        await client.query(
-          "ROLLBACK"
-        );
-
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Недостаточно PT",
-          balance:
-            currentBalance,
-          required:
-            total
-        });
-      }
-
-      const orderId =
-        randomId("order_");
-
       await client.query(
         `
-          UPDATE users
-          SET
-            balance = balance - $1,
-            updated_at = NOW()
-          WHERE telegram_id = $2
+          SELECT telegram_id
+          FROM users
+          WHERE telegram_id = $1
+          FOR UPDATE
         `,
         [
-          total,
           String(
-            lockedUser.telegram_id
+            user.telegram_id
           )
         ]
       );
 
       await client.query(
-        `
-          INSERT INTO orders (
-            id,
-            telegram_id,
-            status,
-
-            product_id,
-            product_name,
-            quantity,
-            unit_price,
-            total,
-            game_id,
-
-            user_first_name,
-            user_last_name,
-            user_username
-          )
-          VALUES (
-            $1,
-            $2,
-            'waiting',
-
-            $3,
-            $4,
-            $5,
-            $6,
-            $7,
-            $8,
-
-            $9,
-            $10,
-            $11
-          )
-        `,
-        [
-          orderId,
-          String(
-            lockedUser.telegram_id
-          ),
-
-          product.id,
-          product.name,
-          quantity,
-          product.price,
-          total,
-          gameId,
-
-          tgUser.first_name || "",
-          tgUser.last_name || "",
-          tgUser.username || ""
-        ]
-      );
-
-      await addTransaction({
-        telegramId:
-          lockedUser.telegram_id,
-
-        type:
-          "purchase",
-
-        amount:
-          -total,
-
-        description:
-          `Покупка: ${product.name} × ${quantity}`,
-
-        orderId,
-
-        client
-      });
-
-      const newBalance =
-        currentBalance - total;
-
-      await client.query(
-        "COMMIT"
-      );
-
-      const order = {
-        id: orderId,
-        telegramId:
-          String(
-            lockedUser.telegram_id
-          ),
-
-        status:
-          "waiting",
-
-        productId:
-          product.id,
-
-        productName:
-          product.name,
-
-        quantity,
-
-        unitPrice:
-          product.price,
-
-        total,
-
-        gameId,
-
-        user: {
-          telegramId:
-            tgUser.id,
-
-          firstName:
-            tgUser.first_name || "",
-
-          lastName:
-            tgUser.last_name || "",
-
-          username:
-            tgUser.username || ""
-        }
-      };
-
-      try {
-
-        await sendOrderToStaff(
-          order
-        );
-
-        // Уведомление покупателю не влияет на сам заказ:
-        // если сообщение не отправится, заказ всё равно остаётся создан.
-        await notifyOrderWaiting(
-          order
-        );
-
-      } catch (telegramError) {
-
-        const refundClient =
-          await pool.connect();
-
-        try {
-
-          await refundClient.query(
-            "BEGIN"
-          );
-
-          const refundUser =
-            await refundClient.query(
-              `
-                SELECT *
-                FROM users
-                WHERE telegram_id = $1
-                FOR UPDATE
-              `,
-              [
-                String(
-                  lockedUser.telegram_id
-                )
-              ]
-            );
-
-          if (
-            refundUser.rows.length
-          ) {
-
-            await refundClient.query(
-              `
-                UPDATE users
-                SET
-                  balance =
-                    balance + $1,
-                  updated_at =
-                    NOW()
-                WHERE telegram_id = $2
-              `,
-              [
-                total,
-                String(
-                  lockedUser.telegram_id
-                )
-              ]
-            );
-
-            await refundClient.query(
-              `
-                UPDATE orders
-                SET status = 'cancelled'
-                WHERE id = $1
-              `,
-              [
-                orderId
-              ]
-            );
-
-            await addTransaction({
-              telegramId:
-                lockedUser.telegram_id,
-
-              type:
-                "refund",
-
-              amount:
-                total,
-
-              description:
-                `Возврат за заказ ${orderId}: ошибка отправки`,
-
-              orderId,
-
-              client:
-                refundClient
-            });
-          }
-
-          await refundClient.query(
-            "COMMIT"
-          );
-
-        } catch (refundError) {
-
-          try {
-            await refundClient.query(
-              "ROLLBACK"
-            );
-          } catch {}
-
-          console.error(
-            "REFUND ERROR:",
-            refundError.message
-          );
-
-        } finally {
-
-          refundClient.release();
-        }
-
-        return res.status(500).json({
-          ok: false,
-          message:
-            "Не удалось отправить заказ сотрудникам. PT возвращены."
-        });
-      }
-
-      return res.json({
-        ok: true,
-        message:
-          "Заказ создан",
-
-        orderId,
-
-        balance:
-          newBalance,
-
-        order: {
-          id:
-            order.id,
-
-          productName:
-            order.productName,
-
-          quantity:
-            order.quantity,
-
-          total:
-            order.total,
-
-          status:
-            order.status
-        }
-      });
-
-    } catch (error) {
-
-      try {
-        await client.query(
-          "ROLLBACK"
-        );
-      } catch {}
-
-      console.error(
-        "BUY ERROR:",
-        error.message
-      );
-
-      return res.status(400).json({
-        ok: false,
-        message:
-          error.message ||
-          "Не удалось оформить заказ"
-      });
-
-    } finally {
-
-      client.release();
-    }
-  }
-);
-
-
-// ==========================================
-// УТИЛИТЫ СТАТУСА ЗАКАЗА
-// ==========================================
-
-function getStaffDisplayName(staff) {
-  const name = [
-    staff?.first_name || "",
-    staff?.last_name || ""
-  ]
-    .join(" ")
-    .trim();
-
-  if (name) {
-    return name;
-  }
-
-  if (staff?.username) {
-    return `@${staff.username}`;
-  }
-
-  return "Сотрудник";
-}
-
-function getStaffUsername(staff) {
-  return staff?.username
-    ? `@${staff.username}`
-    : "без username";
-}
-
-function buildStaffOrderText(order, status = "waiting", staff = null) {
-  const username =
-    order.user?.username
-      ? `@${order.user.username}`
-      : "без username";
-
-  let statusBlock = "⏳ СТАТУС: В ОЖИДАНИИ";
-
-  if (status === "claimed") {
-    const staffName =
-      order.claimed_by_name ||
-      getStaffDisplayName(staff);
-
-    const staffUsername =
-      order.claimed_by_username
-        ? `@${order.claimed_by_username}`
-        : "без username";
-
-    statusBlock =
-      `🟡 СТАТУС: ЗАКАЗ ВЗЯТ\n` +
-      `👤 Взял: ${staffName}\n` +
-      `🔗 ${staffUsername}`;
-  }
-
-  if (status === "completed") {
-    const staffName =
-      order.claimed_by_name ||
-      getStaffDisplayName(staff);
-
-    const staffUsername =
-      order.claimed_by_username
-        ? `@${order.claimed_by_username}`
-        : "без username";
-
-    statusBlock =
-      `✅ СТАТУС: ЗАКАЗ ВЫПОЛНЕН\n` +
-      `👤 Выполнил: ${staffName}\n` +
-      `🔗 ${staffUsername}`;
-  }
-
-  if (status === "cancelled") {
-    statusBlock = "❌ СТАТУС: ЗАКАЗ ОТМЕНЁН";
-  }
-
-  return [
-    "🛒 ЗАКАЗ",
-    "",
-    statusBlock,
-    "",
-    `📦 Товар: ${order.product_name || order.productName}`,
-    `🔢 Количество: ${order.quantity}`,
-    `💎 Сумма: ${order.total} PT`,
-    `🎮 Game ID: ${order.game_id || order.gameId}`,
-    "",
-    `👤 ${order.user_first_name || order.user?.firstName || ""} ${order.user_last_name || order.user?.lastName || ""}`.trim(),
-    `🔗 ${order.user_username ? `@${order.user_username}` : username}`,
-    `🆔 Telegram ID: ${order.telegram_id || order.telegramId}`,
-    "",
-    `🧾 Заказ: ${order.id}`
-  ].join("\n");
-}
-
-async function notifyOrderWaiting(order) {
-  try {
-    await telegramRequest(
-      "sendMessage",
-      {
-        chat_id: order.telegramId || order.telegram_id,
-        text:
-          `🕐 Заказ принят!\n\n` +
-          `📦 ${order.productName || order.product_name}\n` +
-          `🔢 Количество: ${order.quantity}\n` +
-          `💎 Сумма: ${order.total} PT\n\n` +
-          `⏳ Статус: ЗАКАЗ В ОЖИДАНИИ\n\n` +
-          `Ожидайте, пока сотрудник возьмёт заказ.\n\n` +
-          `🧾 Заказ: ${order.id}`
-      }
-    );
-  } catch (notifyError) {
-    console.error(
-      "NOTIFY ORDER WAITING ERROR:",
-      notifyError.message
-    );
-  }
-}
-
-async function notifyOrderClaimed(order, staffName, staffUsername) {
-  try {
-    await telegramRequest(
-      "sendMessage",
-      {
-        chat_id: order.telegram_id || order.telegramId,
-        text:
-          `🟡 Ваш заказ взят!\n\n` +
-          `📦 ${order.product_name || order.productName}\n` +
-          `🔢 Количество: ${order.quantity}\n` +
-          `💎 Сумма: ${order.total} PT\n\n` +
-          `🟡 Статус: ЗАКАЗ ВЗЯТ\n` +
-          `👤 Взял: ${staffName}` +
-          (staffUsername ? ` (@${staffUsername})` : "") +
-          `\n\n` +          `Сотрудник уже выполняет ваш заказ.\n\n` +
-          `🧾 Заказ: ${order.id}`
-      }
-    );
-  } catch (notifyError) {
-    console.error(
-      "NOTIFY ORDER CLAIM ERROR:",
-      notifyError.message
-    );
-  }
-}
-
-async function notifyOrderCompleted(order) {
-  try {
-    await telegramRequest(
-      "sendMessage",
-      {
-        chat_id: order.telegram_id,
-        text:
-          `✅ Ваш заказ выполнен!\n\n` +
-          `📦 ${order.product_name}\n` +
-          `🔢 Количество: ${order.quantity}\n` +
-          `💎 Списано: ${order.total} PT\n\n` +
-          `✅ Статус: ЗАКАЗ ВЫПОЛНЕН\n` +
-          `👤 Выполнил: ${order.claimed_by_name || "Сотрудник"}` +
-          (
-            order.claimed_by_username
-              ? ` (@${order.claimed_by_username})`
-              : ""
-          ) +
-          `\n\n` +
-          `🧾 Заказ: ${order.id}`
-      }
-    );
-  } catch (notifyError) {
-    console.error(
-      "NOTIFY ORDER COMPLETE ERROR:",
-      notifyError.message
-    );
-  }
-}
-
-// ==========================================
-// ОТПРАВКА ЗАКАЗА СОТРУДНИКАМ
-// ==========================================
-
-async function sendOrderToStaff(order) {
-  if (!STAFF_CHAT_ID) {
-    throw new Error(
-      "STAFF_CHAT_ID не настроен"
-    );
-  }
-
-  const text = buildStaffOrderText(
-    order,
-    "waiting"
-  );
-
-  return telegramRequest(
-    "sendMessage",
-    {
-      chat_id: STAFF_CHAT_ID,
-      text,
-
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: "✅ ВЗЯТЬ ЗАКАЗ",
-              callback_data:
-                `claim:${order.id}`
-            }
-          ]
-        ]
-      }
-    }
-  );
-}
-
-
-// ==========================================
-// ОТПРАВКА ЗАЯВКИ НА ПОПОЛНЕНИЕ
-// ==========================================
-
-async function sendTopupToPaymentChat(
-  topup
-) {
-  if (!PAYMENT_CHAT_ID) {
-    throw new Error(
-      "PAYMENT_CHAT_ID не настроен"
-    );
-  }
-
-  const username =
-    topup.user.username
-      ? `@${topup.user.username}`
-      : "без username";
-
-  const text = [
-    "💎 НОВАЯ ЗАЯВКА НА ПОПОЛНЕНИЕ",
-    "",
-    `💰 Оплата: ${topup.paymentRub} ₽`,
-    `💎 Зачисление: ${topup.totalPoints} PT`,
-    `🎁 Бонус: ${topup.bonusPoints} PT`,
-    `🎟️ Промокод: ${topup.promoPercent || "нет"}`,
-    "",
-    `👤 ${topup.user.firstName || ""} ${topup.user.lastName || ""}`.trim(),
-    `🔗 ${username}`,
-    `🆔 Telegram ID: ${topup.telegramId}`,
-    "",
-    `🧾 Заявка: ${topup.id}`,
-    "",
-    "⚠️ Перед зачислением обязательно проверь перевод вручную."
-  ].join("\n");
-
-  return telegramRequest(
-    "sendMessage",
-    {
-      chat_id: PAYMENT_CHAT_ID,
-      text,
-
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: "✅ ЗАЧИСЛИТЬ PT",
-              callback_data:
-                `topup_confirm:${topup.id}`
-            }
-          ],
-          [
-            {
-              text: "❌ ОТКЛОНИТЬ",
-              callback_data:
-                `topup_reject:${topup.id}`
-            }
-          ]
-        ]
-      }
-    }
-  );
-}
-
-
-// ==========================================
-// API: СТАТУС ЗАКАЗА
-// ==========================================
-
-app.post(
-  "/api/order/status",
-  async (req, res) => {
-    try {
-      const {
-        user
-      } =
-        await requireTelegramUser(
-          req
-        );
-
-      const orderId =
-        String(
-          req.body?.orderId ||
-          ""
-        ).trim();
-
-      if (!orderId) {
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Не указан ID заказа"
-        });
-      }
-
-      const result =
-        await pool.query(
-          `
-            SELECT
-              id,
-              telegram_id,
-              status,
-              product_id,
-              product_name,
-              quantity,
-              unit_price,
-              total,
-              game_id,
-              user_first_name,
-              user_last_name,
-              user_username,
-              claimed_by_id,
-              claimed_by_name,
-              claimed_by_username,
-              created_at,
-              completed_at
-            FROM orders
-            WHERE id = $1
-          `,
-          [
-            orderId
-          ]
-        );
-
-      if (!result.rows.length) {
-        return res.status(404).json({
-          ok: false,
-          message:
-            "Заказ не найден"
-        });
-      }
-
-      const order =
-        result.rows[0];
-
-      if (
-        String(order.telegram_id) !==
-        String(user.telegram_id)
-      ) {
-        return res.status(403).json({
-          ok: false,
-          message:
-            "Нет доступа к этому заказу"
-        });
-      }
-
-      return res.json({
-        ok: true,
-
-        order: {
-          id: order.id,
-
-          status:
-            order.status,
-
-          productName:
-            order.product_name,
-
-          quantity:
-            Number(order.quantity),
-
-          unitPrice:
-            Number(order.unit_price),
-
-          total:
-            Number(order.total),
-
-          gameId:
-            order.game_id,
-
-          claimedBy:
-            order.claimed_by_id
-              ? {
-                  id:
-                    String(
-                      order.claimed_by_id
-                    ),
-
-                  name:
-                    order.claimed_by_name ||
-                    "Сотрудник",
-
-                  username:
-                    order.claimed_by_username ||
-                    ""
-                }
-              : null,
-
-          createdAt:
-            order.created_at,
-
-          completedAt:
-            order.completed_at
-        }
-      });
-
-    } catch (error) {
-      console.error(
-        "ORDER STATUS ERROR:",
-        error.message
-      );
-
-      return res.status(400).json({
-        ok: false,
-        message:
-          error.message ||
-          "Ошибка получения статуса заказа"
-      });
-    }
-  }
-);
-
-
-// ==========================================
-// API: СОЗДАНИЕ ЗАЯВКИ НА ПОПОЛНЕНИЕ
-// ==========================================
-
-app.post(
-  "/api/topup/create",
-  async (req, res) => {
-
-    try {
-
-      const {
-        tgUser,
-        user
-      } =
-        await requireTelegramUser(
-          req
-        );
-
-      const amount =
-        Number(
-          req.body?.amount || 0
-        );
-
-      if (
-        !Number.isInteger(amount)
-      ) {
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Количество PT должно быть целым числом"
-        });
-      }
-
-      if (
-        amount < 1 ||
-        amount > 1000000
-      ) {
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Сумма пополнения должна быть от 1 до 1 000 000 PT"
-        });
-      }
-
-      const promoPercent =
-        normalizePromoCode(
-          req.body?.promoPercent
-        );
-
-      let percent = 0;
-
-      if (promoPercent) {
-
-        const promoResult =
-          await calculatePercentPromo(
-            user,
-            promoPercent
-          );
-
-        if (!promoResult.ok) {
-          return res.status(400).json({
-            ok: false,
-            message:
-              promoResult.message
-          });
-        }
-
-        percent =
-          promoResult.percent;
-      }
-
-      const bonusPoints =
-        Math.floor(
-          amount *
-          (percent / 100)
-        );
-
-      const totalPoints =
-        amount +
-        bonusPoints;
-
-      const paymentRub =
-        Math.ceil(
-          amount *
-          PT_RUB_RATE
-        );
-
-      if (
-        !Number.isFinite(
-          paymentRub
-        ) ||
-        paymentRub <= 0
-      ) {
-        return res.status(500).json({
-          ok: false,
-          message:
-            "Некорректный курс PT/₽"
-        });
-      }
-
-      if (
-        !PAYMENT_CARD ||
-        !PAYMENT_RECIPIENT
-      ) {
-        return res.status(500).json({
-          ok: false,
-          message:
-            "Реквизиты оплаты ещё не настроены"
-        });
-      }
-
-      const paymentId =
-        randomId("topup_");
-
-      await pool.query(
         `
           INSERT INTO topups (
             id,
@@ -2575,7 +1604,6 @@ app.post(
             percent,
             payment_rub,
             status,
-
             user_first_name,
             user_last_name,
             user_username
@@ -2590,219 +1618,25 @@ app.post(
             $7,
             $8,
             'waiting_payment',
-
             $9,
             $10,
             $11
           )
         `,
         [
-          paymentId,
-
+          topupId,
           String(
             user.telegram_id
           ),
-
-          amount,
+          amountPt,
           bonusPoints,
           totalPoints,
-
-          promoPercent || null,
-
+          promoResult.code,
           percent,
           paymentRub,
-
-          tgUser.first_name || "",
-          tgUser.last_name || "",
-          tgUser.username || ""
-        ]
-      );
-
-      return res.json({
-        ok: true,
-
-        paymentId,
-
-        amountPT:
-          amount,
-
-        bonusPoints,
-
-        totalPoints,
-
-        paymentRub,
-
-        promoPercent:
-          promoPercent || null,
-
-        payment: {
-          card:
-            PAYMENT_CARD,
-
-          recipient:
-            PAYMENT_RECIPIENT
-        },
-
-        status:
-          "waiting_payment",
-
-        message:
-          "Заявка создана. Выполните перевод и нажмите «Я оплатил»."
-      });
-
-    } catch (error) {
-
-      console.error(
-        "TOPUP CREATE ERROR:",
-        error.message
-      );
-
-      return res.status(400).json({
-        ok: false,
-        message:
-          error.message ||
-          "Не удалось создать заявку"
-      });
-    }
-  }
-);
-
-
-// ==========================================
-// API: ПОЛЬЗОВАТЕЛЬ НАЖАЛ «Я ОПЛАТИЛ»
-// ==========================================
-
-app.post(
-  "/api/topup/mark-paid",
-  async (req, res) => {
-
-    const client =
-      await pool.connect();
-
-    try {
-
-      const {
-        user
-      } =
-        await requireTelegramUser(
-          req
-        );
-
-      const paymentId =
-        String(
-          req.body?.paymentId ||
-          ""
-        ).trim();
-
-      if (!paymentId) {
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Не указан ID заявки"
-        });
-      }
-
-      await client.query(
-        "BEGIN"
-      );
-
-      const result =
-        await client.query(
-          `
-            SELECT *
-            FROM topups
-            WHERE id = $1
-            FOR UPDATE
-          `,
-          [
-            paymentId
-          ]
-        );
-
-      if (
-        !result.rows.length
-      ) {
-        await client.query(
-          "ROLLBACK"
-        );
-
-        return res.status(404).json({
-          ok: false,
-          message:
-            "Заявка не найдена"
-        });
-      }
-
-      const topup =
-        result.rows[0];
-
-      if (
-        String(
-          topup.telegram_id
-        ) !==
-        String(
-          user.telegram_id
-        )
-      ) {
-        await client.query(
-          "ROLLBACK"
-        );
-
-        return res.status(403).json({
-          ok: false,
-          message:
-            "Это не ваша заявка"
-        });
-      }
-
-      if (
-        topup.status ===
-        "paid_waiting_confirmation"
-      ) {
-
-        await client.query(
-          "COMMIT"
-        );
-
-        return res.json({
-          ok: true,
-          status:
-            topup.status,
-
-          message:
-            "Заявка уже отправлена на проверку"
-        });
-      }
-
-      if (
-        topup.status !==
-        "waiting_payment"
-      ) {
-
-        await client.query(
-          "ROLLBACK"
-        );
-
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Эта заявка больше не может быть оплачена"
-        });
-      }
-
-      await client.query(
-        `
-          UPDATE topups
-          SET
-            status =
-              'paid_waiting_confirmation',
-
-            paid_at =
-              NOW()
-          WHERE id = $1
-        `,
-        [
-          paymentId
+          user.first_name || "",
+          user.last_name || "",
+          user.username || ""
         ]
       );
 
@@ -2810,95 +1644,56 @@ app.post(
         "COMMIT"
       );
 
-      const topupForTelegram = {
-        id:
-          topup.id,
-
-        telegramId:
-          topup.telegram_id,
-
-        amountPT:
-          Number(
-            topup.amount_pt
-          ),
-
-        bonusPoints:
-          Number(
-            topup.bonus_points
-          ),
-
-        totalPoints:
-          Number(
-            topup.total_points
-          ),
-
-        promoPercent:
-          topup.promo_percent,
-
-        percent:
-          Number(
-            topup.percent
-          ),
-
-        paymentRub:
-          Number(
-            topup.payment_rub
-          ),
-
-        user: {
-          firstName:
-            topup.user_first_name || "",
-
-          lastName:
-            topup.user_last_name || "",
-
-          username:
-            topup.user_username || ""
-        }
-      };
-
-      try {
-
-        await sendTopupToPaymentChat(
-          topupForTelegram
-        );
-
-      } catch (telegramError) {
-
+      const result =
         await pool.query(
           `
-            UPDATE topups
-            SET
-              status =
-                'waiting_payment',
-
-              paid_at = NULL
+            SELECT *
+            FROM topups
             WHERE id = $1
-              AND status =
-                'paid_waiting_confirmation'
           `,
-          [
-            paymentId
-          ]
+          [topupId]
         );
 
-        return res.status(500).json({
-          ok: false,
-          message:
-            "Не удалось отправить заявку в чат оплаты. Попробуйте ещё раз."
-        });
+      const topup =
+        result.rows[0];
+
+      try {
+        await notifyUserTopupWaiting(
+          topup
+        );
+      } catch (error) {
+        console.error(
+          "USER TOPUP NOTIFY ERROR:",
+          error.message
+        );
       }
 
-      return res.json({
+      try {
+        await notifyTopupCreated(
+          topup
+        );
+      } catch (error) {
+        console.error(
+          "STAFF TOPUP NOTIFY ERROR:",
+          error.message
+        );
+      }
+
+      res.json({
         ok: true,
-
-        paymentId,
-
-        status:
-          "paid_waiting_confirmation",
-
-        message:
-          "Заявка отправлена на проверку. Ожидайте подтверждения оплаты."
+        topup: {
+          id: topup.id,
+          amountPt:
+            topup.amount_pt,
+          bonusPoints:
+            topup.bonus_points,
+          totalPoints:
+            topup.total_points,
+          paymentRub:
+            topup.payment_rub,
+          status:
+            topup.status
+        }
       });
 
     } catch (error) {
@@ -2910,15 +1705,15 @@ app.post(
       } catch {}
 
       console.error(
-        "MARK PAID ERROR:",
+        "TOPUP ERROR:",
         error.message
       );
 
-      return res.status(400).json({
+      res.status(400).json({
         ok: false,
         message:
           error.message ||
-          "Не удалось отметить оплату"
+          "Ошибка создания пополнения"
       });
 
     } finally {
@@ -2926,143 +1721,43 @@ app.post(
       client.release();
     }
   }
-);
+);  const text =
+    buildStaffOrderText(
+      order,
+      "waiting"
+    );
 
+  const keyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: "✅ ВЗЯТЬ ЗАКАЗ",
+          callback_data:
+            `claim:${order.id}`
+        }
+      ]
+    ]
+  };
 
-// ==========================================
-// API: СТАТУС ПОПОЛНЕНИЯ
-// ==========================================
-
-app.post(
-  "/api/topup/status",
-  async (req, res) => {
-
-    try {
-
-      const {
-        user
-      } =
-        await requireTelegramUser(
-          req
-        );
-
-      const paymentId =
-        String(
-          req.body?.paymentId ||
-          ""
-        ).trim();
-
-      if (!paymentId) {
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Не указан ID заявки"
-        });
-      }
-
-      const result =
-        await pool.query(
-          `
-            SELECT *
-            FROM topups
-            WHERE id = $1
-          `,
-          [
-            paymentId
-          ]
-        );
-
-      if (
-        !result.rows.length
-      ) {
-        return res.status(404).json({
-          ok: false,
-          message:
-            "Заявка не найдена"
-        });
-      }
-
-      const topup =
-        result.rows[0];
-
-      if (
-        String(
-          topup.telegram_id
-        ) !==
-        String(
-          user.telegram_id
-        )
-      ) {
-        return res.status(403).json({
-          ok: false,
-          message:
-            "Нет доступа к этой заявке"
-        });
-      }
-
-      return res.json({
-        ok: true,
-
-        paymentId:
-          topup.id,
-
-        status:
-          topup.status,
-
-        amountPT:
-          Number(
-            topup.amount_pt
-          ),
-
-        bonusPoints:
-          Number(
-            topup.bonus_points
-          ),
-
-        totalPoints:
-          Number(
-            topup.total_points
-          ),
-
-        paymentRub:
-          Number(
-            topup.payment_rub
-          ),
-
-        createdAt:
-          topup.created_at,
-
-        paidAt:
-          topup.paid_at,
-
-        confirmedAt:
-          topup.confirmed_at
-      });
-
-    } catch (error) {
-
-      console.error(
-        "TOPUP STATUS ERROR:",
-        error.message
-      );
-
-      return res.status(400).json({
-        ok: false,
-        message:
-          error.message ||
-          "Ошибка получения статуса"
-      });
+  return telegramRequest(
+    "sendMessage",
+    {
+      chat_id:
+        STAFF_CHAT_ID,
+      text,
+      reply_markup:
+        keyboard
     }
-  }
-);
+  );
+}
 
 
 // ==========================================
-// ПОЛУЧИТЬ ПОЛЬЗОВАТЕЛЯ ИЗ БД
+// ПОЛУЧЕНИЕ ЗАКАЗА ИЗ БАЗЫ
 // ==========================================
 
-async function getUserByTelegramId(
-  telegramId,
+async function getOrderById(
+  orderId,
   client = null
 ) {
   const executor =
@@ -3072,19 +1767,13 @@ async function getUserByTelegramId(
     await executor.query(
       `
         SELECT *
-        FROM users
-        WHERE telegram_id = $1
+        FROM orders
+        WHERE id = $1
       `,
-      [
-        String(
-          telegramId
-        )
-      ]
+      [orderId]
     );
 
-  if (
-    !result.rows.length
-  ) {
+  if (!result.rows.length) {
     return null;
   }
 
@@ -3093,25 +1782,35 @@ async function getUserByTelegramId(
 
 
 // ==========================================
-// ПОДТВЕРЖДЕНИЕ ПОПОЛНЕНИЯ
+// УВЕДОМЛЕНИЕ О ВЗЯТИИ ЗАКАЗА
 // ==========================================
 
-async function handleTopupConfirm(
+async function handleClaim(
   callbackQuery,
-  paymentId
+  orderId
 ) {
   if (
     String(
       callbackQuery.message?.chat?.id
     ) !==
-    String(
-      PAYMENT_CHAT_ID
-    )
+    String(STAFF_CHAT_ID)
   ) {
-    throw new Error(
-      "Недоступно вне чата оплаты"
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+        text:
+          "❌ У вас нет доступа",
+        show_alert: true
+      }
     );
+
+    return;
   }
+
+  const staff =
+    callbackQuery.from;
 
   const client =
     await pool.connect();
@@ -3122,7 +1821,648 @@ async function handleTopupConfirm(
       "BEGIN"
     );
 
-    const topupResult =
+    const result =
+      await client.query(
+        `
+          SELECT *
+          FROM orders
+          WHERE id = $1
+          FOR UPDATE
+        `,
+        [orderId]
+      );
+
+    if (!result.rows.length) {
+
+      await client.query(
+        "ROLLBACK"
+      );
+
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id,
+          text:
+            "❌ Заказ не найден",
+          show_alert: true
+        }
+      );
+
+      return;
+    }
+
+    const order =
+      result.rows[0];
+
+    if (
+      order.status !==
+      "waiting"
+    ) {
+
+      await client.query(
+        "ROLLBACK"
+      );
+
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id,
+          text:
+            "⚠️ Этот заказ уже взят или выполнен",
+          show_alert: true
+        }
+      );
+
+      return;
+    }
+
+    const staffName =
+      getStaffDisplayName(
+        staff
+      );
+
+    const staffUsername =
+      staff.username ||
+      "";
+
+    await client.query(
+      `
+        UPDATE orders
+        SET
+          status = 'claimed',
+          claimed_by_id = $1,
+          claimed_by_name = $2,
+          claimed_by_username = $3
+        WHERE id = $4
+      `,
+      [
+        String(staff.id),
+        staffName,
+        staffUsername,
+        orderId
+      ]
+    );
+
+    await client.query(
+      "COMMIT"
+    );
+
+    const updatedOrder =
+      await getOrderById(
+        orderId
+      );
+
+    const staffText =
+      buildStaffOrderText(
+        updatedOrder,
+        "claimed"
+      );
+
+    const keyboard = {
+      inline_keyboard: [
+        [
+          {
+            text:
+              "✅ ВЫПОЛНИТЬ ЗАКАЗ",
+            callback_data:
+              `complete:${orderId}`
+          }
+        ]
+      ]
+    };
+
+    try {
+
+      await telegramRequest(
+        "editMessageText",
+        {
+          chat_id:
+            callbackQuery.message
+              .chat.id,
+
+          message_id:
+            callbackQuery.message
+              .message_id,
+
+          text:
+            staffText,
+
+          reply_markup:
+            keyboard
+        }
+      );
+
+    } catch (editError) {
+
+      console.error(
+        "EDIT CLAIMED ORDER ERROR:",
+        editError.message
+      );
+    }
+
+    try {
+
+      await notifyOrderClaimed(
+        updatedOrder,
+        staffName,
+        staffUsername
+      );
+
+    } catch (notifyError) {
+
+      console.error(
+        "CLAIM USER NOTIFY ERROR:",
+        notifyError.message
+      );
+    }
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+        text:
+          "✅ Заказ взят"
+      }
+    );
+
+  } catch (error) {
+
+    try {
+      await client.query(
+        "ROLLBACK"
+      );
+    } catch {}
+
+    console.error(
+      "CLAIM ERROR:",
+      error.message
+    );
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+        text:
+          "❌ Ошибка при взятии заказа",
+        show_alert: true
+      }
+    );
+
+  } finally {
+
+    client.release();
+  }
+}
+
+
+// ==========================================
+// ВЫПОЛНЕНИЕ ЗАКАЗА
+// ==========================================
+
+async function handleComplete(
+  callbackQuery,
+  orderId
+) {
+  if (
+    String(
+      callbackQuery.message?.chat?.id
+    ) !==
+    String(STAFF_CHAT_ID)
+  ) {
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+        text:
+          "❌ У вас нет доступа",
+        show_alert: true
+      }
+    );
+
+    return;
+  }
+
+  const staff =
+    callbackQuery.from;
+
+  const client =
+    await pool.connect();
+
+  try {
+
+    await client.query(
+      "BEGIN"
+    );
+
+    const result =
+      await client.query(
+        `
+          SELECT *
+          FROM orders
+          WHERE id = $1
+          FOR UPDATE
+        `,
+        [orderId]
+      );
+
+    if (!result.rows.length) {
+
+      await client.query(
+        "ROLLBACK"
+      );
+
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id,
+          text:
+            "❌ Заказ не найден",
+          show_alert: true
+        }
+      );
+
+      return;
+    }
+
+    const order =
+      result.rows[0];
+
+    if (
+      order.status !==
+      "claimed"
+    ) {
+
+      await client.query(
+        "ROLLBACK"
+      );
+
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id,
+          text:
+            "⚠️ Заказ нельзя выполнить в текущем статусе",
+          show_alert: true
+        }
+      );
+
+      return;
+    }
+
+    if (
+      String(
+        order.claimed_by_id
+      ) !==
+      String(staff.id)
+    ) {
+
+      await client.query(
+        "ROLLBACK"
+      );
+
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id,
+          text:
+            "❌ Выполнить заказ может только сотрудник, который его взял",
+          show_alert: true
+        }
+      );
+
+      return;
+    }
+
+    await client.query(
+      `
+        UPDATE orders
+        SET
+          status = 'completed',
+          completed_at = NOW()
+        WHERE id = $1
+      `,
+      [orderId]
+    );
+
+    await client.query(
+      "COMMIT"
+    );
+
+    const updatedOrder =
+      await getOrderById(
+        orderId
+      );
+
+    const staffText =
+      buildStaffOrderText(
+        updatedOrder,
+        "completed"
+      );
+
+    try {
+
+      await telegramRequest(
+        "editMessageText",
+        {
+          chat_id:
+            callbackQuery.message
+              .chat.id,
+
+          message_id:
+            callbackQuery.message
+              .message_id,
+
+          text:
+            staffText
+        }
+      );
+
+    } catch (editError) {
+
+      console.error(
+        "EDIT COMPLETED ORDER ERROR:",
+        editError.message
+      );
+    }
+
+    try {
+
+      await notifyOrderCompleted(
+        updatedOrder
+      );
+
+    } catch (notifyError) {
+
+      console.error(
+        "COMPLETE USER NOTIFY ERROR:",
+        notifyError.message
+      );
+    }
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+        text:
+          "✅ Заказ выполнен"
+      }
+    );
+
+  } catch (error) {
+
+    try {
+      await client.query(
+        "ROLLBACK"
+      );
+    } catch {}
+
+    console.error(
+      "COMPLETE ERROR:",
+      error.message
+    );
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+        text:
+          "❌ Ошибка выполнения заказа",
+        show_alert: true
+      }
+    );
+
+  } finally {
+
+    client.release();
+  }
+}
+
+
+// ==========================================
+// ПОПОЛНЕНИЕ: ПОЛЬЗОВАТЕЛЬ НАЖАЛ «ОПЛАЧЕНО»
+// ==========================================
+
+async function handleTopupPaid(
+  callbackQuery,
+  topupId
+) {
+  const callbackUser =
+    callbackQuery.from;
+
+  const client =
+    await pool.connect();
+
+  try {
+
+    const chatId =
+      String(
+        callbackQuery.message?.chat?.id
+      );
+
+    const paymentChat =
+      String(
+        PAYMENT_CHAT_ID
+      );
+
+    const isStaffChat =
+      chatId === paymentChat;
+
+    if (
+      !isStaffChat
+    ) {
+
+      const user =
+        await getOrCreateUser(
+          callbackUser
+        );
+
+      const result =
+        await client.query(
+          `
+            SELECT *
+            FROM topups
+            WHERE id = $1
+              AND telegram_id = $2
+          `,
+          [
+            topupId,
+            String(
+              user.telegram_id
+            )
+          ]
+        );
+
+      if (!result.rows.length) {
+
+        await telegramRequest(
+          "answerCallbackQuery",
+          {
+            callback_query_id:
+              callbackQuery.id,
+            text:
+              "❌ Пополнение не найдено",
+            show_alert: true
+          }
+        );
+
+        return;
+      }
+
+      const topup =
+        result.rows[0];
+
+      if (
+        topup.status !==
+        "waiting_payment"
+      ) {
+
+        await telegramRequest(
+          "answerCallbackQuery",
+          {
+            callback_query_id:
+              callbackQuery.id,
+            text:
+              "⚠️ Это пополнение уже обработано",
+            show_alert: true
+          }
+        );
+
+        return;
+      }
+
+      await client.query(
+        `
+          UPDATE topups
+          SET status = 'paid'
+          WHERE id = $1
+        `,
+        [topupId]
+      );
+
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id,
+          text:
+            "✅ Информация об оплате отправлена"
+        }
+      );
+
+      const updated =
+        await client.query(
+          `
+            SELECT *
+            FROM topups
+            WHERE id = $1
+          `,
+          [topupId]
+        );
+
+      try {
+
+        await notifyTopupPaid(
+          updated.rows[0]
+        );
+
+      } catch (notifyError) {
+
+        console.error(
+          "TOPUP PAID STAFF NOTIFY ERROR:",
+          notifyError.message
+        );
+      }
+
+      return;
+    }
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+        text:
+          "❌ Эта кнопка доступна пользователю"
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "TOPUP PAID ERROR:",
+      error.message
+    );
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+        text:
+          "❌ Ошибка",
+        show_alert: true
+      }
+    );
+
+  } finally {
+
+    client.release();
+  }
+}
+
+
+// ==========================================
+// ПОДТВЕРЖДЕНИЕ ПОПОЛНЕНИЯ СОТРУДНИКОМ
+// ==========================================
+
+async function handleTopupConfirm(
+  callbackQuery,
+  topupId
+) {
+  if (
+    String(
+      callbackQuery.message?.chat?.id
+    ) !==
+    String(PAYMENT_CHAT_ID)
+  ) {
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+        text:
+          "❌ Нет доступа",
+        show_alert: true
+      }
+    );
+
+    return;
+  }
+
+  const staff =
+    callbackQuery.from;
+
+  const client =
+    await pool.connect();
+
+  try {
+
+    await client.query(
+      "BEGIN"
+    );
+
+    const result =
       await client.query(
         `
           SELECT *
@@ -3130,38 +2470,55 @@ async function handleTopupConfirm(
           WHERE id = $1
           FOR UPDATE
         `,
-        [
-          paymentId
-        ]
+        [topupId]
       );
 
-    if (
-      !topupResult.rows.length
-    ) {
-      throw new Error(
-        "Заявка на пополнение не найдена"
+    if (!result.rows.length) {
+
+      await client.query(
+        "ROLLBACK"
       );
+
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id,
+          text:
+            "❌ Пополнение не найдено",
+          show_alert: true
+        }
+      );
+
+      return;
     }
 
     const topup =
-      topupResult.rows[0];
-
-    if (
-      topup.status ===
-      "completed"
-    ) {
-      throw new Error(
-        "PT по этой заявке уже были начислены"
-      );
-    }
+      result.rows[0];
 
     if (
       topup.status !==
-      "paid_waiting_confirmation"
+        "paid" &&
+      topup.status !==
+        "waiting_payment"
     ) {
-      throw new Error(
-        `Нельзя подтвердить заявку в статусе: ${topup.status}`
+
+      await client.query(
+        "ROLLBACK"
       );
+
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id,
+          text:
+            "⚠️ Пополнение уже обработано",
+          show_alert: true
+        }
+      );
+
+      return;
     }
 
     const userResult =
@@ -3183,7 +2540,7 @@ async function handleTopupConfirm(
       !userResult.rows.length
     ) {
       throw new Error(
-        "Пользователь заявки не найден"
+        "Пользователь не найден"
       );
     }
 
@@ -3191,48 +2548,49 @@ async function handleTopupConfirm(
       userResult.rows[0];
 
     const promoCode =
-      topup.promo_percent
-        ? normalizePromoCode(
-            topup.promo_percent
-          )
-        : "";
+      normalizePromoCode(
+        topup.promo_percent
+      );
 
-    let finalBonus = 0;
+    let bonusPoints =
+      Number(
+        topup.bonus_points || 0
+      );
 
-    // ========================================
-    // ПРОВЕРКА ПРОЦЕНТНОГО ПРОМОКОДА
-    // ========================================
-
-    if (promoCode) {
+    if (
+      promoCode &&
+      bonusPoints > 0
+    ) {
 
       const promoResult =
-        await calculatePercentPromo(      if (!promoResult.ok) {
+        await calculatePercentPromo(
+          user,
+          promoCode
+        );
+
+      if (!promoResult.ok) {
         throw new Error(
-          `Промокод ${promoCode} больше нельзя применить: ${promoResult.message}`
+          promoResult.message
         );
       }
 
-      finalBonus =
+      bonusPoints =
         Math.floor(
-          Number(topup.amount_pt) *
-          (
-            Number(promoResult.percent) /
-            100
-          )
+          Number(
+            topup.amount_pt
+          ) *
+          Number(
+            promoResult.percent || 0
+          ) /
+          100
         );
-
-      await activatePromoCode(
-        user,
-        promoCode,
-        client
-      );
     }
 
-    const amountPT =
-      Number(topup.amount_pt);
-
     const totalPoints =
-      amountPT + finalBonus;
+      Number(
+        topup.amount_pt
+      ) +
+      bonusPoints;
 
     const balanceBefore =
       Number(
@@ -3242,6 +2600,17 @@ async function handleTopupConfirm(
     const balanceAfter =
       balanceBefore +
       totalPoints;
+
+    if (
+      promoCode &&
+      bonusPoints > 0
+    ) {
+      await activatePromoCode(
+        user,
+        promoCode,
+        client
+      );
+    }
 
     await client.query(
       `
@@ -3263,37 +2632,24 @@ async function handleTopupConfirm(
       `
         UPDATE topups
         SET
-          bonus_points = $1,
-          total_points = $2,
-          percent = $3,
-          status = 'completed',
+          status = 'confirmed',
+          total_points = $1,
+          bonus_points = $2,
           confirmed_at = NOW(),
-          confirmed_by_id = $4,
-          confirmed_by_name = $5,
-          confirmed_by_username = $6
-        WHERE id = $7
+          confirmed_by_id = $3,
+          confirmed_by_name = $4,
+          confirmed_by_username = $5
+        WHERE id = $6
       `,
       [
-        finalBonus,
         totalPoints,
-        promoCode
-          ? Number(
-              topup.percent || 0
-            )
-          : 0,
-
-        String(
-          callbackQuery.from.id
-        ),
-
+        bonusPoints,
+        String(staff.id),
         getStaffDisplayName(
-          callbackQuery.from
+          staff
         ),
-
-        callbackQuery.from.username ||
-          "",
-
-        paymentId
+        staff.username || "",
+        topupId
       ]
     );
 
@@ -3308,15 +2664,9 @@ async function handleTopupConfirm(
         totalPoints,
 
       description:
-        `Пополнение ${amountPT} PT` +
-        (
-          finalBonus > 0
-            ? ` + бонус ${finalBonus} PT`
-            : ""
-        ),
+        `Пополнение ${topupId}`,
 
-      topupId:
-        paymentId,
+      topupId,
 
       client
     });
@@ -3325,61 +2675,20 @@ async function handleTopupConfirm(
       "COMMIT"
     );
 
-    const staffName =
-      getStaffDisplayName(
-        callbackQuery.from
+    const updated =
+      await pool.query(
+        `
+          SELECT *
+          FROM topups
+          WHERE id = $1
+        `,
+        [topupId]
       );
 
     try {
 
-      await telegramRequest(
-        "editMessageText",
-        {
-          chat_id:
-            callbackQuery.message.chat.id,
-
-          message_id:
-            callbackQuery.message.message_id,
-
-          text:
-            callbackQuery.message.text +
-            `\n\n━━━━━━━━━━━━━━\n` +
-            `✅ ЗАЧИСЛЕНО\n` +
-            `👤 Подтвердил: ${staffName}` +
-            (
-              callbackQuery.from.username
-                ? ` (@${callbackQuery.from.username})`
-                : ""
-            )
-        }
-      );
-
-    } catch (editError) {
-
-      console.error(
-        "TOPUP CONFIRM EDIT ERROR:",
-        editError.message
-      );
-    }
-
-    try {
-
-      await telegramRequest(
-        "sendMessage",
-        {
-          chat_id:
-            user.telegram_id,
-
-          text:
-            `✅ Пополнение подтверждено!\n\n` +
-            `💎 Зачислено: ${totalPoints} PT\n` +
-            (
-              finalBonus > 0
-                ? `🎁 Бонус: +${finalBonus} PT\n`
-                : ""
-            ) +
-            `💰 Новый баланс: ${balanceAfter} PT`
-        }
+      await notifyTopupConfirmed(
+        updated.rows[0]
       );
 
     } catch (notifyError) {
@@ -3390,7 +2699,250 @@ async function handleTopupConfirm(
       );
     }
 
-    return true;
+    try {
+
+      await telegramRequest(
+        "editMessageText",
+        {
+          chat_id:
+            callbackQuery.message
+              .chat.id,
+
+          message_id:
+            callbackQuery.message
+              .message_id,
+
+          text:
+            `✅ ПОПОЛНЕНИЕ ПОДТВЕРЖДЕНО\n\n` +
+            `🆔 ID: ${topupId}\n` +
+            `👤 ${topup.user_first_name || ""} ${topup.user_last_name || ""}\n` +
+            `💎 Начислено: ${totalPoints} PT\n` +
+            `🎁 Бонус: ${bonusPoints} PT\n\n` +
+            `👤 Подтвердил: ${getStaffDisplayName(staff)}`
+        }
+      );
+
+    } catch (editError) {
+
+      console.error(
+        "EDIT TOPUP CONFIRM ERROR:",
+        editError.message
+      );
+    }
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+        text:
+          `✅ Начислено ${totalPoints} PT`
+      }
+    );
+
+  } catch (error) {
+
+    try {
+      await client.query(
+        "ROLLBACK"
+      );
+    } catch {}
+
+    console.error(
+      "TOPUP CONFIRM ERROR:",
+      error.message
+    );
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+        text:
+          error.message ||
+          "❌ Ошибка подтверждения",
+        show_alert: true
+      }
+    );
+
+  } finally {
+
+    client.release();
+  }
+}    }
+
+    const oldBalance =
+      Number(
+        user.balance || 0
+      );
+
+    const totalPoints =
+      Number(
+        topup.amount_pt
+      ) +
+      finalBonus;
+
+    const newBalance =
+      oldBalance +
+      totalPoints;
+
+    await client.query(
+      `
+        UPDATE users
+        SET
+          balance = $1,
+          updated_at = NOW()
+        WHERE telegram_id = $2
+      `,
+      [
+        newBalance,
+        String(
+          user.telegram_id
+        )
+      ]
+    );
+
+    await addTransaction({
+      telegramId:
+        user.telegram_id,
+
+      type:
+        "topup",
+
+      amount:
+        totalPoints,
+
+      description:
+        `Пополнение ${topup.amount_pt} PT` +
+        (
+          finalBonus > 0
+            ? ` + ${finalBonus} PT бонус`
+            : ""
+        ),
+
+      topupId:
+        topup.id,
+
+      client
+    });
+
+    const staff =
+      callbackQuery.from;
+
+    await client.query(
+      `
+        UPDATE topups
+        SET
+          status = 'completed',
+
+          confirmed_at = NOW(),
+
+          confirmed_by_id = $1,
+          confirmed_by_name = $2,
+          confirmed_by_username = $3,
+
+          bonus_points = $4,
+          total_points = $5
+        WHERE id = $6
+      `,
+      [
+        String(staff.id),
+
+        [
+          staff.first_name || "",
+          staff.last_name || ""
+        ]
+          .join(" ")
+          .trim(),
+
+        staff.username || "",
+
+        finalBonus,
+        totalPoints,
+
+        topup.id
+      ]
+    );
+
+    await client.query(
+      "COMMIT"
+    );
+
+    const staffName =
+      [
+        staff.first_name || "",
+        staff.last_name || ""
+      ]
+        .join(" ")
+        .trim() ||
+      "Сотрудник";
+
+    await telegramRequest(
+      "editMessageReplyMarkup",
+      {
+        chat_id:
+          callbackQuery.message.chat.id,
+
+        message_id:
+          callbackQuery.message.message_id,
+
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text:
+                  `✅ ЗАЧИСЛЕНО: ${totalPoints} PT`
+                    .slice(
+                      0,
+                      64
+                    ),
+
+                callback_data:
+                  "noop"
+              }
+            ]
+          ]
+        }
+      }
+    );
+
+    try {
+
+      await telegramRequest(
+        "sendMessage",
+        {
+          chat_id:
+            topup.telegram_id,
+
+          text:
+            `✅ Пополнение подтверждено!\n\n` +
+            `💰 Оплачено: ${topup.payment_rub} ₽\n` +
+            `💎 Зачислено: ${totalPoints} PT\n` +
+            (
+              finalBonus > 0
+                ? `🎁 Бонус: +${finalBonus} PT\n`
+                : ""
+            ) +
+            `💳 Новый баланс: ${newBalance} PT\n\n` +
+            `🧾 Заявка: ${topup.id}`
+        }
+      );
+
+    } catch (notifyError) {
+
+      console.error(
+        "NOTIFY TOPUP USER ERROR:",
+        notifyError.message
+      );
+    }
+
+    return {
+      ok: true,
+      totalPoints,
+      balance:
+        newBalance,
+      staffName
+    };
 
   } catch (error) {
 
@@ -3465,19 +3017,19 @@ async function handleTopupReject(
 
     if (
       topup.status ===
-      "completed"
+      "rejected"
     ) {
       throw new Error(
-        "Эта заявка уже подтверждена"
+        "Заявка уже отклонена"
       );
     }
 
     if (
       topup.status ===
-      "rejected"
+      "completed"
     ) {
       throw new Error(
-        "Эта заявка уже отклонена"
+        "Нельзя отклонить уже подтверждённое пополнение"
       );
     }
 
@@ -3490,28 +3042,33 @@ async function handleTopupReject(
       );
     }
 
+    const staff =
+      callbackQuery.from;
+
     await client.query(
       `
         UPDATE topups
         SET
           status = 'rejected',
+
           rejected_at = NOW(),
+
           rejected_by_id = $1,
           rejected_by_name = $2,
           rejected_by_username = $3
         WHERE id = $4
       `,
       [
-        String(
-          callbackQuery.from.id
-        ),
+        String(staff.id),
 
-        getStaffDisplayName(
-          callbackQuery.from
-        ),
+        [
+          staff.first_name || "",
+          staff.last_name || ""
+        ]
+          .join(" ")
+          .trim(),
 
-        callbackQuery.from.username ||
-          "",
+        staff.username || "",
 
         paymentId
       ]
@@ -3521,37 +3078,43 @@ async function handleTopupReject(
       "COMMIT"
     );
 
-    try {
+    const staffName =
+      [
+        staff.first_name || "",
+        staff.last_name || ""
+      ]
+        .join(" ")
+        .trim() ||
+      "Сотрудник";
 
-      await telegramRequest(
-        "editMessageText",
-        {
-          chat_id:
-            callbackQuery.message.chat.id,
+    await telegramRequest(
+      "editMessageReplyMarkup",
+      {
+        chat_id:
+          callbackQuery.message.chat.id,
 
-          message_id:
-            callbackQuery.message.message_id,
+        message_id:
+          callbackQuery.message.message_id,
 
-          text:
-            callbackQuery.message.text +
-            `\n\n━━━━━━━━━━━━━━\n` +
-            `❌ ОТКЛОНЕНО\n` +
-            `👤 Отклонил: ${getStaffDisplayName(callbackQuery.from)}` +
-            (
-              callbackQuery.from.username
-                ? ` (@${callbackQuery.from.username})`
-                : ""
-            )
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text:
+                  `❌ ОТКЛОНЕНО: ${staffName}`
+                    .slice(
+                      0,
+                      64
+                    ),
+
+                callback_data:
+                  "noop"
+              }
+            ]
+          ]
         }
-      );
-
-    } catch (editError) {
-
-      console.error(
-        "TOPUP REJECT EDIT ERROR:",
-        editError.message
-      );
-    }
+      }
+    );
 
     try {
 
@@ -3562,21 +3125,26 @@ async function handleTopupReject(
             topup.telegram_id,
 
           text:
-            `❌ Пополнение отклонено.\n\n` +
-            `Заявка: ${paymentId}\n` +
-            `Если вы уверены, что оплатили, обратитесь к сотруднику.`
+            `❌ Заявка на пополнение отклонена.\n\n` +
+            `💰 Сумма: ${topup.payment_rub} ₽\n` +
+            `💎 PT: ${topup.total_points}\n\n` +
+            `🧾 Заявка: ${topup.id}\n\n` +
+            `Если вы действительно отправили оплату, обратитесь к сотруднику магазина.`
         }
       );
 
     } catch (notifyError) {
 
       console.error(
-        "TOPUP REJECT USER NOTIFY ERROR:",
+        "NOTIFY REJECT ERROR:",
         notifyError.message
       );
     }
 
-    return true;
+    return {
+      ok: true,
+      staffName
+    };
 
   } catch (error) {
 
@@ -3596,7 +3164,7 @@ async function handleTopupReject(
 
 
 // ==========================================
-// ВЗЯТИЕ ЗАКАЗА СОТРУДНИКОМ
+// ЗАБРАТЬ ЗАКАЗ
 // ==========================================
 
 async function handleClaim(
@@ -3620,7 +3188,6 @@ async function handleClaim(
     await pool.connect();
 
   try {
-
     await client.query(
       "BEGIN"
     );
@@ -3654,7 +3221,7 @@ async function handleClaim(
       "waiting"
     ) {
       throw new Error(
-        "Этот заказ уже взят или выполнен"
+        "Этот заказ уже взят или завершён"
       );
     }
 
@@ -3666,14 +3233,12 @@ async function handleClaim(
         staff
       );
 
-    const staffUsername =
-      staff.username || "";
-
     await client.query(
       `
         UPDATE orders
         SET
           status = 'claimed',
+
           claimed_by_id = $1,
           claimed_by_name = $2,
           claimed_by_username = $3
@@ -3686,7 +3251,7 @@ async function handleClaim(
 
         staffName,
 
-        staffUsername,
+        staff.username || "",
 
         orderId
       ]
@@ -3696,84 +3261,54 @@ async function handleClaim(
       "COMMIT"
     );
 
-    try {
-
-      await telegramRequest(
-        "editMessageText",
-        {
-          chat_id:
-            callbackQuery.message.chat.id,
-
-          message_id:
-            callbackQuery.message.message_id,
-
-          text:
-            buildStaffOrderText(
-              {
-                ...order,
-                status:
-                  "claimed",
-                claimed_by_id:
-                  String(
-                    staff.id
-                  ),
-                claimed_by_name:
-                  staffName,
-                claimed_by_username:
-                  staffUsername
-              },
-              "claimed",
-              staff
-            ),
-
-          reply_markup: {
-            inline_keyboard: [
-              [
-                {
-                  text:
-                    "✅ ЗАКАЗ ВЫПОЛНЕН",
-                  callback_data:
-                    `complete:${orderId}`
-                }
-              ]
-            ]
-          }
-        }
-      );
-
-    } catch (editError) {
-
-      console.error(
-        "CLAIM EDIT ERROR:",
-        editError.message
-      );
-    }
-
     const claimedOrder = {
       ...order,
-
-      status:
-        "claimed",
-
+      status: "claimed",
       claimed_by_id:
-        String(
-          staff.id
-        ),
-
+        String(staff.id),
       claimed_by_name:
         staffName,
-
       claimed_by_username:
-        staffUsername
+        staff.username || ""
     };
+
+    await telegramRequest(
+      "editMessageText",
+      {
+        chat_id:
+          callbackQuery.message.chat.id,
+
+        message_id:
+          callbackQuery.message.message_id,
+
+        text:
+          buildStaffOrderText(
+            claimedOrder,
+            "claimed"
+          ),
+
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text:
+                  `✅ ЗАВЕРШИТЬ ЗАКАЗ`
+                    .slice(0, 64),
+
+                callback_data:
+                  `complete:${orderId}`
+              }
+            ]
+          ]
+        }
+      }
+    );
 
     await notifyOrderClaimed(
       claimedOrder,
       staffName,
-      staffUsername
+      staff.username || ""
     );
-
-    return true;
 
   } catch (error) {
 
@@ -3786,14 +3321,13 @@ async function handleClaim(
     throw error;
 
   } finally {
-
     client.release();
   }
 }
 
 
 // ==========================================
-// ВЫПОЛНЕНИЕ ЗАКАЗА
+// ЗАВЕРШИТЬ ЗАКАЗ
 // ==========================================
 
 async function handleComplete(
@@ -3817,7 +3351,6 @@ async function handleComplete(
     await pool.connect();
 
   try {
-
     await client.query(
       "BEGIN"
     );
@@ -3851,7 +3384,7 @@ async function handleComplete(
       "claimed"
     ) {
       throw new Error(
-        "Этот заказ нельзя завершить"
+        "Заказ нельзя завершить в текущем статусе"
       );
     }
 
@@ -3889,46 +3422,42 @@ async function handleComplete(
 
     const completedOrder = {
       ...order,
-
-      status:
-        "completed",
-
-      completed_at:
-        new Date()
+      status: "completed"
     };
 
-    try {
+    await telegramRequest(
+      "editMessageText",
+      {
+        chat_id:
+          callbackQuery.message.chat.id,
 
-      await telegramRequest(
-        "editMessageText",
-        {
-          chat_id:
-            callbackQuery.message.chat.id,
+        message_id:
+          callbackQuery.message.message_id,
 
-          message_id:
-            callbackQuery.message.message_id,
+        text:
+          buildStaffOrderText(
+            completedOrder,
+            "completed"
+          ),
 
-          text:
-            buildStaffOrderText(
-              completedOrder,
-              "completed"
-            )
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text:
+                  "✅ ЗАКАЗ ВЫПОЛНЕН",
+                callback_data:
+                  "noop"
+              }
+            ]
+          ]
         }
-      );
-
-    } catch (editError) {
-
-      console.error(
-        "COMPLETE EDIT ERROR:",
-        editError.message
-      );
-    }
+      }
+    );
 
     await notifyOrderCompleted(
       completedOrder
     );
-
-    return true;
 
   } catch (error) {
 
@@ -3941,58 +3470,46 @@ async function handleComplete(
     throw error;
 
   } finally {
-
     client.release();
   }
 }
 
 
 // ==========================================
-// TELEGRAM CALLBACK
+// CALLBACK QUERY
 // ==========================================
 
 async function handleCallback(
   callbackQuery
 ) {
-  const callbackData =
+  const data =
     String(
       callbackQuery.data || ""
     );
 
   try {
 
-    await telegramRequest(
-      "answerCallbackQuery",
-      {
-        callback_query_id:
-          callbackQuery.id
-      }
-    );
+    if (data === "noop") {
 
-  } catch (error) {
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id
+        }
+      );
 
-    console.error(
-      "ANSWER CALLBACK ERROR:",
-      error.message
-    );
-  }
-
-  try {
-
-    if (
-      callbackData ===
-      "noop"
-    ) {
       return;
     }
 
     if (
-      callbackData.startsWith(
+      data.startsWith(
         "claim:"
       )
     ) {
+
       const orderId =
-        callbackData.slice(
+        data.slice(
           "claim:".length
         );
 
@@ -4001,16 +3518,28 @@ async function handleCallback(
         orderId
       );
 
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id,
+
+          text:
+            "Заказ взят"
+        }
+      );
+
       return;
     }
 
     if (
-      callbackData.startsWith(
+      data.startsWith(
         "complete:"
       )
     ) {
+
       const orderId =
-        callbackData.slice(
+        data.slice(
           "complete:".length
         );
 
@@ -4019,35 +3548,62 @@ async function handleCallback(
         orderId
       );
 
-      return;
-    }
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id,
 
-    if (
-      callbackData.startsWith(
-        "topup_confirm:"
-      )
-    ) {
-      const paymentId =
-        callbackData.slice(
-          "topup_confirm:".length
-        );
-
-      await handleTopupConfirm(
-        callbackQuery,
-        paymentId
+          text:
+            "Заказ завершён"
+        }
       );
 
       return;
     }
 
     if (
-      callbackData.startsWith(
+      data.startsWith(
+        "topup_confirm:"
+      )
+    ) {
+
+      const paymentId =
+        data.slice(
+          "topup_confirm:"
+            .length
+        );
+
+      const result =
+        await handleTopupConfirm(
+          callbackQuery,
+          paymentId
+        );
+
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id,
+
+          text:
+            `Зачислено ${result.totalPoints} PT`
+        }
+      );
+
+      return;
+    }
+
+    if (
+      data.startsWith(
         "topup_reject:"
       )
     ) {
+
       const paymentId =
-        callbackData.slice(
-          "topup_reject:".length
+        data.slice(
+          "topup_reject:"
+            .length
         );
 
       await handleTopupReject(
@@ -4055,8 +3611,30 @@ async function handleCallback(
         paymentId
       );
 
+      await telegramRequest(
+        "answerCallbackQuery",
+        {
+          callback_query_id:
+            callbackQuery.id,
+
+          text:
+            "Пополнение отклонено"
+        }
+      );
+
       return;
     }
+
+    await telegramRequest(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackQuery.id,
+
+        text:
+          "Неизвестная команда"
+      }
+    );
 
   } catch (error) {
 
@@ -4075,40 +3653,52 @@ async function handleCallback(
 
           text:
             error.message ||
-            "Произошла ошибка",
+            "Ошибка",
 
-          show_alert:
-            true
+          show_alert: true
         }
       );
 
-    } catch {}
+    } catch (answerError) {
+
+      console.error(
+        "ANSWER CALLBACK ERROR:",
+        answerError.message
+      );
+    }
   }
 }
 
 
 // ==========================================
-// TELEGRAM POLLING
+// TELEGRAM LONG POLLING
 // ==========================================
 
 let telegramOffset = 0;
-let pollingRunning = false;
+
+let pollingRunning =
+  false;
+
 
 async function startTelegramPolling() {
+
   if (pollingRunning) {
     return;
   }
 
   if (!BOT_TOKEN) {
+
     console.log(
       "⚠️ BOT_TOKEN не установлен. Telegram polling отключён."
     );
+
     return;
   }
 
   pollingRunning = true;
 
   try {
+
     await telegramRequest(
       "deleteWebhook",
       {
@@ -4122,6 +3712,7 @@ async function startTelegramPolling() {
     );
 
   } catch (error) {
+
     console.error(
       "DELETE WEBHOOK ERROR:",
       error.message
@@ -4131,7 +3722,9 @@ async function startTelegramPolling() {
   while (
     pollingRunning
   ) {
+
     try {
+
       const updates =
         await telegramRequest(
           "getUpdates",
@@ -4153,12 +3746,14 @@ async function startTelegramPolling() {
         const update
         of updates
       ) {
+
         telegramOffset =
           update.update_id + 1;
 
         if (
           update.callback_query
         ) {
+
           await handleCallback(
             update.callback_query
           );
@@ -4186,10 +3781,11 @@ async function startTelegramPolling() {
 
 
 // ==========================================
-// ЗАПУСК СЕРВЕРА
+// ЗАПУСК
 // ==========================================
 
 async function startServer() {
+
   try {
 
     await initDatabase();
@@ -4199,24 +3795,45 @@ async function startServer() {
       () => {
 
         console.log(
-          `🚀 Сервер запущен на порту ${PORT}`
+          `✅ СК МЕТРОШОП сервер запущен на порту ${PORT}`
         );
 
         console.log(
-          `💎 PT_RUB_RATE: ${PT_RUB_RATE}`
+          `💎 PT/₽ курс: ${PT_RUB_RATE}`
         );
 
         console.log(
-          `👥 STAFF_CHAT_ID: ${STAFF_CHAT_ID || "не задан"}`
+          `💳 Реквизиты оплаты: ${
+            PAYMENT_CARD
+              ? "настроены"
+              : "НЕ НАСТРОЕНЫ"
+          }`
         );
 
         console.log(
-          `💳 PAYMENT_CHAT_ID: ${PAYMENT_CHAT_ID || "не задан"}`
+          `👤 Получатель: ${
+            PAYMENT_RECIPIENT
+              ? "настроен"
+              : "НЕ НАСТРОЕН"
+          }`
         );
+
+        console.log(
+          `💬 Чат оплаты: ${
+            PAYMENT_CHAT_ID
+              ? "настроен"
+              : "НЕ НАСТРОЕН"
+          }`
+
+        );
+
+        console.log(
+          `🗄️ PostgreSQL: подключён`
+        );
+
+        startTelegramPolling();
       }
     );
-
-    startTelegramPolling();
 
   } catch (error) {
 
@@ -4228,5 +3845,3 @@ async function startServer() {
     process.exit(1);
   }
 }
-
-startServer();
