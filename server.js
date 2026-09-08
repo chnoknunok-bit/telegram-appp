@@ -3507,7 +3507,32 @@ async function handleComplete(
 
     await client.query(
       "COMMIT"
-    );
+);
+    
+    try {
+
+  await telegramRequest(
+    "sendMessage",
+    {
+      chat_id:
+        order.telegram_id,
+
+      text:
+        `🟡 Ваш заказ взят в работу!\n\n` +
+        `📦 Товар: ${order.product_name}\n` +
+        `🔢 Количество: ${order.quantity}\n\n` +
+        `👤 Сотрудник: ${staffName}\n\n` +
+        `🧾 Заказ: ${order.id}`
+    }
+  );
+
+} catch (notifyError) {
+
+  console.error(
+    "NOTIFY ORDER CLAIM ERROR:",
+    notifyError.message
+  );
+}
 
     await telegramRequest(
       "editMessageReplyMarkup",
