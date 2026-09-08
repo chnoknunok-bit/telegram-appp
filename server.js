@@ -803,7 +803,10 @@ async function telegramRequest(
   }
 
   return data.result;
-}// ==========================================
+}
+
+
+// ==========================================
 // АКТИВАЦИЯ ПРОМОКОДА
 // ==========================================
 
@@ -999,6 +1002,231 @@ app.post(
             user.username,
 
           balance:
+            Number(
+              user.balance || 0
+            )
+        }
+      });
+
+    } catch (error) {
+
+      console.error(
+        "PROFILE ERROR:",
+        error.message
+      );
+
+      res.status(400).json({
+        ok: false,
+        message:
+          error.message ||
+          "Ошибка получения профиля"
+      });
+    }
+  }
+);
+
+
+// ==========================================
+// API: ИСТОРИЯ ТРАНЗАКЦИЙ
+// ==========================================
+
+app.post(
+  "/api/transactions",
+  async (req, res) => {
+
+    try {
+
+      const {
+        user
+      } =
+        await requireTelegramUser(
+          req
+        );
+
+      const result =
+        await pool.query(
+          `
+            SELECT
+              id,
+              type,
+              amount,
+              description,
+              order_id,
+              topup_id,
+              created_at
+            FROM transactions
+            WHERE telegram_id = $1
+            ORDER BY created_at DESC
+            LIMIT 100
+          `,
+          [
+            String(
+              user.telegram_id
+            )
+          ]
+        );
+
+      res.json({
+        ok: true,
+        transactions:
+          result.rows.map(
+            (row) => ({
+              id: row.id,
+              type: row.type,
+              amount:
+                Number(
+                  row.amount || 0
+                ),
+              description:
+                row.description || "",
+              orderId:
+                row.order_id,
+              topupId:
+                row.topup_id,
+              createdAt:
+                row.created_at
+            })
+          )
+      });
+
+    } catch (error) {
+
+      console.error(
+        "TRANSACTIONS ERROR:",
+        error.message
+      );
+
+      res.status(400).json({
+        ok: false,
+        message:
+          error.message ||
+          "Ошибка получения истории"
+      });
+    }
+  }
+);
+
+
+// ==========================================
+// API: ПРОВЕРКА ПРОМО %
+// ==========================================
+
+app.post(
+  "/api/promo/check-percent",
+  async (req, res) => {
+
+    try {
+
+      const {
+        user
+      } =
+        await requireTelegramUser(
+          req
+        );
+
+      const code =
+        normalizePromoCode(
+          req.body?.code
+        );
+
+      const result =
+        await calculatePercentPromo(
+          user,
+          code
+        );
+
+      if (!result.ok) {
+        return res.status(400).json(
+          result
+        );
+      }
+
+      return res.json({
+        ok: true,
+        code:
+          result.code,
+        percent:
+          result.percent,
+        bonus:
+          result.bonus
+      });
+
+    } catch (error) {
+
+      console.error(
+        "PROMO PERCENT CHECK ERROR:",
+        error.message
+      );
+
+      return res.status(400).json({
+        ok: false,
+        message:
+          error.message ||
+          "Ошибка проверки промокода"
+      });
+    }
+  }
+);
+
+
+// ==========================================
+// API: ПРОВЕРКА ПРОМО PT
+// ==========================================
+
+app.post(
+  "/api/promo/check-bonus",
+  async (req, res) => {
+
+    try {
+
+      const {
+        user
+      } =
+        await requireTelegramUser(
+          req
+        );
+
+      const code =
+        normalizePromoCode(
+          req.body?.code
+        );
+
+      const result =
+        await calculateBonusPromo(
+          user,
+          code
+        );
+
+      if (!result.ok) {
+        return res.status(400).json(
+          result
+        );
+      }
+
+      return res.json({
+        ok: true,
+        code:
+          result.code,
+        bonus:
+          result.bonus
+      });
+
+    } catch (error) {
+
+      console.error(
+        "PROMO BONUS CHECK ERROR:",
+        error.message
+      );
+
+      return res.status(400).json({
+        ok: false,
+        message:
+          error.message ||
+          "Ошибка проверки промокода"
+      });
+    }
+  }
+);          balance:
             Number(user.balance || 0)
         }
       });
@@ -1358,9 +1586,6 @@ app.post(
         "BEGIN"
       );
 
-      // Блокируем строку пользователя,
-      // чтобы два одновременных запроса
-      // не смогли изменить баланс неправильно.
       const userResult =
         await client.query(
           `
@@ -1786,6 +2011,10 @@ app.post(
           order
         );
 
+        await notifyOrderWaiting(
+          order
+        );
+
       } catch (telegramError) {
 
         const refundClient =
@@ -1947,48 +2176,256 @@ app.post(
       client.release();
     }
   }
-);// ==========================================
+);
+
+
+// ==========================================
+// УТИЛИТЫ СТАТУСА ЗАКАЗА
+// ==========================================
+
+function getStaffDisplayName(staff) {
+  const name = [
+    staff?.first_name || "",
+    staff?.last_name || ""
+  ]
+    .join(" ")
+    .trim();
+
+  if (name) {
+    return name;
+  }
+
+  if (staff?.username) {
+    return `@${staff.username}`;
+  }
+
+  return "Сотрудник";
+}
+
+function getStaffUsername(staff) {
+  return staff?.username
+    ? `@${staff.username}`
+    : "без username";
+}
+
+function buildStaffOrderText(
+  order,
+  status = "waiting",
+  staff = null
+) {
+  const username =
+    order.user?.username
+      ? `@${order.user.username}`
+      : "без username";
+
+  let statusBlock =
+    "⏳ СТАТУС: В ОЖИДАНИИ";
+
+  if (status === "claimed") {
+
+    const staffName =
+      order.claimed_by_name ||
+      getStaffDisplayName(staff);
+
+    const staffUsername =
+      order.claimed_by_username
+        ? `@${order.claimed_by_username}`
+        : "без username";
+
+    statusBlock =
+      `🟡 СТАТУС: ЗАКАЗ ВЗЯТ\n` +
+      `👤 Взял: ${staffName}\n` +
+      `🔗 ${staffUsername}`;
+  }
+
+  if (status === "completed") {
+
+    const staffName =
+      order.claimed_by_name ||
+      getStaffDisplayName(staff);
+
+    const staffUsername =
+      order.claimed_by_username
+        ? `@${order.claimed_by_username}`
+        : "без username";
+
+    statusBlock =
+      `✅ СТАТУС: ЗАКАЗ ВЫПОЛНЕН\n` +
+      `👤 Выполнил: ${staffName}\n` +
+      `🔗 ${staffUsername}`;
+  }
+
+  if (status === "cancelled") {
+    statusBlock =
+      "❌ СТАТУС: ЗАКАЗ ОТМЕНЁН";
+  }
+
+  return [
+    "🛒 ЗАКАЗ",
+    "",
+    statusBlock,
+    "",
+    `📦 Товар: ${order.product_name || order.productName}`,
+    `🔢 Количество: ${order.quantity}`,
+    `💎 Сумма: ${order.total} PT`,
+    `🎮 Game ID: ${order.game_id || order.gameId}`,
+    "",
+    `👤 ${order.user_first_name || order.user?.firstName || ""} ${order.user_last_name || order.user?.lastName || ""}`.trim(),
+    `🔗 ${order.user_username ? `@${order.user_username}` : username}`,
+    `🆔 Telegram ID: ${order.telegram_id || order.telegramId}`,
+    "",
+    `🧾 Заказ: ${order.id}`
+  ].join("\n");
+}
+
+
+async function notifyOrderWaiting(
+  order
+) {
+  try {
+
+    await telegramRequest(
+      "sendMessage",
+      {
+        chat_id:
+          order.telegramId ||
+          order.telegram_id,
+
+        text:
+          `🕐 Заказ принят!\n\n` +
+          `📦 ${order.productName || order.product_name}\n` +
+          `🔢 Количество: ${order.quantity}\n` +
+          `💎 Сумма: ${order.total} PT\n\n` +
+          `⏳ Статус: ЗАКАЗ В ОЖИДАНИИ\n\n` +
+          `Ожидайте, пока сотрудник возьмёт заказ.\n\n` +
+          `🧾 Заказ: ${order.id}`
+      }
+    );
+
+  } catch (notifyError) {
+
+    console.error(
+      "NOTIFY ORDER WAITING ERROR:",
+      notifyError.message
+    );
+  }
+}
+
+
+async function notifyOrderClaimed(
+  order,
+  staffName,
+  staffUsername
+) {
+  try {
+
+    await telegramRequest(
+      "sendMessage",
+      {
+        chat_id:
+          order.telegram_id ||
+          order.telegramId,
+
+        text:
+          `🟡 Ваш заказ взят!\n\n` +
+          `📦 ${order.product_name || order.productName}\n` +
+          `🔢 Количество: ${order.quantity}\n` +
+          `💎 Сумма: ${order.total} PT\n\n` +
+          `🟡 Статус: ЗАКАЗ ВЗЯТ\n` +
+          `👤 Взял: ${staffName}` +
+          (
+            staffUsername
+              ? ` (@${staffUsername})`
+              : ""
+          ) +
+          `\n\n` +
+          `Сотрудник уже выполняет ваш заказ.\n\n` +
+          `🧾 Заказ: ${order.id}`
+      }
+    );
+
+  } catch (notifyError) {
+
+    console.error(
+      "NOTIFY ORDER CLAIM ERROR:",
+      notifyError.message
+    );
+  }
+}
+
+
+async function notifyOrderCompleted(
+  order
+) {
+  try {
+
+    await telegramRequest(
+      "sendMessage",
+      {
+        chat_id:
+          order.telegram_id,
+
+        text:
+          `✅ Ваш заказ выполнен!\n\n` +
+          `📦 ${order.product_name}\n` +
+          `🔢 Количество: ${order.quantity}\n` +
+          `💎 Списано: ${order.total} PT\n\n` +
+          `✅ Статус: ЗАКАЗ ВЫПОЛНЕН\n` +
+          `👤 Выполнил: ${order.claimed_by_name || "Сотрудник"}` +
+          (
+            order.claimed_by_username
+              ? ` (@${order.claimed_by_username})`
+              : ""
+          ) +
+          `\n\n` +
+          `🧾 Заказ: ${order.id}`
+      }
+    );
+
+  } catch (notifyError) {
+
+    console.error(
+      "NOTIFY ORDER COMPLETE ERROR:",
+      notifyError.message
+    );
+  }
+}
+
+
+// ==========================================
 // ОТПРАВКА ЗАКАЗА СОТРУДНИКАМ
 // ==========================================
 
-async function sendOrderToStaff(order) {
+async function sendOrderToStaff(
+  order
+) {
   if (!STAFF_CHAT_ID) {
     throw new Error(
       "STAFF_CHAT_ID не настроен"
     );
   }
 
-  const username =
-    order.user.username
-      ? `@${order.user.username}`
-      : "без username";
-
-  const text = [
-    "🛒 НОВЫЙ ЗАКАЗ",
-    "",
-    `📦 Товар: ${order.productName}`,
-    `🔢 Количество: ${order.quantity}`,
-    `💎 Сумма: ${order.total} PT`,
-    `🎮 Game ID: ${order.gameId}`,
-    "",
-    `👤 ${order.user.firstName || ""} ${order.user.lastName || ""}`.trim(),
-    `🔗 ${username}`,
-    `🆔 Telegram ID: ${order.telegramId}`,
-    "",
-    `🧾 Заказ: ${order.id}`
-  ].join("\n");
+  const text =
+    buildStaffOrderText(
+      order,
+      "waiting"
+    );
 
   return telegramRequest(
     "sendMessage",
     {
-      chat_id: STAFF_CHAT_ID,
+      chat_id:
+        STAFF_CHAT_ID,
+
       text,
 
       reply_markup: {
         inline_keyboard: [
           [
             {
-              text: "✅ ВЗЯТЬ ЗАКАЗ",
+              text:
+                "✅ ВЗЯТЬ ЗАКАЗ",
+
               callback_data:
                 `claim:${order.id}`
             }
@@ -2038,21 +2475,27 @@ async function sendTopupToPaymentChat(
   return telegramRequest(
     "sendMessage",
     {
-      chat_id: PAYMENT_CHAT_ID,
+      chat_id:
+        PAYMENT_CHAT_ID,
+
       text,
 
       reply_markup: {
         inline_keyboard: [
           [
             {
-              text: "✅ ЗАЧИСЛИТЬ PT",
+              text:
+                "✅ ЗАЧИСЛИТЬ PT",
+
               callback_data:
                 `topup_confirm:${topup.id}`
             }
           ],
           [
             {
-              text: "❌ ОТКЛОНИТЬ",
+              text:
+                "❌ ОТКЛОНИТЬ",
+
               callback_data:
                 `topup_reject:${topup.id}`
             }
@@ -2062,6 +2505,163 @@ async function sendTopupToPaymentChat(
     }
   );
 }
+
+
+// ==========================================
+// API: СТАТУС ЗАКАЗА
+// ==========================================
+
+app.post(
+  "/api/order/status",
+  async (req, res) => {
+
+    try {
+
+      const {
+        user
+      } =
+        await requireTelegramUser(
+          req
+        );
+
+      const orderId =
+        String(
+          req.body?.orderId ||
+          ""
+        ).trim();
+
+      if (!orderId) {
+        return res.status(400).json({
+          ok: false,
+          message:
+            "Не указан ID заказа"
+        });
+      }
+
+      const result =
+        await pool.query(
+          `
+            SELECT
+              id,
+              telegram_id,
+              status,
+              product_id,
+              product_name,
+              quantity,
+              unit_price,
+              total,
+              game_id,
+              user_first_name,
+              user_last_name,
+              user_username,
+              claimed_by_id,
+              claimed_by_name,
+              claimed_by_username,
+              created_at,
+              completed_at
+            FROM orders
+            WHERE id = $1
+          `,
+          [
+            orderId
+          ]
+        );
+
+      if (!result.rows.length) {
+        return res.status(404).json({
+          ok: false,
+          message:
+            "Заказ не найден"
+        });
+      }
+
+      const order =
+        result.rows[0];
+
+      if (
+        String(order.telegram_id) !==
+        String(user.telegram_id)
+      ) {
+        return res.status(403).json({
+          ok: false,
+          message:
+            "Нет доступа к этому заказу"
+        });
+      }
+
+      return res.json({
+        ok: true,
+
+        order: {
+          id:
+            order.id,
+
+          status:
+            order.status,
+
+          productName:
+            order.product_name,
+
+          quantity:
+            Number(
+              order.quantity
+            ),
+
+          unitPrice:
+            Number(
+              order.unit_price
+            ),
+
+          total:
+            Number(
+              order.total
+            ),
+
+          gameId:
+            order.game_id,
+
+          claimedBy:
+            order.claimed_by_id
+              ? {
+                  id:
+                    String(
+                      order.claimed_by_id
+                    ),
+
+                  name:
+                    order.claimed_by_name ||
+                    "Сотрудник",
+
+                  username:
+                    order.claimed_by_username ||
+                    ""
+                }
+              : null,
+
+          createdAt:
+            order.created_at,
+
+          completedAt:
+            order.completed_at
+        }
+      });
+
+    } catch (error) {
+
+      console.error(
+        "ORDER STATUS ERROR:",
+        error.message
+      );
+
+      return res.status(400).json({
+        ok: false,
+        message:
+          error.message ||
+          "Ошибка получения статуса заказа"
+      });
+    }
+  }
+);
 
 
 // ==========================================
@@ -2691,6 +3291,14 @@ async function getUserByTelegramId(
         WHERE telegram_id = $1
       `,
       [
+        String(telegramId)
+      ]
+    );
+
+  return result.rows[0] || null;
+}        WHERE telegram_id = $1
+      `,
+      [
         String(
           telegramId
         )
@@ -2814,10 +3422,6 @@ async function handleTopupConfirm(
 
     let finalBonus = 0;
 
-    // ========================================
-    // ПРОВЕРКА ПРОЦЕНТНОГО ПРОМОКОДА
-    // ========================================
-
     if (promoCode) {
 
       const promoResult =
@@ -2864,8 +3468,6 @@ async function handleTopupConfirm(
       finalBonus =
         expectedBonus;
 
-      // Активируем промокод
-      // только после подтверждения оплаты.
       await activatePromoCode(
         user,
         promoCode,
@@ -2936,13 +3538,10 @@ async function handleTopupConfirm(
         UPDATE topups
         SET
           status = 'completed',
-
           confirmed_at = NOW(),
-
           confirmed_by_id = $1,
           confirmed_by_name = $2,
           confirmed_by_username = $3,
-
           bonus_points = $4,
           total_points = $5
         WHERE id = $6
@@ -3152,9 +3751,7 @@ async function handleTopupReject(
         UPDATE topups
         SET
           status = 'rejected',
-
           rejected_at = NOW(),
-
           rejected_by_id = $1,
           rejected_by_name = $2,
           rejected_by_username = $3
@@ -3345,7 +3942,7 @@ async function handleClaim(
         UPDATE orders
         SET
           status = 'claimed',
-
+          claimed_at = NOW(),
           claimed_by_id = $1,
           claimed_by_name = $2,
           claimed_by_username = $3
@@ -3368,8 +3965,19 @@ async function handleClaim(
       "COMMIT"
     );
 
+    const claimedOrder = {
+      ...order,
+      status: "claimed",
+      claimed_by_id:
+        String(staff.id),
+      claimed_by_name:
+        staffName,
+      claimed_by_username:
+        staff.username || ""
+    };
+
     await telegramRequest(
-      "editMessageReplyMarkup",
+      "editMessageText",
       {
         chat_id:
           callbackQuery.message.chat.id,
@@ -3377,12 +3985,18 @@ async function handleClaim(
         message_id:
           callbackQuery.message.message_id,
 
+        text:
+          buildStaffOrderText(
+            claimedOrder,
+            "claimed"
+          ),
+
         reply_markup: {
           inline_keyboard: [
             [
               {
                 text:
-                  `✅ ВЗЯТО: ${staffName}`
+                  `✅ ЗАВЕРШИТЬ ЗАКАЗ`
                     .slice(
                       0,
                       64
@@ -3395,6 +4009,12 @@ async function handleClaim(
           ]
         }
       }
+    );
+
+    await notifyOrderClaimed(
+      claimedOrder,
+      staffName,
+      staff.username || ""
     );
 
   } catch (error) {
@@ -3509,8 +4129,13 @@ async function handleComplete(
       "COMMIT"
     );
 
+    const completedOrder = {
+      ...order,
+      status: "completed"
+    };
+
     await telegramRequest(
-      "editMessageReplyMarkup",
+      "editMessageText",
       {
         chat_id:
           callbackQuery.message.chat.id,
@@ -3518,12 +4143,18 @@ async function handleComplete(
         message_id:
           callbackQuery.message.message_id,
 
+        text:
+          buildStaffOrderText(
+            completedOrder,
+            "completed"
+          ),
+
         reply_markup: {
           inline_keyboard: [
             [
               {
                 text:
-                  "✅ ЗАКАЗ ЗАВЕРШЁН",
+                  "✅ ЗАКАЗ ВЫПОЛНЕН",
 
                 callback_data:
                   "noop"
@@ -3534,29 +4165,9 @@ async function handleComplete(
       }
     );
 
-    try {
-
-      await telegramRequest(
-        "sendMessage",
-        {
-          chat_id:
-            order.telegram_id,
-
-          text:
-            `✅ Заказ ${order.id} завершён.\n\n` +
-            `📦 ${order.product_name}\n` +
-            `🔢 Количество: ${order.quantity}\n` +
-            `💎 Списано: ${order.total} PT`
-        }
-      );
-
-    } catch (notifyError) {
-
-      console.error(
-        "NOTIFY ORDER COMPLETE ERROR:",
-        notifyError.message
-      );
-    }
+    await notifyOrderCompleted(
+      completedOrder
+    );
 
   } catch (error) {
 
@@ -3589,7 +4200,10 @@ async function handleCallback(
 
   try {
 
-    if (data === "noop") {
+    if (
+      data ===
+      "noop"
+    ) {
 
       await telegramRequest(
         "answerCallbackQuery",
@@ -3601,11 +4215,6 @@ async function handleCallback(
 
       return;
     }
-
-
-    // --------------------------------------
-    // ВЗЯТЬ ЗАКАЗ
-    // --------------------------------------
 
     if (
       data.startsWith(
@@ -3637,11 +4246,6 @@ async function handleCallback(
       return;
     }
 
-
-    // --------------------------------------
-    // ЗАВЕРШИТЬ ЗАКАЗ
-    // --------------------------------------
-
     if (
       data.startsWith(
         "complete:"
@@ -3672,11 +4276,6 @@ async function handleCallback(
       return;
     }
 
-
-    // --------------------------------------
-    // ЗАЧИСЛИТЬ ПОПОЛНЕНИЕ
-    // --------------------------------------
-
     if (
       data.startsWith(
         "topup_confirm:"
@@ -3685,8 +4284,7 @@ async function handleCallback(
 
       const paymentId =
         data.slice(
-          "topup_confirm:"
-            .length
+          "topup_confirm:".length
         );
 
       const result =
@@ -3709,11 +4307,6 @@ async function handleCallback(
       return;
     }
 
-
-    // --------------------------------------
-    // ОТКЛОНИТЬ ПОПОЛНЕНИЕ
-    // --------------------------------------
-
     if (
       data.startsWith(
         "topup_reject:"
@@ -3722,8 +4315,7 @@ async function handleCallback(
 
       const paymentId =
         data.slice(
-          "topup_reject:"
-            .length
+          "topup_reject:".length
         );
 
       await handleTopupReject(
@@ -3744,7 +4336,6 @@ async function handleCallback(
 
       return;
     }
-
 
     await telegramRequest(
       "answerCallbackQuery",
@@ -3776,7 +4367,8 @@ async function handleCallback(
             error.message ||
             "Ошибка",
 
-          show_alert: true
+          show_alert:
+            true
         }
       );
 
@@ -3795,7 +4387,8 @@ async function handleCallback(
 // TELEGRAM LONG POLLING
 // ==========================================
 
-let telegramOffset = 0;
+let telegramOffset =
+  0;
 
 let pollingRunning =
   false;
@@ -3803,11 +4396,15 @@ let pollingRunning =
 
 async function startTelegramPolling() {
 
-  if (pollingRunning) {
+  if (
+    pollingRunning
+  ) {
     return;
   }
 
-  if (!BOT_TOKEN) {
+  if (
+    !BOT_TOKEN
+  ) {
 
     console.log(
       "⚠️ BOT_TOKEN не установлен. Telegram polling отключён."
@@ -3816,7 +4413,8 @@ async function startTelegramPolling() {
     return;
   }
 
-  pollingRunning = true;
+  pollingRunning =
+    true;
 
   try {
 
@@ -3839,7 +4437,6 @@ async function startTelegramPolling() {
       error.message
     );
   }
-
 
   while (
     pollingRunning
@@ -3870,7 +4467,8 @@ async function startTelegramPolling() {
       ) {
 
         telegramOffset =
-          update.update_id + 1;
+          update.update_id +
+          1;
 
         if (
           update.callback_query
@@ -3891,10 +4489,12 @@ async function startTelegramPolling() {
 
       await new Promise(
         (resolve) => {
+
           setTimeout(
             resolve,
             3000
           );
+
         }
       );
     }
@@ -3946,7 +4546,6 @@ async function startServer() {
               ? "настроен"
               : "НЕ НАСТРОЕН"
           }`
-
         );
 
         console.log(
@@ -3954,6 +4553,7 @@ async function startServer() {
         );
 
         startTelegramPolling();
+
       }
     );
 
